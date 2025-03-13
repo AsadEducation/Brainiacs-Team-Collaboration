@@ -20,14 +20,14 @@ const Statistics = () => {
             });
         });
 
-        return () => observer.disconnect();  // Cleanup the observer when the component unmounts
+        return () => observer.disconnect();  
     }, []);
     const { ref, inView } = useInView({
         threshold: 0.5,
         triggerOnce: true,
     })
     return (
-        <div className={`bg-gradient-to-br from-secondary/20 via-white to-secondary/20 pb-10 bg-cover bg-right text-white px-5 my-20 `}>
+        <div className={`bg-gradient-to-br from-secondary/20 via-white to-secondary/20 pb-10 bg-cover bg-right text-white px-5 py-10`}>
             <div className="py-10 flex flex-col md:flex-row gap-5 md:gap-28">
                 <h1 className="text-xl md:text-3xl font-bold  text-primary ">Why Teams Trust Brainiacs for Seamless Collaboration & Productivity?</h1>
                 <div className="space-y-3">

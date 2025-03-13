@@ -5,9 +5,9 @@ import linkedin from "../../assets/icons/linkedin.svg";
 import user from "../../assets/icons/user.svg";
 import email from "../../assets/icons/email.svg";
 import password from "../../assets/icons/password.svg";
-import { Link } from "react-router";
 import logo from "../../assets/brainiacs logo.png";
-const Login = () => {
+import { Link } from "react-router";
+const SignUp = () => {
   const {
     register,
     handleSubmit,
@@ -21,10 +21,10 @@ const Login = () => {
   return (
     <div className="flex items-center justify-center px-5 py-5 text-white min-h-screen">
       <div className="rounded-4xl shadow-2xl w-full overflow-hidden max-w-lg md:max-w-7xl bg-white">
-        <div className="relative top-10 ">
+        <div className="relative top-10">
           <img className="w-32" src={logo} alt="" />
         </div>
-        <div className="md:flex flex-row-reverse w-full h-[95vh]">
+        <div className="md:flex w-full h-[95vh]">
           {/* Left side */}
           <div className="flex flex-col justify-center items-center md:w-1/3 py-10 px-10 text-center bg-secondary">
             <h2 className="text-white text-4xl mb-4 font-bold">
@@ -41,7 +41,7 @@ const Login = () => {
           <div className="text-black flex flex-col items-center justify-center gap-10 w-full md:w-2/3 py-10 px-10">
             <div>
               <h1 className="text-4xl text-secondary font-medium text-center mb-6">
-                Log in to Brainiacs
+                Create an account
               </h1>
               <div className="flex items-center justify-center gap-4 mb-8">
                 <button className="p-2 border border-gray-300 rounded-full cursor-pointer">
@@ -62,6 +62,20 @@ const Login = () => {
               action="#"
               method="POST"
             >
+              <div className="relative w-full">
+                <img
+                  src={user}
+                  alt="user icon"
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 w-6 h-6"
+                />
+                <input
+                  type="text"
+                  id="username"
+                  className="w-lg p-5 pl-12 mt-2 bg-gray-200 rounded-lg focus:outline-none"
+                  placeholder="Enter username"
+                />
+              </div>
+
               <div className="relative w-full">
                 <img
                   src={email}
@@ -89,8 +103,7 @@ const Login = () => {
                   placeholder="Enter password"
                 />
               </div>
-              <Link to="/forgot-password">Forgot your password?</Link>
-              <p>Don't have an account, <Link className="text-secondary" to="/signup">Log in</Link></p>
+<p>Already have an account, <Link className="text-secondary" to="/login">Log in</Link></p>
               <button
                 type="submit"
                 className="mx-auto w-2xs text-xl text-white bg-secondary cursor-pointer hover:bg-accent py-4 px-16 mt-5 rounded-full focus:outline-none"
@@ -105,4 +118,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default SignUp;
