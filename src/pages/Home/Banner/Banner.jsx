@@ -44,7 +44,7 @@ const Banner = () => {
   }, []);
 
   return (
-    <section className="relative -top-24 bg-primary text-white py-[173px] lg:py-[107px] ">
+    <section className="relative bg-primary text-white py-[173px] lg:py-[107px] ">
       {/* <div className="px-4 md:px-8"> */}
         <div className=" container mx-auto  grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
           {/* Banner Content */}
