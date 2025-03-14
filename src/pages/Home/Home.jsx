@@ -1,9 +1,11 @@
+import Navbar from "../../Component/Shared/Navbar";
+import Banner from "./Banner/Banner";
 import Statistics from "./Statistics/Statistics";
 
 const Home = () => {
     return (
         <div>
-            <h2 className="text-3xl text-red-500">This is Home</h2>
+            <Banner/>
             <Statistics></Statistics>
         </div>
     );
