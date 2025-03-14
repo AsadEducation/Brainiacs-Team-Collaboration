@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-
+import { Link } from "react-router";
+import logo from "../../assets/brainiacs logo.png"
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
@@ -35,7 +36,7 @@ const Navbar = () => {
         animate={{ y: isVisible ? 0 : -100 }}
         transition={{ duration: 0.3 }}
       >
-        <a className="text-3xl font-bold leading-none">Brainiacs</a>
+        <Link to="/" className="text-3xl font-bold leading-none"><img className="w-40" src={logo} alt="" /></Link>
         <div className="lg:hidden">
           <button
             className="navbar-burger flex items-center p-3"
@@ -52,7 +53,7 @@ const Navbar = () => {
         </div>
         <ul className="hidden relative left-44 lg:flex lg:mx-auto lg:items-center lg:w-auto lg:space-x-6">
           <li>
-            <a className="text-sm hover:text-accent cursor-pointer">Home</a>
+            <Link to="/" className="text-sm hover:text-accent cursor-pointer">Home</Link>
           </li>
           <li>
             <svg
@@ -131,9 +132,9 @@ const Navbar = () => {
             <a className="text-sm hover:text-accent cursor-pointer">Contact</a>
           </li>
         </ul>
-        <a className="hidden lg:inline-block lg:ml-auto lg:mr-3 py-2 px-6 text-sm font-bold rounded-xl transition duration-200 bg-secondary hover:bg-accent text-white">
+        <Link to="/login" className="hidden lg:inline-block lg:ml-auto lg:mr-3 py-2 px-6 text-sm font-bold rounded-xl transition duration-200 bg-secondary hover:bg-accent text-white">
           Log In
-        </a>
+        </Link>
       </motion.nav>
 
       {/* Mobile Menu */}
@@ -186,9 +187,9 @@ const Navbar = () => {
             </ul>
             <div className="mt-auto">
               <div className="pt-6">
-                <a className="block px-4 py-3 mb-3 text-xs text-center font-semibold leading-none bg-secondary hover:bg-accent text-white rounded-xl">
+                <Link to="/login" className="block px-4 py-3 mb-3 text-xs text-center font-semibold leading-none bg-secondary hover:bg-accent text-white rounded-xl cursor-pointer">
                   Log in
-                </a>
+                </Link>
               </div>
             </div>
           </motion.nav>
