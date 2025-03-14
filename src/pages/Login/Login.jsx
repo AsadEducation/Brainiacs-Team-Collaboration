@@ -19,7 +19,7 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center px-5 py-5 text-white min-h-screen">
+    <div className="flex items-center justify-center px-5 py-5 text-white min-h-screen scale-75">
       <div className="rounded-4xl shadow-2xl w-full overflow-hidden max-w-lg md:max-w-7xl bg-white pb-48 md:pb-0 ">
         {/* <div className="hidden md:block relative top-0 ">
           <img className="w-32" src={logo} alt="" />
@@ -33,7 +33,7 @@ const Login = () => {
             <p className="text-white text-lg md:text-xl mb-8">
             Enter your personal details and start journey with us</p>
             <button className="text-lg text-white border-2 rounded-full py-1 md:py-3 px-10 md:px-14">
-              Sign Up
+              Log In
             </button>
           </div>
           {/* right side */}
@@ -89,12 +89,12 @@ const Login = () => {
                 />
               </div>
               <Link to="/forgot-password">Forgot your password?</Link>
-              <p>Don't have an account, <Link className="text-secondary" to="/signup">Log in</Link></p>
+              <p>Don't have an account, <Link className="text-secondary" to="/signup">Sign Up</Link></p>
               <button
                 type="submit"
                 className="mx-auto w-2xs text-xl text-white bg-secondary cursor-pointer hover:bg-accent py-4 px-16 mt-5 rounded-full focus:outline-none"
               >
-                Sign Up
+                Log In
               </button>
             </form>
           </div>

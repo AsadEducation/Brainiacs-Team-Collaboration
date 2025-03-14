@@ -46,9 +46,9 @@ const Pricing = () => {
 
     return (
         <div className="p-4">
-            <div className="max-w-5xl max-lg:max-w-2xl mx-auto">
+            <div className=" max-lg:max-w-2xl mx-auto">
                 <div className="text-center">
-                    <h2 className="text-slate-900 text-3xl font-bold mb-4">Pricing</h2>
+                    <h2 className="text-primary text-3xl font-bold mb-4">Pricing</h2>
                     <p className="text-sm text-slate-500">Change your plan according to your needs</p>
                 </div>
 
@@ -94,7 +94,7 @@ const Pricing = () => {
 
                                 <button
                                     type="button"
-                                    className="w-full mt-6 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md"
+                                    className="w-full mt-6 px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-secondary rounded-md"
                                 >
                                     Buy now
                                 </button>
