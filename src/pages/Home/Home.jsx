@@ -1,6 +1,5 @@
 import Statistics from "./Statistics/Statistics";
 
-
 const Home = () => {
     return (
         <div>
