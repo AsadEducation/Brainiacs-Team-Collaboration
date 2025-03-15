@@ -1,0 +1,43 @@
+[
+    {
+      "reviewText": "Brainiacs has completely transformed the way our team collaborates. The real-time chat, task management, and seamless file-sharing features have made our workflow more efficient than ever. It eliminates miscommunication, ensures clarity, and keeps our entire team aligned on project goals. The integration with other tools also makes it incredibly convenient!",
+      "rating": 5,
+      "reviewTime": "2025-03-14T10:30:00Z",
+      "reviewerName": "John Doe",
+      "designation": "Project Manager",
+      "photo":"https://i.ibb.co.com/XX1j4yb/linkedin-sales-solutions-p-At-A8xe-i-VM-unsplash.jpg"
+    },
+    {
+        "reviewText": "I love the simplicity and efficiency of Brainiacs. Task tracking has never been easier! The intuitive UI allows us to quickly assign, track, and complete tasks without any hassle. The ability to set deadlines, priorities, and notifications ensures that nothing falls through the cracks, making team collaboration truly effortless.",
+        "rating": 4.5,
+        "reviewTime": "2025-03-13T15:45:00Z",
+        "reviewerName": "Sarah Johnson",
+        "designation": "Software Engineer",
+        "photo":"https://i.ibb.co.com/y4Yq601/alex-starnes-PK-t0-Lrh7-MM-unsplash.jpg"
+    },
+    {
+      "reviewText": "Brainiacs makes remote work seamless and highly productive. The integration with third-party tools, real-time messaging, and smooth task management features allow our distributed team to collaborate as if we were in the same office. It eliminates the need for endless emails, bringing everything into one streamlined workspace.",
+      "rating": 5,
+      "reviewTime": "2025-03-12T09:15:00Z",
+      "reviewerName": "Michael Lee",
+      "designation": "Team Lead",
+        "photo":"https://i.ibb.co.com/XX1j4yb/linkedin-sales-solutions-p-At-A8xe-i-VM-unsplash.jpg"
+    },
+    {
+      "reviewText": "The AI-powered task suggestions in Brainiacs are a game-changer. It intelligently assigns and prioritizes tasks based on workload, deadlines, and team availability, making it easier to stay on top of projects. This feature alone has significantly improved our team's efficiency and coordination, making sure no task gets overlooked.",
+      "rating": 4.8,
+      "reviewTime": "2025-03-11T18:20:00Z",
+      "reviewerName": "Emily Carter",
+      "designation": "Product Designer",
+        "photo":"https://i.ibb.co.com/y4Yq601/alex-starnes-PK-t0-Lrh7-MM-unsplash.jpg"
+    },
+    {
+      "reviewText": "Brainiacs is a must-have tool for startups looking to streamline their workflow. Since adopting it, we have noticed a huge improvement in our internal communication and project execution. The intuitive dashboard, easy collaboration tools, and seamless integration with other apps have made it an essential part of our daily operations.",
+      "rating": 4.7,
+      "reviewTime": "2025-03-10T14:10:00Z",
+      "reviewerName": "David Brown",
+      "designation": "CTO",
+        "photo":"https://i.ibb.co.com/fFS3xPp/gregory-hayes-h5cd51-KXm-RQ-unsplash.jpg"
+    }
+  ]
+  

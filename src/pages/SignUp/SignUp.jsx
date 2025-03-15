@@ -19,7 +19,7 @@ const SignUp = () => {
   };
 
   return (
-    <div className="flex items-center justify-center px-5 py-5 text-white min-h-screen">
+    <div className="flex items-center justify-center px-5 py-5 text-white min-h-screen scale-75">
       <div className="rounded-4xl shadow-2xl w-full overflow-hidden max-w-lg md:max-w-7xl bg-white pb-48 md:pb-0 ">
         {/* <div className="hidden md:block absolute top-10">
           <img className="w-32" src={logo} alt="" />

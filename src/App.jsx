@@ -6,6 +6,8 @@ import SignUp from "./pages/SignUp/SignUp";
 import Login from "./pages/Login/Login";
 
 function App() {
+
+
   return (
     <Routes>
       <Route path="/" element={<MainLayout />} >
@@ -15,6 +17,7 @@ function App() {
         <Route path="login" element={<Login />} />
       </Route>
     </Routes>
+    
   );
 }
 
