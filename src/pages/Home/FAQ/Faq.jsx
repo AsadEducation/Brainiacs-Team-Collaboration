@@ -23,6 +23,7 @@ const Faq = () => {
      question: " Who can use Brainiacs ?", 
      answer: "It is designed for businesses, remote teams, startups, freelancers, and anyone looking to enhance team collaboration." 
  },
+ 
  {
       question: "How do I sign up for Brainiacs?", 
       answer: "You can sign up using your email or Google account on our website."
@@ -31,10 +32,11 @@ const Faq = () => {
       question: "Can I invite my team members to join?", 
       answer: "Yes! You can invite team members via email and assign them roles."
   },
- { 
-     question: "Does Brainiacs support real-time messaging?",
-     answer: "Yes, you can chat instantly with team members through one-on-one and group conversations."
- },
+  { 
+    question: "Does Brainiacs support real-time messaging?",
+    answer: "Yes, you can chat instantly with team members through one-on-one and group conversations."
+  },
+ 
  { 
      question: " Can I schedule messages or announcements?",
      answer: "Yes, you can schedule messages to be sent at a later time."
@@ -47,13 +49,13 @@ const Faq = () => {
 
   return (
     <div className="bg-[#2E5077] p-8">
-      
+
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-4xl font-bold text-center text-white mb-12 mt-8">
-          Frequently Asked Question
+        <h2 className="text-4xl font-bold text-center text-white mb-12">
+          Frequently Asked Questions
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
 
           {/* Column 1 */}
 
@@ -61,7 +63,7 @@ const Faq = () => {
             {column1.map((faq, index) => (
               <div
                 key={index}
-                className="bg-white p-8 rounded-lg shadow-md transition-all duration-300">
+                className="bg-white p-8  rounded-lg shadow-md transition-all duration-300">
 
                 {/* FAQ Question */}
 
@@ -76,7 +78,7 @@ const Faq = () => {
                     {openIndex === index ? "−" : "+"}
                   </span>
 
-                  <h3 className="text-lg font-medium">{faq.question}</h3>
+                  <h3 className="text-lg md:text-base lg:text-lg font-medium">{faq.question}</h3>
                 </div>
 
                 {/* FAQ Answer */}
@@ -99,7 +101,7 @@ const Faq = () => {
               return (
                 <div
                   key={adjustedIndex}
-                  className="bg-white p-8 rounded-lg shadow-md transition-all duration-300">
+                  className="bg-white p-8 md:p-[22px] lg:p-8  rounded-lg shadow-md transition-all duration-300">
 
                   {/* FAQ Question */}
 
@@ -113,7 +115,7 @@ const Faq = () => {
                       }`}>
                       {openIndex === adjustedIndex ? "−" : "+"}
                     </span>
-                    <h3 className="text-lg font-medium">{faq.question}</h3>
+                    <h3 className="text-lg md:text-base lg:text-lg font-medium">{faq.question}</h3>
                   </div>
 
                   {/* FAQ Answer */}
