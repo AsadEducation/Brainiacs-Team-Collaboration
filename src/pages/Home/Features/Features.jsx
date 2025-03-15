@@ -48,7 +48,7 @@ export default function Features() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-6 mt-6">
                 {featuresData.map((feature) => (
                     //feature card
-                    <div className={`overflow-hidden rounded-lg border border-gray-100 bg-white shadow-xs ${feature?.extraClass} md:hover:scale-105 transition duration-300 ease-in-out`}>
+                    <div key={feature.id} className={`overflow-hidden rounded-lg border border-gray-100 bg-white shadow-xs ${feature?.extraClass} md:hover:scale-105 transition duration-300 ease-in-out`}>
                         <img
                             alt=""
                             src={feature.image}

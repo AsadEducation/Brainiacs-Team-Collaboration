@@ -23,7 +23,7 @@ const Banner = () => {
 
   return (
     <section className="relative bg-primary text-white py-16 md:py-24 lg:py-32 xl:py-40">
-      <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center px-6">
+      <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center pt-16 lg:pt-0 px-6">
         <motion.div
           className="text-center md:text-left space-y-4 md:space-y-6"
           initial={{ x: -100, opacity: 0 }}
