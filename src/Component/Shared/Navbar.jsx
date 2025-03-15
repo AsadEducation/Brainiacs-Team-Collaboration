@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router";
-import logo from "../../assets/brainiacs logo.png"
+import logo from "../../assets/brainiacs logo.png";
+import close from "../../assets/icons/close.svg";
+
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
@@ -31,12 +33,14 @@ const Navbar = () => {
     <div>
       {/* Desktop Navbar */}
       <motion.nav
-        className="relative px-4 py-4 flex justify-between items-center"
+        className="min-w-[95%] fixed top-2 left-1/2 transform -translate-x-1/2 px-4 py-4 flex justify-between items-center rounded-full z-50 bg-white"
         initial={{ y: 0 }}
         animate={{ y: isVisible ? 0 : -100 }}
         transition={{ duration: 0.3 }}
       >
-        <Link to="/" className="text-3xl font-bold leading-none"><img className="w-40" src={logo} alt="" /></Link>
+        <Link to="/" className="text-3xl font-bold leading-none">
+          <img className="w-40" src={logo} alt="Brainiacs" />
+        </Link>
         <div className="lg:hidden">
           <button
             className="navbar-burger flex items-center p-3"
@@ -51,7 +55,7 @@ const Navbar = () => {
             </svg>
           </button>
         </div>
-        <ul className="hidden relative left-44 lg:flex lg:mx-auto lg:items-center lg:w-auto lg:space-x-6">
+        <ul className="hidden  relative lg:left-20 lg:flex lg:mx-auto lg:items-center lg:w-auto lg:space-x-6">
           <li>
             <Link to="/" className="text-sm hover:text-accent cursor-pointer">Home</Link>
           </li>
@@ -132,7 +136,10 @@ const Navbar = () => {
             <a className="text-sm hover:text-accent cursor-pointer">Contact</a>
           </li>
         </ul>
-        <Link to="/login" className="hidden lg:inline-block lg:ml-auto lg:mr-3 py-2 px-6 text-sm font-bold rounded-xl transition duration-200 bg-secondary hover:bg-accent text-white">
+        <Link
+          to="/login"
+          className="hidden lg:inline-block lg:ml-auto lg:mr-3 py-2 px-6 text-sm font-bold rounded-xl transition duration-200 bg-secondary hover:bg-accent text-white"
+        >
           Log In
         </Link>
       </motion.nav>
@@ -148,46 +155,49 @@ const Navbar = () => {
             transition={{ duration: 0.3 }}
           >
             <div className="flex items-center mb-8">
-              <a className="mr-auto text-3xl font-bold leading-none text-primary">
-                Brainiacs
-              </a>
+              <Link to="/" className="mr-auto text-3xl font-bold leading-none text-primary">
+                <img className="w-40" src={logo} alt="Brainiacs" />
+              </Link>
               <button
-                className="navbar-close text-4xl text-primary"
+                className="navbar-close text-primary"
                 onClick={toggleMenu}
               >
-                x
+                <img className="w-8" src={close || X} alt="X" />
               </button>
             </div>
             <ul>
               <li className="mb-1">
-                <a className="block p-4 text-sm font-semibold text-primary hover:bg-blue-50 hover:text-secondary rounded">
+                <Link to="/" className="block p-4 text-sm font-semibold text-primary hover:bg-blue-50 hover:text-secondary rounded">
                   Home
-                </a>
+                </Link>
               </li>
               <li className="mb-1">
-                <a className="block p-4 text-sm font-semibold text-primary hover:bg-blue-50 hover:text-secondary rounded">
+                <Link to="/about" className="block p-4 text-sm font-semibold text-primary hover:bg-blue-50 hover:text-secondary rounded">
                   About Us
-                </a>
+                </Link>
               </li>
               <li className="mb-1">
-                <a className="block p-4 text-sm font-semibold text-primary hover:bg-blue-50 hover:text-secondary rounded">
+                <Link to="/services" className="block p-4 text-sm font-semibold text-primary hover:bg-blue-50 hover:text-secondary rounded">
                   Services
-                </a>
+                </Link>
               </li>
               <li className="mb-1">
-                <a className="block p-4 text-sm font-semibold text-primary hover:bg-blue-50 hover:text-secondary rounded">
+                <Link to="/pricing" className="block p-4 text-sm font-semibold text-primary hover:bg-blue-50 hover:text-secondary rounded">
                   Pricing
-                </a>
+                </Link>
               </li>
               <li className="mb-1">
-                <a className="block p-4 text-sm font-semibold text-primary hover:bg-blue-50 hover:text-secondary rounded">
+                <Link to="/contact" className="block p-4 text-sm font-semibold text-primary hover:bg-blue-50 hover:text-secondary rounded">
                   Contact
-                </a>
+                </Link>
               </li>
             </ul>
             <div className="mt-auto">
               <div className="pt-6">
-                <Link to="/login" className="block px-4 py-3 mb-3 text-xs text-center font-semibold leading-none bg-secondary hover:bg-accent text-white rounded-xl cursor-pointer">
+                <Link
+                  to="/login"
+                  className="block px-4 py-3 mb-3 text-xs text-center font-semibold leading-none bg-secondary hover:bg-accent text-white rounded-xl cursor-pointer"
+                >
                   Log in
                 </Link>
               </div>
