@@ -27,8 +27,7 @@ const Banner = () => {
         <motion.div
           className="text-center md:text-left space-y-4 md:space-y-6"
           initial={{ x: -100, opacity: 0 }}
-          whileInView={{ x: 0, opacity: 1 }}
-          exit={{ x: -100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 1 }}
         >
           <h1 className="text-3xl md:text-5xl font-bold">Brainiacs</h1>
@@ -47,8 +46,7 @@ const Banner = () => {
         <motion.div
           className="w-full mx-auto"
           initial={{ x: 100, opacity: 0 }}
-          whileInView={{ x: 0, opacity: 1 }}
-          exit={{ x: 100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 1 }}
         >
           <Slider {...settings}>
