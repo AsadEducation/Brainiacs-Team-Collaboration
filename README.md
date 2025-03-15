@@ -9,3 +9,29 @@ Click the link below to view the testing Live of development branch:
       <li>No one can push to development branch</li>
       <li>No one can push to main branch</li>
 </ul>
+
+## 📁 Folder Structure
+
+```
+e:\Brainiacs-Team-Collaboration\             
+│── src/
+│   │── assets/       
+│   │── components/
+│   │   │── shared/   
+│   │── context/         
+│   │── hooks/           
+│   │── layouts/
+│   │── pages/
+│   │   │── Login
+│   │   │── Sign Up
+│   │   │── Home 
+│   │   │── Dashboard/   
+│   │── routes/          
+│   │── App.jsx          
+│   │── main.jsx        
+│── .env                 
+│── package.json        
+│── tailwind.config.js  
+│── vite.config.js       
+│── README.md         
+```
