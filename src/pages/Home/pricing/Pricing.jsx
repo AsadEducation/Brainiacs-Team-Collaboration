@@ -48,7 +48,7 @@ const Pricing = () => {
         <div className="p-4">
             <div className=" max-lg:max-w-2xl mx-auto">
                 <div className="text-center">
-                    <h2 className="text-primary text-3xl font-bold mb-4">Pricing</h2>
+                    <h2 className="text-primary text-3xl font-bold mb-4">Value That Scales With You</h2>
                     <p className="text-sm text-slate-500">Change your plan according to your needs</p>
                 </div>
 
