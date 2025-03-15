@@ -5,7 +5,7 @@ const featuresData = [
         description:
             "Work together seamlessly with live document editing, task management, and instant updates for your team.",
         image:
-            "/public/feature-images/real-time.avif",
+            "/feature-images/real-time.avif",
 
 
     },
@@ -15,7 +15,7 @@ const featuresData = [
         description:
             "Share and store files securely with cloud-based access control, ensuring privacy and data protection.",
         image:
-            "/public/feature-images/secure-file.avif",
+            "/feature-images/secure-file.avif",
         extraClass: 'lg: relative -top-30'
 
     },
@@ -25,7 +25,7 @@ const featuresData = [
         description:
             "Stay connected with built-in messaging, voice, and video calls for smooth team communication.",
         image:
-            "/public/feature-images/video-call.jpg",
+            "/feature-images/video-call.jpg",
 
     },
     {
@@ -34,7 +34,7 @@ const featuresData = [
         description:
             "Organize your workflow with to-do lists, kanban boards, and progress tracking for better productivity.",
         image:
-            "/public/feature-images/project-management.jpg",
+            "/feature-images/project-management.jpg",
         extraClass: 'lg: relative -top-30'
 
 
