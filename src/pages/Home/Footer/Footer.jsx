@@ -1,5 +1,6 @@
 import React from 'react';
-
+import { FaFacebook, FaLinkedin } from 'react-icons/fa';
+import { IoLogoTwitter } from 'react-icons/io';
 const Footer = () => {
     return (
         <div>
@@ -10,6 +11,20 @@ const Footer = () => {
     <p className='text-4xl '>
       Follow Us On 
     </p>
+
+    <div className="flex items-center  gap-4 mt-5">
+             <button className='bg-white text-2xl rounded-full text-[#1877F2] cursor-pointer'>
+              <FaFacebook></FaFacebook>
+             </button>
+                <button className=' text-2xl rounded-full text-[#1877F2] cursor-pointer'>
+                <IoLogoTwitter />
+                </button>
+                <div className='flex items-center justify-center bg-white h-4 w-4'>
+                <button className=' text-2xl    text-[#1877F2] cursor-pointer'>
+                <FaLinkedin />
+                </button>
+                </div>
+              </div>
 
     </div>
   </aside>
