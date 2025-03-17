@@ -10,8 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.0.14",
+<<<<<<< HEAD
     "@tailwindcss/vite": "^4.0.13",
+=======
+    "@tailwindcss/vite": "^4.0.14",
+>>>>>>> 94ff62d49187b4e87145782a962c83881406a7b0
     "animate.css": "^4.1.1",
     "framer-motion": "^12.5.0",
     "gsap": "^3.12.7",
@@ -19,15 +22,13 @@
     "react": "^19.0.0",
     "react-countup": "^6.5.3",
     "react-dom": "^19.0.0",
-    "tailwindcss": "^4.0.14",
     "react-hook-form": "^7.54.2",
     "react-icons": "^5.5.0",
     "react-intersection-observer": "^9.16.0",
     "react-router": "^7.3.0",
     "react-slick": "^0.30.3",
     "slick-carousel": "^1.8.1",
-    "swiper": "^11.2.5",
-    "tailwindcss": "^4.0.13"
+    "swiper": "^11.2.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
