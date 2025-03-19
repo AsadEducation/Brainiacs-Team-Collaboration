@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const Faq = () => {
+const FAQ = () => {
  
   const [openIndex, setOpenIndex] = useState(null);
 
@@ -23,7 +23,6 @@ const Faq = () => {
      question: " Who can use Brainiacs ?", 
      answer: "It is designed for businesses, remote teams, startups, freelancers, and anyone looking to enhance team collaboration." 
  },
- 
  {
       question: "How do I sign up for Brainiacs?", 
       answer: "You can sign up using your email or Google account on our website."
@@ -32,11 +31,10 @@ const Faq = () => {
       question: "Can I invite my team members to join?", 
       answer: "Yes! You can invite team members via email and assign them roles."
   },
-  { 
-    question: "Does Brainiacs support real-time messaging?",
-    answer: "Yes, you can chat instantly with team members through one-on-one and group conversations."
-  },
- 
+ { 
+     question: "Does Brainiacs support real-time messaging?",
+     answer: "Yes, you can chat instantly with team members through one-on-one and group conversations."
+ },
  { 
      question: " Can I schedule messages or announcements?",
      answer: "Yes, you can schedule messages to be sent at a later time."
@@ -48,14 +46,13 @@ const Faq = () => {
   const column2 = faqData.slice(Math.ceil(faqData.length / 2));
 
   return (
-    <div className="bg-[#2E5077] p-8">
-
+    <div className="bg-primary p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-4xl font-bold text-center text-white mb-12">
-          Frequently Asked Questions
+        <h2 className="text-2xl md:text-4xl font-bold text-center text-white mb-8 md:mb-12 mt-4 md:mt-8">
+          Frequently Asked Question
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
 
           {/* Column 1 */}
 
@@ -63,7 +60,7 @@ const Faq = () => {
             {column1.map((faq, index) => (
               <div
                 key={index}
-                className="bg-white p-8  rounded-lg shadow-md transition-all duration-300">
+                className="bg-white p-4 md:p-8 rounded-lg shadow-md transition-all duration-300">
 
                 {/* FAQ Question */}
 
@@ -72,19 +69,19 @@ const Faq = () => {
                   onClick={() => toggleAnswer(index)}>
                   
                   <span
-                    className={`text-xl mr-4 ${
+                    className={`text-lg md:text-xl mr-2 md:mr-4 ${
                       openIndex === index ? "text-[#4DA1A9]" : "text-gray-700"
                     }`}>
                     {openIndex === index ? "−" : "+"}
                   </span>
 
-                  <h3 className="text-lg md:text-base lg:text-lg font-medium">{faq.question}</h3>
+                  <h3 className="text-md md:text-lg font-medium">{faq.question}</h3>
                 </div>
 
                 {/* FAQ Answer */}
 
                 <div
-                  className={`faq-answer mt-4 overflow-hidden transition-all duration-300 ${
+                  className={`faq-answer mt-2 md:mt-4 overflow-hidden transition-all duration-300 ${
                     openIndex === index ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
                   }`}>
                   <p className="text-gray-600">{faq.answer}</p>
@@ -101,7 +98,7 @@ const Faq = () => {
               return (
                 <div
                   key={adjustedIndex}
-                  className="bg-white p-8 md:p-[22px] lg:p-8  rounded-lg shadow-md transition-all duration-300">
+                  className="bg-white p-4 md:p-8 rounded-lg shadow-md transition-all duration-300">
 
                   {/* FAQ Question */}
 
@@ -110,18 +107,18 @@ const Faq = () => {
                     onClick={() => toggleAnswer(adjustedIndex)}>
                    
                     <span
-                      className={`text-xl mr-4 ${
+                      className={`text-lg md:text-xl mr-2 md:mr-4 ${
                         openIndex === adjustedIndex ? "text-[#4DA1A9]" : "text-black"
                       }`}>
                       {openIndex === adjustedIndex ? "−" : "+"}
                     </span>
-                    <h3 className="text-lg md:text-base lg:text-lg font-medium">{faq.question}</h3>
+                    <h3 className="text-md md:text-lg font-medium">{faq.question}</h3>
                   </div>
 
                   {/* FAQ Answer */}
 
                   <div
-                    className={`faq-answer mt-4 overflow-hidden transition-all duration-300 ${
+                    className={`faq-answer mt-2 md:mt-4 overflow-hidden transition-all duration-300 ${
                       openIndex === adjustedIndex ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
                     }`}>
                     <p className="text-gray-600">{faq.answer}</p>
@@ -137,4 +134,4 @@ const Faq = () => {
   );
 };
 
-export default Faq;
+export default FAQ;

@@ -1,7 +1,7 @@
 ## 🌐 Testing Live Link
 
 Click the link below to view the testing Live of development branch:  
-🔗 **[View Live Project](https://testing-brainiacs.vercel.app)**
+🔗 **[View Live Project](https://brainiacs-team-collaboration.vercel.app)**
 
 <hr>
 <h3>Rule sets:</h3>

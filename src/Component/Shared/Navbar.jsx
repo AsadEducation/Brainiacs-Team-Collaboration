@@ -3,8 +3,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router";
 import logo from "../../assets/brainiacs logo.png";
 import close from "../../assets/icons/close.svg";
+import useAuth from "../../Hooks/useAuth";
+import Swal from "sweetalert2";
 
 const Navbar = () => {
+  const { user, signOutUser } = useAuth()
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   let lastScrollY = window.scrollY;
@@ -28,6 +31,16 @@ const Navbar = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+
+  const handleLogOut = () => {
+    signOutUser()
+      .then(res => {
+        console.log("Success", res)
+        Swal.fire("Logged Out Successfully")
+      })
+      .catch(err => console.log("error", err))
+  }
 
   return (
     <div>
@@ -136,12 +149,22 @@ const Navbar = () => {
             <a className="text-sm hover:text-accent cursor-pointer">Contact</a>
           </li>
         </ul>
-        <Link
-          to="/login"
-          className="hidden lg:inline-block lg:ml-auto lg:mr-3 py-2 px-6 text-sm font-bold rounded-xl transition duration-200 bg-secondary hover:bg-accent text-white"
-        >
-          Log In
-        </Link>
+        {
+          user ?
+            <Link
+              onClick={handleLogOut}
+              className="hidden lg:inline-block lg:ml-auto lg:mr-3 py-2 px-6 text-sm font-bold rounded-xl transition duration-200 bg-secondary hover:bg-accent text-white"
+            >
+              Log Out
+            </Link>
+            :
+            <Link
+              to="/login"
+              className="hidden lg:inline-block lg:ml-auto lg:mr-3 py-2 px-6 text-sm font-bold rounded-xl transition duration-200 bg-secondary hover:bg-accent text-white"
+            >
+              Log In
+            </Link>
+        }
       </motion.nav>
 
       {/* Mobile Menu */}
@@ -194,12 +217,23 @@ const Navbar = () => {
             </ul>
             <div className="mt-auto">
               <div className="pt-6">
-                <Link
-                  to="/login"
-                  className="block px-4 py-3 mb-3 text-xs text-center font-semibold leading-none bg-secondary hover:bg-accent text-white rounded-xl cursor-pointer"
-                >
-                  Log in
-                </Link>
+                {
+                  user ?
+                    <Link
+                      onClick={handleLogOut}
+                      className="block px-4 py-3 mb-3 text-xs text-center font-semibold leading-none bg-secondary hover:bg-accent text-white rounded-xl cursor-pointer"
+                    >
+                      Log Out
+                    </Link>
+                    :
+                    <Link
+                      to="/login"
+                      className="block px-4 py-3 mb-3 text-xs text-center font-semibold leading-none bg-secondary hover:bg-accent text-white rounded-xl cursor-pointer"
+                    >
+                      Log in
+                    </Link>
+                }
+
               </div>
             </div>
           </motion.nav>
