@@ -10,11 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-<<<<<<< HEAD
     "@tailwindcss/vite": "^4.0.13",
-=======
-    "@tailwindcss/vite": "^4.0.14",
->>>>>>> 94ff62d49187b4e87145782a962c83881406a7b0
     "animate.css": "^4.1.1",
     "framer-motion": "^12.5.0",
     "gsap": "^3.12.7",
