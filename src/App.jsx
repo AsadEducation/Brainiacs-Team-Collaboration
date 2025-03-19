@@ -1,9 +1,9 @@
 import { Route, Routes } from "react-router";
 import "./App.css";
-import Home from "./pages/Home/Home";
+import Home from "./pages/Home/Home.jsx";
 import MainLayout from "./Layouts/MainLayout";
-import SignUp from "./pages/SignUp/SignUp";
-import Login from "./pages/Login/Login";
+import SignUp from "./pages/SignUp/SignUp.jsx";
+import Login from "./pages/Login/Login.jsx";
 
 function App() {
 
@@ -12,12 +12,12 @@ function App() {
     <Routes>
       <Route path="/" element={<MainLayout />} >
         <Route index element={<Home />} />
-        
+
         <Route path="/signup" element={<SignUp />} />
-        <Route path="login" element={<Login />} />
+        <Route path="/login" element={<Login />} />
       </Route>
     </Routes>
-    
+
   );
 }
 
