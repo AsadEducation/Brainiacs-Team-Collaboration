@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const Faq = () => {
+const FAQ = () => {
  
   const [openIndex, setOpenIndex] = useState(null);
 
@@ -134,4 +134,4 @@ const Faq = () => {
   );
 };
 
-export default Faq;
+export default FAQ;
