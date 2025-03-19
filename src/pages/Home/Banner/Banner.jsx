@@ -6,6 +6,7 @@ import "slick-carousel/slick/slick-theme.css";
 import image1 from "../../../assets/image-1.jpg";
 import image2 from "../../../assets/image-2.jpg";
 import image3 from "../../../assets/image-3.jpg";
+import { Link } from "react-router";
 
 const Banner = () => {
   const images = [image1, image2, image3];
@@ -37,9 +38,9 @@ const Banner = () => {
           <p className="text-sm md:text-base">
             Chat, manage tasks & share files seamlessly.
           </p>
-          <button className="inline-block bg-secondary text-white px-6 py-2 rounded-lg font-semibold hover:bg-opacity-60 transition cursor-pointer">
+          <Link to="/signup" className="inline-block bg-secondary text-white px-6 py-2 rounded-lg font-semibold hover:bg-opacity-60 transition cursor-pointer">
             Get Started
-          </button>
+          </Link>
         </motion.div>
 
         {/* Slider */}

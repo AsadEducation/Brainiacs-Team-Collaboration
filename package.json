@@ -1,5 +1,5 @@
 {
-  "name": "brainiacs-team.json",
+  "name": "brainiacs-team",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -12,6 +12,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.0.13",
     "animate.css": "^4.1.1",
+    "firebase": "^11.4.0",
     "framer-motion": "^12.5.0",
     "gsap": "^3.12.7",
     "keen-slider": "^6.8.6",
@@ -24,6 +25,7 @@
     "react-router": "^7.3.0",
     "react-slick": "^0.30.3",
     "slick-carousel": "^1.8.1",
+    "sweetalert2": "^11.17.2",
     "swiper": "^11.2.5"
   },
   "devDependencies": {
