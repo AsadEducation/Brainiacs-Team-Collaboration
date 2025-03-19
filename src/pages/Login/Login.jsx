@@ -5,12 +5,13 @@ import linkedin from "../../assets/icons/linkedin.svg";
 import user from "../../assets/icons/user.svg";
 import email from "../../assets/icons/email.svg";
 import password from "../../assets/icons/password.svg";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import logo from "../../assets/brainiacs logo.png";
 import GoogleButton from "../SignUp/GoogleButton";
 import useAuth from "../../Hooks/useAuth";
 import Swal from "sweetalert2";
 const Login = () => {
+  const navigate=useNavigate()
   const { logInUser } = useAuth()
   const {
     register,
@@ -25,6 +26,7 @@ const Login = () => {
     .then(res=>{
       console.log("success",res)
       Swal.fire("Successfully Logged In")
+      navigate("/")
     })
     .catch(err=>console.log("error",err))
   };
