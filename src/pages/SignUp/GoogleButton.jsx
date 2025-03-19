@@ -12,7 +12,7 @@ const GoogleButton = () => {
         .then(res=>{
             console.log("success",res)
             Swal.fire("Successfully Logged in")
-            // navigate("/")
+            navigate("/")
         })
         .catch(err=>console.log("error",err))
         // TODO: add post api for saving user info
