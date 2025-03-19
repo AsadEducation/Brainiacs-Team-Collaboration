@@ -1,53 +1,65 @@
 import { useEffect, useState } from "react";
 
-import {
-  FaBell,
-  FaSearch,
-  FaUsers,
-  FaCog,
-  FaPlus,
-  FaImage,
-} from "react-icons/fa";
 import TaskCard from "./TaskCard";
-import { LuFileUp } from "react-icons/lu";
-import { Link } from "react-router";
+
 
 const TaskManagement = () => {
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState({});
   useEffect(() => {
-    fetch("/fake.json")
+    fetch("/tasks.json")
       .then((res) => res.json())
-      .then((data) => setTasks(data.tasks));
+      .then((data) => setTasks(data));
   }, []);
-
+  console.log("tasks", tasks)
   return (
-    <div className="flex h-screen bg-[#2E5077] text-white">
-      {/* Sidebar */}
-      <div className="w-64 p-5 bg-gray-900 h-full ">
-        <h2 className="text-xl font-bold">Dashboard</h2>
-        <div className="mt-5 space-y-2 flex flex-col">
-          <Link className="flex items-center gap-3">
-            <FaImage /> Inbox
-          </Link>
-          <Link className="flex items-center gap-3">
-            <LuFileUp /> Drive file
-          </Link>
-          <Link to="/boards">Boards</Link>
-          <Link to="/updates">Updates</Link>
-          <Link to="/projects">Projects</Link>
-          <Link to="/settings">Settings</Link>
-          <Link to="/ecommerce">Ecommerce</Link>
-        </div>
-      </div>
+    <div className=" bg-secondary text-white">
 
       {/* Main Content */}
-      <div className="">
-        <div className="grid grid-cols-4 gap-4 p-4 bg-[#2E5077] ">
-          {tasks.map((task) => (
-            <TaskCard key={task.id} task={task} />
-          ))}
+      <div className=" p-4 h-screen grid grid-cols-3 gap-3 justify-items-center">
+
+        <div className=" h-fit w-72 p-2 bg-[#F1F2F4] rounded-xl">
+          <h3 className=" w-full px-4 text-start rounded-md mt- text-[12px] py-1 font-semibold flex items-center text-[#172B4D] hover:text-gray-90">To-Do</h3>
+          <div className="max-h-[calc(100vh-120px)] h-fit overflow-y-scroll  ">
+            <div className=" flex flex-col items-center gap-2">
+              {
+                tasks.toDo?.map((task, index) => <TaskCard key={index} task={task} />)
+              }
+            </div>
+          </div>
+          <button className="hover:bg-[#D0D4DB] w-full px-4 text-start rounded-md mt-2 text-[12px] py-1 font-semibold flex items-center text-[#172B4D] hover:text-gray-900">+  Add a card</button>
         </div>
+
+
+        <div className=" h-fit w-72 p-2 bg-[#F1F2F4] rounded-xl">
+          <h3 className=" w-full px-4 text-start rounded-md mt- text-[12px] py-1 font-semibold flex items-center text-[#172B4D] hover:text-gray-90">In Progress</h3>
+          <div className="max-h-[calc(100vh-120px)] h-fit overflow-y-scroll  ">
+            <div className=" flex flex-col items-center gap-2">
+              {
+                tasks.inProgress?.map((task, index) => <TaskCard key={index} task={task} />)
+              }
+            </div>
+          </div>
+          <button className="hover:bg-[#D0D4DB] w-full px-4 text-start rounded-md mt-2 text-[12px] py-1 font-semibold flex items-center text-[#172B4D] hover:text-gray-900">+  Add a card</button>
+        </div>
+        <div className=" h-fit w-72 p-2 bg-[#F1F2F4] rounded-xl">
+          <h3 className=" w-full px-4 text-start rounded-md mt- text-[12px] py-1 font-semibold flex items-center text-[#172B4D] hover:text-gray-90">Done</h3>
+          <div className="max-h-[calc(100vh-120px)] h-fit overflow-y-scroll  ">
+            <div className=" flex flex-col items-center gap-2">
+              {
+                tasks.done?.map((task, index) => <TaskCard key={index} task={task} />)
+              }
+            </div>
+          </div>
+          <button className="hover:bg-[#D0D4DB] w-full px-4 text-start rounded-md mt-2 text-[12px] py-1 font-semibold flex items-center text-[#172B4D] hover:text-gray-900">+  Add a card</button>
+        </div>
+
+
+
+
       </div>
+      {/* Main Content */}
+
+
     </div>
   );
 };

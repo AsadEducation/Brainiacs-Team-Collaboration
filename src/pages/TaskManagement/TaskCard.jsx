@@ -4,24 +4,24 @@ import { MdOutlineMessage } from 'react-icons/md';
 import { RiAttachmentFill } from 'react-icons/ri';
 
 const TaskCard = ({task}) => {
-  const {title, category} = task
+  const {taskTitle, dueTime} = task
   return (
     <div className="bg-white rounded-2xl p-4 shadow-lg w-64">
    
    <div className='flex justify-between items-center'>
-   <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+   <h3 className="text-[12px] font-medium text-gray-900"> {taskTitle}</h3>
    <div className="flex items-center text-cyan-600 space-x-1">
-          <span className="text-lg"><LiaFileSolid /></span>
-          <p className="text-sm font-medium">4</p>
+          <span className="text-base"><LiaFileSolid /></span>
+          <p className="text-xs font-medium">4</p>
         </div>
    </div>
 
   
-    <div className="flex space-x-2 mt-2">
-      <p className="bg-gray-100 text-gray-700 px-2 py-1 rounded-lg text-xs font-medium">#UI007</p>
-      <p className="bg-blue-100 text-blue-600 px-2 py-1 rounded-lg text-xs font-medium">Design</p>
-      <p className="bg-yellow-100 text-yellow-600 px-2 py-1 rounded-lg text-xs font-medium">Backlog</p>
-    </div>
+    {/* <div className="flex space-x-2 mt-2">
+      <p className="bg-gray-100 text-gray-700 px-2  rounded-md  text-[10px] font-medium">#UI007</p>
+      <p className="bg-blue-100 text-blue-600 px-2  rounded-md  text-[10px] font-medium">Design</p>
+      <p className="bg-yellow-100 text-yellow-600 px-2  rounded-md  text-[10px] font-medium">Backlog</p>
+    </div> */}
 
     {/* Member img */}
     <div className="flex items-center justify-between mt-3">
@@ -29,18 +29,18 @@ const TaskCard = ({task}) => {
       {/* img */}
       <div className="flex items-center -space-x-2">
 
-        <img className="w-8 h-8 rounded-full border-2 border-white" src="https://i.ibb.co.com/7tY0Hq0/rapunzels-face-v0-l1vu0bitjpjd1.webp" alt="User 1" />
-        <img className="w-8 h-8 rounded-full border-2 border-white" src="https://i.ibb.co.com/7tY0Hq0/rapunzels-face-v0-l1vu0bitjpjd1.webp" alt="User 2" />
+        <img className="w-7 h-7 rounded-full border-2 border-white" src="https://i.ibb.co.com/7tY0Hq0/rapunzels-face-v0-l1vu0bitjpjd1.webp" alt="User 1" />
+        <img className="w-7 h-7 rounded-full border-2 border-white" src="https://i.ibb.co.com/7tY0Hq0/rapunzels-face-v0-l1vu0bitjpjd1.webp" alt="User 2" />
 
         {/* number of added members */}
-        <p className="w-8 h-8 flex items-center justify-center bg-gray-200 text-gray-600 rounded-full text-xs font-medium border-2 border-white">+5</p>
+        <p className="w-7 h-7 flex items-center justify-center bg-gray-200 text-gray-600 rounded-full  text-[10px] font-medium border-2 border-white">+5</p>
 
       </div>
 
-      {/* Add More round dotted Icon */}
-      <div className="w-9 h-9 flex items-center justify-center border-2 border-dotted border-gray-400 rounded-full">
-        <div className='border-2 border-gray-400 rounded-full w-4 h-4 flex items-center justify-center'>
-        <p className="text-gray-400  mb-1">+</p>
+      {/* Add More round dashed Icon */}
+      <div className="w-6 h-6 flex items-center justify-center border-2 border-dashed border-gray-400 rounded-full">
+        <div className=' rounded-full w-4 h-4 flex items-center justify-center'>
+        <p className="text-gray-400">+</p>
         </div>
       </div>
 
