@@ -5,11 +5,12 @@ import user from "../../assets/icons/user.svg";
 import email from "../../assets/icons/email.svg";
 import password from "../../assets/icons/password.svg";
 import logo from "../../assets/brainiacs logo.png";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import useAuth from "../../Hooks/useAuth";
 import GoogleButton from "./GoogleButton";
 import Swal from "sweetalert2";
 const SignUp = () => {
+  const navigate=useNavigate()
   const { signUpUser } = useAuth()
   const {
     register,
@@ -24,6 +25,7 @@ const SignUp = () => {
       .then(res => {
         console.log("success", res)
         Swal.fire(`Welcome ${userName} to Brainiacs`)
+        navigate("/")
       })
       .catch(err => {
         console.log("error", err)
