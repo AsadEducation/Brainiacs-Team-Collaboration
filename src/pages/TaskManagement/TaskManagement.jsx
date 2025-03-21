@@ -1,16 +1,48 @@
 import { useEffect, useState } from "react";
 
 import TaskCard from "./TaskCard";
+import { closestCorners, DndContext, MouseSensor, PointerSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { arrayMove, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 
 
 const TaskManagement = () => {
+  // setting the fetched tasks into a state 
   const [tasks, setTasks] = useState({});
   useEffect(() => {
     fetch("/tasks.json")
       .then((res) => res.json())
       .then((data) => setTasks(data));
   }, []);
-  console.log("tasks", tasks)
+// this function is used below on handleDragEnd
+const getPosition=id=>tasks.toDo.findIndex(obj=>obj.id===id);
+
+  // setting a function for the functionality when drag ends 
+  const handleDragEnd=event=>{
+     const {active,over}=event;
+     console.log(active,over)
+    if(active.id===over.id) return;
+
+    const originalPosition=getPosition(active.id);
+    const latestPosition=getPosition(over.id);
+    setTasks(
+      (prevTasks) => ({ ...prevTasks, toDo: arrayMove(tasks.toDo,originalPosition,latestPosition) })
+      
+    )
+
+  }
+
+  const sensors = useSensors(
+    useSensor(PointerSensor,{
+      activationConstraint: {
+        distance: 3,
+      },
+    }),
+    useSensor(TouchSensor),
+    useSensor(MouseSensor)
+  );
+
+  // checking the current tasks length
+  console.log("tasks", Object.keys(tasks).length)
   return (
     <div className=" bg-secondary text-white">
 
@@ -22,7 +54,17 @@ const TaskManagement = () => {
           <div className="max-h-[calc(100vh-120px)] h-fit overflow-y-scroll  ">
             <div className=" flex flex-col items-center gap-2">
               {
-                tasks.toDo?.map((task, index) => <TaskCard key={index} task={task} />)
+                Object.keys(tasks).length < 1 ?
+                  <h1>Loading</h1>
+                  :
+                  <DndContext sensors={sensors} onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
+                    <SortableContext items={tasks.toDo} strategy={verticalListSortingStrategy}>
+
+                      {
+                        tasks.toDo?.map((task, index) => <TaskCard key={index} task={task} />)
+                      }
+                    </SortableContext>
+                  </DndContext>
               }
             </div>
           </div>

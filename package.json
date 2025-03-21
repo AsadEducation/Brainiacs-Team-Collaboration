@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@headlessui/react": "^2.2.0",
     "@tailwindcss/vite": "^4.0.13",
     "animate.css": "^4.1.1",
     "firebase": "^11.4.0",
