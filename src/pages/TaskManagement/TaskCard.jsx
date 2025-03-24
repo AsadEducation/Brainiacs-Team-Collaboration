@@ -7,33 +7,32 @@ import { CSS } from '@dnd-kit/utilities';
 import TaskModal from './TaskModal';
 
 const TaskCard = ({ task }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    active,
-  } = useSortable({ id: task.id })
+  const { setNodeRef, attributes, listeners, transform, transition, isDragging,active } = useSortable({
+    id: task.id,
+    data: task,
+})
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     cursor: active?"grabbing":"grab"
   };
-
-  const { taskTitle, dueTime } = task
-
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  console.log(isModalOpen,"moda")
+  
+if(isDragging){
+  return(
+    <div  style={style} ref={setNodeRef}  className="bg-white rounded-2xl h-24 shadow-lg w-64"></div>
+  )
+}
+  const { taskTittle } = task
   return (
     <>
-    
-    <div style={style} ref={setNodeRef} {...attributes} {...listeners} className="bg-white rounded-2xl p-4 shadow-lg w-64">
+    <div  onClick={()=>setIsModalOpen(true)} style={style} ref={setNodeRef} {...attributes} {...listeners} className="bg-white h-24 rounded-2xl p-4 shadow-lg w-64">
       <div style={{touchAction:"none"}}>
         
       <div className='flex justify-between items-center'>
-        <h3 className="text-[12px] font-medium text-gray-900"> {taskTitle}</h3>
-        <div className="flex items-center text-cyan-600 space-x-1">
+        <h3 className="text-[12px] font-medium text-gray-900"> {taskTittle}</h3>
+        <div onClick={()=>{console.log("object")}} className="flex items-center text-cyan-600 space-x-1">
           <span className="text-base"><LiaFileSolid /></span>
           <p className="text-xs font-medium">4</p>
         </div>
