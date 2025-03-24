@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { LiaFileSolid } from 'react-icons/lia';
 import { MdOutlineMessage } from 'react-icons/md';
 import { RiAttachmentFill } from 'react-icons/ri';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import TaskModal from './TaskModal';
 
 const TaskCard = ({ task }) => {
   const {
@@ -21,7 +22,12 @@ const TaskCard = ({ task }) => {
   };
 
   const { taskTitle, dueTime } = task
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
+    <>
+    
     <div style={style} ref={setNodeRef} {...attributes} {...listeners} className="bg-white rounded-2xl p-4 shadow-lg w-64">
       <div style={{touchAction:"none"}}>
         
@@ -81,6 +87,10 @@ const TaskCard = ({ task }) => {
 
       </div>
     </div>
+
+    <TaskModal task={task} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}></TaskModal>
+
+    </>
   );
 };
 
