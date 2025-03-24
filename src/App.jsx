@@ -8,11 +8,9 @@ import DashboardLayout from "./Layouts/DashboardLayout";
 import TaskManagement from "./pages/TaskManagement/TaskManagement.jsx";
 
 function App() {
-
-
   return (
     <Routes>
-      <Route path="/" element={<MainLayout />} >
+      <Route path="/" element={<MainLayout />}>
         <Route index element={<Home />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
@@ -21,7 +19,6 @@ function App() {
         <Route index element={<TaskManagement/>} />      
       </Route>
     </Routes>
-
   );
 }
 
