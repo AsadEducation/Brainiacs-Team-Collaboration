@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { LiaFileSolid } from 'react-icons/lia';
 import { MdOutlineMessage } from 'react-icons/md';
 import { RiAttachmentFill } from 'react-icons/ri';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import TaskModal from './TaskModal';
 
 const TaskCard = ({ task }) => {
   const { setNodeRef, attributes, listeners, transform, transition, isDragging,active } = useSortable({
@@ -15,6 +16,9 @@ const TaskCard = ({ task }) => {
     transition,
     cursor: active?"grabbing":"grab"
   };
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  console.log(isModalOpen,"moda")
+  
 if(isDragging){
   return(
     <div  style={style} ref={setNodeRef}  className="bg-white rounded-2xl h-24 shadow-lg w-64"></div>
@@ -22,12 +26,13 @@ if(isDragging){
 }
   const { taskTittle } = task
   return (
-    <div style={style} ref={setNodeRef} {...attributes} {...listeners} className="bg-white h-24 rounded-2xl p-4 shadow-lg w-64">
+    <>
+    <div  onClick={()=>setIsModalOpen(true)} style={style} ref={setNodeRef} {...attributes} {...listeners} className="bg-white h-24 rounded-2xl p-4 shadow-lg w-64">
       <div style={{touchAction:"none"}}>
         
       <div className='flex justify-between items-center'>
         <h3 className="text-[12px] font-medium text-gray-900"> {taskTittle}</h3>
-        <div className="flex items-center text-cyan-600 space-x-1">
+        <div onClick={()=>{console.log("object")}} className="flex items-center text-cyan-600 space-x-1">
           <span className="text-base"><LiaFileSolid /></span>
           <p className="text-xs font-medium">4</p>
         </div>
@@ -81,6 +86,10 @@ if(isDragging){
 
       </div>
     </div>
+
+    <TaskModal task={task} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}></TaskModal>
+
+    </>
   );
 };
 

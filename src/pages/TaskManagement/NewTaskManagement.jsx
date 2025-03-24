@@ -43,11 +43,12 @@ export default function NewTaskManagement() {
         })
         setColumns(newColumn)
     }
-    const createTask=(columnId)=>{
+    const createTask=(columnId,columnTittle)=>{
         const newTask={
           id:generateId(),
           type:"Task",
           columnId,
+          columnTittle,
           taskTittle:`Task ${tasks.length+1}`
         }
         setTasks([...tasks,newTask])

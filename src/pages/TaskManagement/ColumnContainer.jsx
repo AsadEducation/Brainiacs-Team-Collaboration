@@ -44,15 +44,15 @@ const ColumnContainer = ({ column, updateColumn, createTask, tasks }) => {
                 <div className=" flex flex-col items-center gap-2">
                     <SortableContext items={taskIds}>
                     {
-                        tasks?.map(task => (
+                        tasks?.map((task,index) => (
                             // <div className="text-black">{task?.taskTittle}</div>
-                            <TaskCard task={task}></TaskCard>
+                            <TaskCard key={index} task={task}></TaskCard>
                         ))
                     }
                     </SortableContext>
                 </div>
             </div>
-            <button onClick={() => createTask(column.id)} className="hover:bg-[#D0D4DB] w-full px-4 text-start rounded-md mt-2 text-[12px] py-1 font-semibold flex items-center text-[#172B4D] hover:text-gray-900">+  Add a card</button>
+            <button onClick={() => createTask(column.id,column.tittle)} className="hover:bg-[#D0D4DB] w-full px-4 text-start rounded-md mt-2 text-[12px] py-1 font-semibold flex items-center text-[#172B4D] hover:text-gray-900">+  Add a card</button>
         </div>
     );
 };
