@@ -22,7 +22,7 @@ const TaskModal = ({ task, isOpen, onClose }) => {
 
 
                 <div className="flex justify-between">
-                    <h2 className="text-xl font-semibold text-gray-900">{task.title}</h2>
+                    <h2 className="text-xl font-semibold text-gray-900">{task.taskTittle}</h2>
 
                     {/* close button */}
                     <button className="px-2 py-2 text-gray-600 bg-gray-200 rounded-full" onClick={onClose}>
@@ -31,7 +31,7 @@ const TaskModal = ({ task, isOpen, onClose }) => {
 
                 </div>
 
-                <p className="text-gray-600 my-2"> {task.category}</p>
+                <p className="text-gray-600 my-2"> {task.columnTittle}</p>
 
 
                 <div className=" flex justify-between space-x-6">

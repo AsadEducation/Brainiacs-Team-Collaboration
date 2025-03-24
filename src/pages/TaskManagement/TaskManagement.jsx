@@ -5,6 +5,25 @@ import { closestCorners, DndContext, MouseSensor, PointerSensor, TouchSensor, us
 import { arrayMove, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 
 
+
+
+
+
+
+
+// This component is not used anymore 
+
+
+
+
+
+
+
+
+
+
+
+
 const TaskManagement = () => {
   // setting the fetched tasks into a state 
   const [tasks, setTasks] = useState({});
@@ -50,7 +69,7 @@ const getPosition=id=>tasks.toDo.findIndex(obj=>obj.id===id);
       <div className=" p-4 h-screen grid grid-cols-3 gap-3 justify-items-center">
 
         <div className=" h-fit w-72 p-2 bg-[#F1F2F4] rounded-xl">
-          <h3 className=" w-full px-4 text-start rounded-md mt- text-[12px] py-1 font-semibold flex items-center text-[#172B4D] hover:text-gray-90">To-Do</h3>
+          <h3 className=" w-full px-4 text-start rounded-md  text-[12px] py-1 font-semibold flex items-center text-[#172B4D] hover:text-gray-90">To-Do</h3>
           <div className="max-h-[calc(100vh-120px)] h-fit overflow-y-scroll  ">
             <div className=" flex flex-col items-center gap-2">
               {
