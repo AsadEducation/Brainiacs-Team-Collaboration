@@ -20,19 +20,29 @@ const SignUp = () => {
 
   const onSubmit = (data) => {
     const { userName, email, password } = data;
-    console.log(data);
+    const newUser = { name: userName, email, role: "user" }; // Include role
+    console.log("Form Data:", data); // Log form data
     signUpUser(email, password)
       .then(res => {
-        console.log("success", res)
-        Swal.fire(`Welcome ${userName} to Brainiacs`)
-        navigate("/")
+        console.log("Signup Success:", res.user); // Log signup success data
+        fetch("http://localhost:5000/users", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newUser),
+        })
+          .then(response => response.json())
+          .then(result => {
+            console.log("User Added to DB:", result); // Log database response
+            Swal.fire(`Welcome ${userName} to Brainiacs`);
+            navigate("/");
+          });
       })
       .catch(err => {
-        console.log("error", err)
-        Swal.fire(`Something Went Wrong`)
-
-      })
-    // TODO: post api for saving user info
+        console.log("Signup Error:", err); // Log signup error
+        Swal.fire(`Something Went Wrong`);
+      });
   };
 
   // TODO: Make facebook and linkedin signup functionality
