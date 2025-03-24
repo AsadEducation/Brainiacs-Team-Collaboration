@@ -38,26 +38,21 @@ const AuthProvider = ({ children }) => {
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
-            console.log("current user", currentUser)
-            // if (currentUser) {
-            //     const userInfo = { email: currentUser.email }
-            //     axiosPublic.post('/jwt', userInfo)
-            //         .then(res => {
-            //             if (res.data.token) {
-            //                 localStorage.setItem('access-token', res.data.token)
-            //             }
-            //         })
-            // }
-            // else {
-            //     localStorage.removeItem('access-token')
-            // }
-
-            setLoading(false)
-        })
+            console.log("current user", currentUser); 
+            if (currentUser) {
+                // console.log("User Details:", {
+                //     uid: currentUser.uid,
+                //     email: currentUser.email,
+                //     displayName: currentUser.displayName,
+                //     photoURL: currentUser.photoURL,
+                // });
+            }
+            setLoading(false);
+        });
         return () => {
-            unsubscribe()
-        }
-    }, [])
+            unsubscribe();
+        };
+    }, []);
     const authInfo = {
         user,
         loading,

@@ -2,7 +2,7 @@ import React from 'react'
 import { FaImage } from 'react-icons/fa'
 import { LuFileUp } from 'react-icons/lu'
 import { RiMenu2Line } from 'react-icons/ri'
-import { Link, Outlet } from 'react-router'
+import { Link, Outlet } from 'react-router-dom'
 import ChatBox from '../Component/Shared/ChatBox/ChatBox'
 
 const DashboardLayout = () => {
@@ -38,7 +38,7 @@ const DashboardLayout = () => {
               </Link>
             </li>
             <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
-              <Link to="/boards">Boards</Link>
+              <Link to="/dashboard/boards">Boards</Link>
             </li>
             <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
               <Link to="/updates">Updates</Link>

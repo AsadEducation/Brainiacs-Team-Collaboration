@@ -6,22 +6,21 @@ import SignUp from "./pages/SignUp/SignUp.jsx";
 import Login from "./pages/Login/Login.jsx";
 import DashboardLayout from "./Layouts/DashboardLayout";
 import TaskManagement from "./pages/TaskManagement/TaskManagement.jsx";
+import Boards from "./pages/Boards/Boards.jsx";
 
 function App() {
-
-
   return (
     <Routes>
-      <Route path="/" element={<MainLayout />} >
+      <Route path="/" element={<MainLayout />}>
         <Route index element={<Home />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
       </Route>
-      <Route path="/dashboard" element={<DashboardLayout />} >
-        <Route index element={<TaskManagement/>} />      
+      <Route path="/dashboard" element={<DashboardLayout />}>
+        <Route index element={<TaskManagement />} />
+        <Route path="boards" element={<Boards />} />
       </Route>
     </Routes>
-
   );
 }
 
