@@ -2,11 +2,19 @@ import React from 'react';
 import { LiaFileSolid } from 'react-icons/lia';
 import { MdOutlineMessage } from 'react-icons/md';
 import { RiAttachmentFill } from 'react-icons/ri';
+import TaskModal from './TaskModal';
 
 const TaskCard = ({task}) => {
+
   const {title, category} = task
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
-    <div className="bg-white rounded-2xl p-4 shadow-lg w-64">
+   <>
+    <div 
+    className="bg-white rounded-2xl p-4 shadow-lg w-64"
+    onClick={() => setIsModalOpen(true)}
+    >
    
    <div className='flex justify-between items-center'>
    <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
@@ -62,6 +70,12 @@ const TaskCard = ({task}) => {
       </div>
     </div>
   </div>
+
+{/* modal component */}
+
+<TaskModal task={task} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} ></TaskModal>
+
+   </>
   );
 };
 
