@@ -27,7 +27,10 @@ if(isDragging){
   const { taskTittle } = task
   return (
     <>
-    <div  onClick={()=>setIsModalOpen(true)} style={style} ref={setNodeRef} {...attributes} {...listeners} className="bg-white h-24 rounded-2xl p-4 shadow-lg w-64">
+    
+    <div style={style} ref={setNodeRef} {...attributes} {...listeners} className="bg-white rounded-2xl p-4 shadow-lg w-64"
+    onClick={() => setIsModalOpen(true)}
+    >
       <div style={{touchAction:"none"}}>
         
       <div className='flex justify-between items-center'>
