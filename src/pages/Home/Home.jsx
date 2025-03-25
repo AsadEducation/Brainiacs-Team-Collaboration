@@ -9,7 +9,7 @@ import Faq from "../FAQ/Faq";
 
 const Home = () => {
     return (
-        <div>
+        <div >
             <Banner />
             <Features />
             <Statistics></Statistics>
