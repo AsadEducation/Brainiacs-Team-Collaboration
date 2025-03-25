@@ -9,7 +9,6 @@ import { TbChecklist } from "react-icons/tb";
 const TaskModal = ({ task, isOpen, onClose }) => {
     if (!isOpen) return null;
 
-
     const [showActivity, setShowActivity] = useState(false);
 
     const handleSubmit = (e) => {
@@ -19,7 +18,6 @@ const TaskModal = ({ task, isOpen, onClose }) => {
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-white p-6 rounded-xl shadow-lg w-[700px]">
-
 
                 <div className="flex justify-between">
                     <h2 className="text-xl font-semibold text-gray-900">{task.taskTittle}</h2>
@@ -32,7 +30,6 @@ const TaskModal = ({ task, isOpen, onClose }) => {
                 </div>
 
                 <p className="text-gray-600 my-2"> {task.columnTittle}</p>
-
 
                 <div className=" flex justify-between space-x-6">
 
