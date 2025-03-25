@@ -7,6 +7,7 @@ import Login from "./pages/Login/Login.jsx";
 import DashboardLayout from "./Layouts/DashboardLayout";
 import TaskManagement from "./pages/TaskManagement/TaskManagement.jsx";
 import Boards from "./pages/Boards/Boards.jsx";
+import NewTaskManagement from "./pages/TaskManagement/NewTaskManagement.jsx";
 function App() {
   return (
     <Routes>
@@ -16,7 +17,7 @@ function App() {
         <Route path="/login" element={<Login />} />
       </Route>
       <Route path="/dashboard" element={<DashboardLayout />}>
-        <Route index element={<TaskManagement />} />
+        <Route index element={<NewTaskManagement></NewTaskManagement>} />
         <Route path="boards" element={<Boards />} />
       </Route>
     </Routes>
