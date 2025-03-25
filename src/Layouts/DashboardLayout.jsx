@@ -25,7 +25,7 @@ const DashboardLayout = () => {
         {/* Sidebar */}
         <div className="drawer-side">
           <label htmlFor="my-drawer-2" aria-label="close sidebar" className="drawer-overlay"></label>
-          <ul className="menu bg-gradient-to-bl from-primary to-primary/90 text-base-content min-h-full w-56 py-4 px-0 gap-2 text-[12px]">
+          <ul className="menu custom-gradient-side-bar text-base-content min-h-full w-56 py-4 px-0 gap-2 text-[12px]">
             {/* Sidebar content */}
             <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
               <Link className="flex items-center gap-3">

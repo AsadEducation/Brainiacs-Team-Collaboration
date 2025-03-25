@@ -113,7 +113,7 @@ export default function NewTaskManagement() {
         })
     )
     return (
-        <div className='bg-gradient-to-rb from-secondary/90 to-secondary/50'>
+        <div className='custom-gradient-task-board'>
 
             <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragOver={onDragOver}>
                 <div className='m-auto flex min-h-screen w-full  overflow-x-auto overflow-y-hidden p-10 bg-gradient-to-bl from-secondary to-secondary/70  '>
