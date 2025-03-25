@@ -5,23 +5,7 @@ import { closestCorners, DndContext, MouseSensor, PointerSensor, TouchSensor, us
 import { arrayMove, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 
 
-
-
-
-
-
-
 // This component is not used anymore 
-
-
-
-
-
-
-
-
-
-
 
 
 const TaskManagement = () => {
@@ -114,12 +98,8 @@ const getPosition=id=>tasks.toDo.findIndex(obj=>obj.id===id);
           <button className="hover:bg-[#D0D4DB] w-full px-4 text-start rounded-md mt-2 text-[12px] py-1 font-semibold flex items-center text-[#172B4D] hover:text-gray-900">+  Add a card</button>
         </div>
 
-
-
-
       </div>
       {/* Main Content */}
-
 
     </div>
   );
