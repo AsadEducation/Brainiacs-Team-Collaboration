@@ -51,7 +51,7 @@ const Faq = () => {
     <div className="bg-[#2E5077] p-8">
 
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-4xl font-bold text-center text-white mb-12">
+        <h2 className="text-4xl font-bold text-center text-white mb-12 mt-10">
           Frequently Asked Questions
         </h2>
 
