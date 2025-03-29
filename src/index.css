@@ -2,3 +2,11 @@
 /* @plugin "daisyui"{
     themes: myCustomTheme;
   } */
+
+
+  .custom-gradient-task-board {
+    background: linear-gradient(to bottom right,#4da1a9da, #4da1a976);
+  }
+  .custom-gradient-side-bar {
+    background: linear-gradient(to bottom left, #2E5077, rgba(46, 80, 119, 0.9));
+  }
