@@ -11,7 +11,7 @@ const Boards = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editBoard, setEditBoard] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [theme, setTheme] = useState("Blue"); // New state for theme
+  const [theme, setTheme] = useState("#3b82f6");
 
   const themeOptions = [
     { name: "Blue", color: "#3b82f6" },
@@ -33,11 +33,11 @@ const Boards = () => {
     fetchBoards();
   }, []);
 
-  // Create Board
   const createBoard = async () => {
     if (!newBoard) return alert("Board name is required!");
 
-    const newBoardData = { name: newBoard, visibility, theme }; // Include theme in board data
+    const currentUser = { id: "currentUserId", name: "Current User" }; // Replace with actual user data
+    const newBoardData = { name: newBoard, visibility, theme, creator: currentUser, members: [currentUser] };
 
     try {
       const response = await axios.post(
@@ -47,7 +47,7 @@ const Boards = () => {
       setBoards([...boards, response.data]);
       setNewBoard("");
       setVisibility("Public");
-      setTheme("Blue"); // Reset theme to default
+      setTheme("#3b82f6");
       setIsModalOpen(false);
     } catch (error) {
       console.error("Error creating board:", error);
@@ -55,13 +55,11 @@ const Boards = () => {
     }
   };
 
-  // Open Edit Modal
   const openEditModal = (board) => {
     setEditBoard(board);
     setIsEditModalOpen(true);
   };
 
-  // Update Board
   const updateBoard = async () => {
     if (!editBoard.name) return alert("Board name is required!");
 
@@ -94,34 +92,34 @@ const Boards = () => {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {boards.length > 0 ? (
-          boards.map((board) => {
-            const themeColor =
-              themeOptions.find((option) => option.name === board.theme)
-                ?.color || "#ffffff";
-            return (
-              <motion.div
-                key={board._id}
-                className="p-8 shadow-lg rounded-lg cursor-pointer relative "
-                style={{ backgroundColor: themeColor }}
-                whileHover={{ scale: 1.03 }}
-                transition={{ duration: 0.1 }}
-                onClick={() => navigate(`/dashboard/boards/${board._id}`)}
-              >
-                <h3 className="text-lg font-semibold">{board.name}</h3>
-                <p className="text-sm text-white">
-                  Visibility: {board.visibility}
-                </p>
-                <div className="absolute top-2 right-2 flex gap-2">
-                  <button
-                    onClick={() => openEditModal(board)}
-                    className="btn btn-sm btn-info"
-                  >
-                    Edit
-                  </button>
-                </div>
-              </motion.div>
-            );
-          })
+          boards.map((board) => (
+            <motion.div
+              key={board._id}
+              className="p-8 shadow-lg rounded-lg cursor-pointer relative"
+              style={{ backgroundColor: board.theme }}
+              onClick={() =>
+                navigate(`/dashboard/boards/${board._id}`, {
+                  state: { theme: board.theme },
+                })
+              }
+            >
+              <h3 className="text-lg font-semibold">{board.name}</h3>
+              <p className="text-sm text-white">
+                Visibility: {board.visibility}
+              </p>
+              <div className="absolute top-2 right-2 flex gap-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openEditModal(board);
+                  }}
+                  className="btn btn-sm btn-info"
+                >
+                  Edit
+                </button>
+              </div>
+            </motion.div>
+          ))
         ) : (
           <p className="text-gray-500">
             No boards available. Create a new one!
@@ -129,7 +127,6 @@ const Boards = () => {
         )}
       </div>
 
-      {/* Create Board Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center backdrop-blur-xs z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">
@@ -150,28 +147,15 @@ const Boards = () => {
               <option value="Private">Private</option>
               <option value="Team Only">Team Only</option>
             </select>
-            <select
-              value={theme}
-              onChange={(e) => setTheme(e.target.value)}
-              className="select select-bordered w-full mb-3"
-            >
-              {themeOptions.map((option) => (
-                <option key={option.name} value={option.name}>
-                  {option.name}
-                </option>
-              ))}
-            </select>
             <div className="flex gap-2 mb-3">
               {themeOptions.map((option) => (
                 <div
                   key={option.name}
                   className={`w-6 h-6 rounded-full cursor-pointer border-2 ${
-                    theme === option.name
-                      ? "border-black"
-                      : "border-transparent"
+                    theme === option.color ? "border-black" : "border-transparent"
                   }`}
                   style={{ backgroundColor: option.color }}
-                  onClick={() => setTheme(option.name)}
+                  onClick={() => setTheme(option.color)}
                 ></div>
               ))}
             </div>
@@ -190,22 +174,21 @@ const Boards = () => {
         </div>
       )}
 
-      {/* Edit Board Modal */}
-      {isEditModalOpen && editBoard && (
+      {isEditModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center backdrop-blur-xs z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">
             <h3 className="text-lg font-bold mb-3">Edit Board</h3>
             <input
               type="text"
               placeholder="Board Name"
-              value={editBoard.name}
+              value={editBoard?.name || ""}
               onChange={(e) =>
                 setEditBoard({ ...editBoard, name: e.target.value })
               }
               className="input input-bordered w-full mb-3"
             />
             <select
-              value={editBoard.visibility}
+              value={editBoard?.visibility || "Public"}
               onChange={(e) =>
                 setEditBoard({ ...editBoard, visibility: e.target.value })
               }
@@ -223,7 +206,7 @@ const Boards = () => {
                 Cancel
               </button>
               <button onClick={updateBoard} className="btn btn-success">
-                Save Changes
+                Save
               </button>
             </div>
           </div>
