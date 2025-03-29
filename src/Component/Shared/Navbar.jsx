@@ -120,7 +120,7 @@ const Navbar = () => {
                   </div>
                   <hr />
                   <Link
-                    to="/dashboard"
+                    to="/dashboard/boards"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     Dashboard
