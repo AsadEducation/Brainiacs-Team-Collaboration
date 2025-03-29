@@ -6,9 +6,13 @@ import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors } from '@
 import { arrayMove, SortableContext } from '@dnd-kit/sortable'
 import { createPortal } from 'react-dom'
 import TaskCard from './TaskCard'
+import { useParams } from 'react-router'
 
 
 export default function NewTaskManagement() {
+    const {id} =useParams()
+    console.log(id);
+    
     // this state contains the column lists 
     const [columns, setColumns] = useState([])
     const [tasks,setTasks]=useState([]);
