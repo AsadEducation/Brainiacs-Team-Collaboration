@@ -20,7 +20,7 @@ const TaskCard = ({ task }) => {
 
   if (isDragging) {
     return (
-      <div style={style} ref={setNodeRef} className="bg-white rounded-2xl h-24 shadow-lg w-64"></div>
+      <div style={style} ref={setNodeRef} className="bg-red-500 rounded-2xl h-24 shadow-lg w-64"></div>
     )
   }
   const { taskTittle } = task
@@ -28,7 +28,7 @@ const TaskCard = ({ task }) => {
   return (
     <>
 
-      <div style={style} ref={setNodeRef} {...attributes} {...listeners} className="bg-white rounded-2xl p-4 shadow-lg w-64"
+      <div style={style} ref={setNodeRef} {...attributes} {...listeners} className="bg-white rounded-2xl p-4 shadow-lg w-[250px] border-sky-500 hover:border "
         onClick={() => setIsModalOpen(true)}
       >
         <div style={{ touchAction: "none" }}>

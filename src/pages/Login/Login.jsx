@@ -10,8 +10,13 @@ import logo from "../../assets/brainiacs logo.png";
 import GoogleButton from "../SignUp/GoogleButton";
 import useAuth from "../../Hooks/useAuth";
 import Swal from "sweetalert2";
+import { useEffect } from "react";
+import useAxiosPublic from "../../Hooks/useAxiosPublic";
 const Login = () => {
-  const navigate=useNavigate()
+
+ 
+
+  const navigate = useNavigate()
   const { logInUser } = useAuth()
   const {
     register,
@@ -21,15 +26,16 @@ const Login = () => {
 
   const onSubmit = (data) => {
     console.log(data);
-    const {email,password}=data;
-    logInUser(email,password)
-    .then(res=>{
-      console.log("success",res)
-      Swal.fire("Successfully Logged In")
-      navigate("/")
-    })
-    .catch(err=>console.log("error",err))
+    const { email, password } = data;
+    logInUser(email, password)
+      .then(res => {
+        console.log("success", res)
+        Swal.fire("Successfully Logged In")
+        navigate("/")
+      })
+      .catch(err => console.log("error", err))
   };
+  
 
   return (
     <div className="flex items-center justify-center px-5 py-5 pt-20 text-white min-h-screen bg-[#F0F4F3] ">
