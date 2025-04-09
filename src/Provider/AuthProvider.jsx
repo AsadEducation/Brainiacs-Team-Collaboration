@@ -6,7 +6,7 @@ import { GoogleAuthProvider } from 'firebase/auth';
 export const AuthContext = createContext()
 const AuthProvider = ({ children }) => {
     const googleProvider = new GoogleAuthProvider();
-    const [user, setUser] = useState([])
+    const [user, setUser] = useState(null); // Initialize as null instead of an empty array
     const [loading, setLoading] = useState(true)
 
     const signUpUser = (email, password) => {
@@ -23,7 +23,6 @@ const AuthProvider = ({ children }) => {
     }
     const updateUser = (name, photo) => {
         setLoading(true)
-        console.log("auth user", auth.currentUser)
         return updateProfile(auth.currentUser, {
             displayName: name,
             photoURL: photo
@@ -38,15 +37,6 @@ const AuthProvider = ({ children }) => {
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
-            console.log("current user", currentUser); 
-            if (currentUser) {
-                // console.log("User Details:", {
-                //     uid: currentUser.uid,
-                //     email: currentUser.email,
-                //     displayName: currentUser.displayName,
-                //     photoURL: currentUser.photoURL,
-                // });
-            }
             setLoading(false);
         });
         return () => {
@@ -54,7 +44,7 @@ const AuthProvider = ({ children }) => {
         };
     }, []);
     const authInfo = {
-        user,
+        currentUser: user, // Provide currentUser for consistency
         loading,
         signUpUser,
         logInUser,

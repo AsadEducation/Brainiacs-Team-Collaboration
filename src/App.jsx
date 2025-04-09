@@ -18,9 +18,9 @@ function App() {
       </Route>
 
       <Route path="/dashboard" element={<DashboardLayout />}>
-        {/* <Route index element={<NewTaskManagement />} /> */}
-        <Route index path="boards" element={<Boards />} />
-        <Route path="boards/:id" element={<NewTaskManagement />} />  
+        <Route index element={<Boards />} />
+        <Route path="boards" element={<Boards />} />
+        <Route path="boards/:id" element={<NewTaskManagement />} />
       </Route>
     </Routes>
   );
