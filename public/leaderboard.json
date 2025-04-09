@@ -1,0 +1,48 @@
+[
+    {
+      "id": 1,
+      "name": "Siam Vai",
+      "points": 220,
+      "badge": "🔥 Speed King",
+      "tasksCompleted": 30,
+      "completedOnTime": 28,
+      "avatar": "https://i.pravatar.cc/150?img=1"
+    },
+    {
+      "id": 2,
+      "name": "Hasib Vai",
+      "points": 195,
+      "badge": "⚡ Task Ninja",
+      "tasksCompleted": 26,
+      "completedOnTime": 22,
+      "avatar": "https://i.pravatar.cc/150?img=2"
+    },
+    {
+      "id": 3,
+      "name": "Apu (You)",
+      "points": 160,
+      "badge": "🏅 Task Master",
+      "tasksCompleted": 22,
+      "completedOnTime": 18,
+      "avatar": "https://i.pravatar.cc/150?img=3"
+    },
+    {
+      "id": 4,
+      "name": "Asad Vai",
+      "points": 130,
+      "badge": "🎯 Efficient Bee",
+      "tasksCompleted": 18,
+      "completedOnTime": 15,
+      "avatar": "https://i.pravatar.cc/150?img=4"
+    },
+    {
+      "id": 5,
+      "name": "Rina",
+      "points": 110,
+      "badge": "🌟 Rising Star",
+      "tasksCompleted": 15,
+      "completedOnTime": 12,
+      "avatar": "https://i.pravatar.cc/150?img=5"
+    }
+  ]
+  
