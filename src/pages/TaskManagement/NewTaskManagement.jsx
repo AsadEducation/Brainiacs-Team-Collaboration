@@ -15,10 +15,9 @@ import TaskCard from "./TaskCard";
 import { useParams, useLocation } from "react-router";
 import axios from "axios";
 import Modal from "react-modal";
-import "./ModalStyles.css"; // Ensure this file exists and contains modal styles
+import "./ModalStyles.css";
 
-// Set the app element for accessibility
-Modal.setAppElement("#root"); // Ensure your app's root element has the id "root"
+Modal.setAppElement("#root");
 
 export default function NewTaskManagement() {
   const { id } = useParams();
@@ -39,6 +38,7 @@ export default function NewTaskManagement() {
     const fetchBoardData = async () => {
       try {
         const response = await axios.get(`http://localhost:5000/boards/${id}`);
+        console.log("Fetched board data:", response.data); // Log the board data
         setBoard(response.data);
         setMembers(response.data.members || []);
       } catch (error) {
@@ -80,12 +80,26 @@ export default function NewTaskManagement() {
     setTasks([...tasks, newTask]);
   };
 
-  const addMember = (memberName) => {
-    const newMember = {
-      id: generateId(),
-      name: memberName,
-    };
-    setMembers([...members, newMember]);
+  const addMember = async (member) => {
+    try {
+      const newMember = {
+        userId: member._id,
+        name: member.name,
+        email: member.email,
+        role: "member",
+      };
+      const updatedMembers = [...members, newMember];
+      setMembers(updatedMembers);
+
+      await axios.put(`http://localhost:5000/boards/${id}`, {
+        members: updatedMembers,
+      });
+
+      alert("Member added successfully!");
+    } catch (error) {
+      console.error("Error adding member:", error);
+      alert("Failed to add member. Please try again.");
+    }
   };
 
   const addTaskToList = (taskTitle, columnId) => {
@@ -123,7 +137,7 @@ export default function NewTaskManagement() {
       } else {
         setSuggestedUsers([]);
       }
-    }, 300); // Debounce for 300ms
+    }, 300);
   };
 
   const handleUserSelect = (user) => {
@@ -136,8 +150,10 @@ export default function NewTaskManagement() {
     setSelectedUsers(selectedUsers.filter((user) => user.id !== userId));
   };
 
-  const handleAddSelectedUsers = () => {
-    selectedUsers.forEach((user) => addMember(user.name));
+  const handleAddSelectedUsers = async () => {
+    for (const user of selectedUsers) {
+      await addMember(user);
+    }
     setSelectedUsers([]);
     setIsModalOpen(false);
   };
@@ -210,18 +226,60 @@ export default function NewTaskManagement() {
     })
   );
 
+  const createBoard = async () => {
+    if (!board?.name) return alert("Board name is required!");
+
+    const currentUser = { id: "currentUserId", name: "Current User" };
+    const newBoardData = {
+      name: board.name,
+      createdBy: currentUser.id,
+      members: members.map((member) => ({
+        userId: member.id,
+        role: "member",
+      })),
+    };
+
+    try {
+      await axios.post("http://localhost:5000/boards", newBoardData);
+      alert("Board created successfully!");
+    } catch (error) {
+      console.error(
+        "Error creating board:",
+        error.response?.data || error.message
+      );
+      alert("Failed to create board. Please check the input and try again.");
+    }
+  };
+
+  const deleteMember = async (userId) => {
+    try {
+      const updatedMembers = members.filter(
+        (member) => member.userId !== userId
+      );
+      setMembers(updatedMembers);
+
+      await axios.put(`http://localhost:5000/boards/${id}`, {
+        members: updatedMembers,
+      });
+
+      alert("Member removed successfully!");
+    } catch (error) {
+      console.error("Error removing member:", error);
+      alert("Failed to remove member. Please try again.");
+    }
+  };
+
   return (
     <div
+      className={`flex flex-col min-h-screen`}
       style={{
         backgroundColor: board?.theme || location.state?.theme || "#f4f5f7",
         minHeight: "100vh",
       }}
-      className="flex flex-col"
     >
-      {/* Header Section */}
       <header className="bg-white shadow-md p-4">
-        <div className="container mx-auto flex justify-between items-center">
-          <div>
+        <div className="container mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center">
+          <div className="mb-4 sm:mb-0">
             <h1 className="text-2xl font-bold text-gray-800">
               {board?.name || "Untitled Board"}
             </h1>
@@ -231,39 +289,42 @@ export default function NewTaskManagement() {
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center"
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 flex items-center transition duration-200"
           >
             <FaUserPlus className="mr-2" /> Add Member
           </button>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-grow p-6">
+      <main className="flex-grow p-6 ">
         <div className="container mx-auto">
-          {/* Members Section */}
           <div className="mb-6">
             <h2 className="text-lg font-semibold text-gray-800">Members</h2>
             <ul className="flex flex-wrap gap-4 mt-2">
               {members.map((member) => (
                 <li
-                  key={member.id}
-                  className="px-4 py-2 bg-gray-100 rounded shadow text-gray-700"
+                  key={member.userId}
+                  className="px-4 py-2 bg-gray-100 rounded-lg shadow text-gray-700 flex justify-between items-center w-full sm:w-auto"
                 >
-                  {member.name}
+                  <span className="truncate">{member.name}</span>
+                  <button
+                    onClick={() => deleteMember(member.userId)}
+                    className="ml-4 text-red-500 text-sm hover:text-red-600 transition duration-200"
+                  >
+                    X
+                  </button>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Columns Section */}
           <DndContext
             sensors={sensors}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             onDragOver={onDragOver}
           >
-            <div className="flex gap-4 overflow-x-auto">
+            <div className="flex flex-wrap gap-4 overflow-x-auto">
               <SortableContext items={columnId}>
                 {columns.map((col) => (
                   <ColumnContainer
@@ -273,13 +334,13 @@ export default function NewTaskManagement() {
                     createTask={createTask}
                     tasks={tasks.filter((task) => task.columnId === col.id)}
                     addTaskToList={addTaskToList}
-                    className="bg-white shadow-md rounded p-4 w-72"
+                    className="bg-white shadow-md rounded-lg p-4 w-full sm:w-72"
                   />
                 ))}
               </SortableContext>
               <button
                 onClick={createNewColumn}
-                className="h-10 px-4 w-60 cursor-pointer rounded-lg bg-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-300 flex items-center justify-center"
+                className="h-10 px-4 w-full sm:w-60 cursor-pointer rounded-lg bg-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-300 flex items-center justify-center transition duration-200"
               >
                 <CiCirclePlus className="text-xl mr-2" /> Add Another List
               </button>
@@ -305,7 +366,6 @@ export default function NewTaskManagement() {
         </div>
       </main>
 
-      {/* Modal */}
       <Modal
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}
@@ -319,22 +379,22 @@ export default function NewTaskManagement() {
           value={searchQuery}
           onChange={handleSearchChange}
           placeholder="Search for users..."
-          className="w-full p-2 border rounded mb-4"
+          className="w-full p-2 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <ul>
           {suggestedUsers.map((user) => (
             <li
-              key={user.id}
-              className="p-2 border-b cursor-pointer hover:bg-gray-100"
+              key={user._id}
+              className="p-2 border-b cursor-pointer hover:bg-gray-100 transition duration-200"
               onClick={() => handleUserSelect(user)}
             >
               <h6 className="text-lg">{user.name}</h6>
-              <p className="text-xs">({user.email})</p>
+              <p className="text-xs text-gray-500">({user.email})</p>
             </li>
           ))}
         </ul>
         <div className="flex justify-between items-center mt-4">
-          <h3 className="text-md font-semibold mt-4">Selected Users</h3>
+          <h3 className="text-md font-semibold">Selected Users</h3>
           <h3>({selectedUsers.length})</h3>
         </div>
         <ul>
@@ -343,13 +403,15 @@ export default function NewTaskManagement() {
               key={user.id}
               className="p-2 border-b flex justify-between items-center"
             >
-              <span>
-                <h6 className="text-lg">{user.name}</h6>
-                <p className="text-xs">({user.email})</p>
-              </span>
+              <div className="flex items-center">
+                <span>
+                  <h6 className="text-lg">{user.name}</h6>
+                  <p className="text-xs text-gray-500">({user.email})</p>
+                </span>
+              </div>
               <button
                 onClick={() => handleRemoveSelectedUser(user.id)}
-                className="text-red-500 text-sm"
+                className="text-red-500 text-xs hover:text-red-600 transition duration-200"
               >
                 Remove
               </button>
@@ -359,13 +421,13 @@ export default function NewTaskManagement() {
         <div className="flex justify-between mt-4">
           <button
             onClick={() => setIsModalOpen(false)}
-            className="px-4 py-2 bg-red-500 text-white rounded"
+            className="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition duration-200"
           >
             Close
           </button>
           <button
             onClick={handleAddSelectedUsers}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition duration-200"
           >
             Add
           </button>
