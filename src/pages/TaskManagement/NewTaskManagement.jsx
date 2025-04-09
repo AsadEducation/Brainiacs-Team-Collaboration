@@ -66,7 +66,7 @@ export default function NewTaskManagement() {
     })
     useEffect(() => {
         if (!isLoading) {
-            const boardColumns=columns.filter(column=>column.boardId==id)
+            const boardColumns = columns.filter(column => column.boardId == id)
             setCurrentColumns(boardColumns)
         }
     }, [columns]);
@@ -87,7 +87,7 @@ export default function NewTaskManagement() {
 
     useEffect(() => {
         if (!taskLoading) {
-            const boardTasks=dbTasks.filter(task=>task.boardId==id)
+            const boardTasks = dbTasks.filter(task => task.boardId == id)
             setTasks(boardTasks)
         }
     }, [dbTasks]);
@@ -132,11 +132,19 @@ export default function NewTaskManagement() {
 
     }
     const updateColumn = (id, tittle) => {
+        const columnInfo = { id, tittle }
         const newColumn = currentColumns.map(col => {
             if (col.id !== id) return col;
             return { ...col, tittle }
         })
         setCurrentColumns(newColumn)
+        axiosPublic.put('/columnName', columnInfo)
+            .then(res => {
+                console.log("Column Name is updated", res)
+            })
+            .catch(err => {
+                console.log("Column Name update Failed", err);
+            })
     }
     const createTask = (e, columnId, columnTittle, setIsAddingTask) => {
         e.preventDefault();
@@ -275,7 +283,7 @@ export default function NewTaskManagement() {
             tasks[activeIndex].columnTittle = tasks[overIndex].columnTittle;
             const newTaskArray = arrayMove(tasks, activeIndex, overIndex)
             setTasks(newTaskArray);
-            currentTask = newTaskArray;
+            // currentTask = newTaskArray;
             axiosPublic.put("/tasks", newTaskArray)
                 .then(res => {
                     console.log("task is updated", res)
@@ -295,7 +303,7 @@ export default function NewTaskManagement() {
             tasks[activeIndex].columnTittle = over.data.current?.tittle;
             const newTaskArray = arrayMove(tasks, activeIndex, activeIndex)
             setTasks(newTaskArray);
-            currentTask = newTaskArray;
+            // currentTask = newTaskArray;
             axiosPublic.put("/tasks", newTaskArray)
                 .then(res => {
                     console.log("task is updated", res)
@@ -323,48 +331,52 @@ export default function NewTaskManagement() {
             className="flex flex-col"
         >
             {/* Header Section */}
-            <header className="bg-white shadow-md p-4">
+            <header className="bg-white/20 shadow-md px-4 py-3">
                 <div className="container mx-auto flex justify-between items-center">
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-800">
+                    <div className="flex items-center gap-2" >
+                        <h1 className="text-2xl font-bold text-white">
                             {board?.name || "Untitled Board"}
                         </h1>
-                        <p className="text-sm text-gray-500">
-                            {board?.visibility || "Public"}
+                        <p className="text-base text-gray-50">
+                            ({board?.visibility || "Public"})
                         </p>
                     </div>
-                    <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center"
-                    >
-                        <FaUserPlus className="mr-2" /> Add Member
-                    </button>
+                    <div className="flex items-center gap-2">
+                        {/* Members Section */}
+                        <div className="flex items-center gap-2">
+                            <h2 className="text-lg font-semibold text-gray-700">Members:</h2>
+                            <ul className="flex flex-wrap gap-1 ">
+                                {members.map((member) => (
+                                    <li
+                                        key={member.id}
+                                        className="px-3 py-1 bg-gray-100 rounded shadow text-gray-700"
+                                    >
+                                        {member.name}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center"
+                        >
+                            <FaUserPlus className="text-lg" />
+                        </button>
+                    </div>
                 </div>
             </header>
 
             {/* Main Content */}
-            <main className="flex-grow p-6">
+            <main className="flex-grow p-6 pb-2">
                 <div className="container mx-auto">
-                    {/* Members Section */}
-                    <div className="mb-6">
-                        <h2 className="text-lg font-semibold text-gray-800">Members</h2>
-                        <ul className="flex flex-wrap gap-4 mt-2">
-                            {members.map((member) => (
-                                <li
-                                    key={member.id}
-                                    className="px-4 py-2 bg-gray-100 rounded shadow text-gray-700"
-                                >
-                                    {member.name}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+
 
                     {/* Columns Section */}
                     <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragOver={onDragOver}>
-                        <div className='m-auto flex min-h-screen w-full  overflow-x-auto overflow-y-hidden p-10 bg-gradient-to-bl from-secondary to-secondary/70  '>
+                        <div className='m-auto flex min-h-[calc(100vh-110px)] w-full  overflow-x-auto overflow-y-hidden px-10 bg-gradient-to-bl from-secondary to-secondary/70  '>
                             <div className='mx-auto flex gap-4'>
-                                <div className='flex gap-2'>
+                                <div className='flex gap-2 pb-2'>
                                     <SortableContext items={columnId}>
                                         {
                                             currentColumns.map((col, idx) => <ColumnContainer key={idx} column={col} updateColumn={updateColumn} createTask={createTask} tasks={tasks.filter(task => task.columnId === col.id)}></ColumnContainer>)

@@ -20,7 +20,7 @@ const TaskCard = ({ task }) => {
 
   if (isDragging) {
     return (
-      <div style={style} ref={setNodeRef} className="bg-red-500 rounded-2xl h-24 shadow-lg w-64"></div>
+      <div style={style} ref={setNodeRef} className="bg-white rounded-2xl h-24 shadow-lg w-64"></div>
     )
   }
   const { taskTittle } = task
@@ -42,11 +42,6 @@ const TaskCard = ({ task }) => {
           </div>
 
 
-          {/* <div className="flex space-x-2 mt-2">
-      <p className="bg-gray-100 text-gray-700 px-2  rounded-md  text-[10px] font-medium">#UI007</p>
-      <p className="bg-blue-100 text-blue-600 px-2  rounded-md  text-[10px] font-medium">Design</p>
-      <p className="bg-yellow-100 text-yellow-600 px-2  rounded-md  text-[10px] font-medium">Backlog</p>
-    </div> */}
 
           {/* Member img */}
           <div className="flex items-center justify-between mt-3">

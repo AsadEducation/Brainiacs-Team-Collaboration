@@ -41,7 +41,7 @@ const ColumnContainer = ({ column, updateColumn, createTask, tasks }) => {
                         </>
                 }
             </div>
-            <div className="max-h-[calc(100vh-185px)] h-fit overflow-y-scroll overflow-x-hidden pb-2">
+            <div className="max-h-[calc(100vh-195px)] h-fit overflow-y-scroll overflow-x-hidden pb-2">
                 <div className=" flex flex-col items-center gap-2">
                     <SortableContext items={taskIds}>
                         {
