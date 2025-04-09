@@ -25,7 +25,9 @@ function App() {
       <Route path="/dashboard" element={<DashboardLayout />}>
         {/* <Route index element={<NewTaskManagement />} /> */}
         <Route index path="boards" element={<Boards />} />
+        <Route path="leaderBoard" element={<LeaderBoard></LeaderBoard>} />
         <Route path="boards/:id" element={<NewTaskManagement />} />  
+        <Route path="activity-log" element={<ActivityLog/>} />
       </Route>
 
     </Routes>
