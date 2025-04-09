@@ -7,6 +7,7 @@ import Login from "./pages/Login/Login.jsx";
 import DashboardLayout from "./Layouts/DashboardLayout";
 import Boards from "./pages/Boards/Boards.jsx";
 import NewTaskManagement from "./pages/TaskManagement/NewTaskManagement.jsx";
+import LeaderBoard from "./pages/LeaderBoardAndReview/LeaderBoard.jsx";
 import ActivityLog from './dashboard-pages/ActivityLog.jsx'
 
 function App() {
@@ -22,6 +23,9 @@ function App() {
       {/* dashboard routes  */}
 
       <Route path="/dashboard" element={<DashboardLayout />}>
+        <Route index element={<NewTaskManagement></NewTaskManagement>} />
+        <Route path="boards" element={<Boards />} />
+        <Route path="leaderBoard" element={<LeaderBoard></LeaderBoard>} />
         {/* <Route index element={<NewTaskManagement />} /> */}
         <Route index path="boards" element={<Boards />} />
         <Route path="boards/:id" element={<NewTaskManagement />} />  
