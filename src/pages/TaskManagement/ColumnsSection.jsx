@@ -23,7 +23,7 @@ export default function ColumnsSection({
 }) {
     return (
         <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragOver={onDragOver}>
-            <div className="m-auto flex min-h-[calc(100vh-110px)] w-full overflow-x-auto overflow-y-hidden px-10 bg-gradient-to-bl from-secondary to-secondary/70">
+            <div className="m-auto flex min-h-[calc(100vh-110px)] w-full overflow-x-auto overflow-y-hidden  bg-gradient-to-bl from-secondary to-secondary/70">
                 <div className="mx-auto flex gap-4">
                     <div className="flex gap-2 pb-2">
                         <SortableContext items={columnId}>

@@ -10,6 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import Modal from "react-modal";
 import "./ModalStyles.css"; // Ensure this file exists and contains modal styles
 import { useSensors, useSensor, PointerSensor } from "@dnd-kit/core"; // Add this import
+import { arrayMove } from "@dnd-kit/sortable";
 
 Modal.setAppElement("#root");
 
