@@ -5,15 +5,16 @@ import logo from "../../assets/brainiacs logo.png";
 import close from "../../assets/icons/close.svg";
 import useAuth from "../../Hooks/useAuth";
 import Swal from "sweetalert2";
-import userimage from "../../assets/icons/user.svg"
+import userimage from "../../assets/icons/user.svg";
 import { MdOutlineLogout } from "react-icons/md";
 
 const Navbar = () => {
-  const { user, signOutUser } = useAuth();
+  const { currentUser, signOutUser } = useAuth(); // Use currentUser instead of user
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   let lastScrollY = window.scrollY;
+
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -64,91 +65,127 @@ const Navbar = () => {
   return (
     <div>
       {/* Desktop and Tablet Navbar */}
-        <motion.nav
-          className="min-w-[95%] fixed top-2 left-1/2 transform -translate-x-1/2 px-4 py-4 flex justify-between items-center rounded-full z-50 bg-white"
-          initial={{ y: 0 }}
-          animate={{ y: isVisible ? 0 : -100 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Link to="/" className="text-3xl font-bold leading-none">
-            <img className="w-32 md:w-40" src={logo} alt="Brainiacs" />
-          </Link>
-          <div className="lg:hidden ml-auto">
-            <button
-              className=" navbar-burger flex items-center p-3"
-              onClick={toggleMenu}
+      <motion.nav
+        className="min-w-[95%] fixed top-2 left-1/2 transform -translate-x-1/2 px-4 py-4 flex justify-between items-center rounded-full z-50 bg-white"
+        initial={{ y: 0 }}
+        animate={{ y: isVisible ? 0 : -100 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Link to="/" className="text-3xl font-bold leading-none">
+          <img className="w-32 md:w-40" src={logo} alt="Brainiacs" />
+        </Link>
+        <div className="lg:hidden ml-auto">
+          <button
+            className=" navbar-burger flex items-center p-3"
+            onClick={toggleMenu}
+          >
+            <svg
+              className="block h-6 w-6 fill-current"
+              viewBox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg"
             >
-              <svg
-                className="block h-6 w-6 fill-current"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z"></path>
-              </svg>
-            </button>
-          </div>
-          <ul className="mx-auto hidden lg:flex lg:items-center lg:space-x-6">
-            <li>
-              <Link to="/" className="text-sm hover:text-accent cursor-pointer">Home</Link>
-            </li>
-            <li>
-              <Link to="/about" className="text-sm hover:text-accent cursor-pointer">About Us</Link>
-            </li>
-            <li>
-              <Link to="/services" className="text-sm hover:text-accent cursor-pointer">Services</Link>
-            </li>
-            <li>
-              <Link to="/pricing" className="text-sm hover:text-accent cursor-pointer">Pricing</Link>
-            </li>
-            <li>
-              <Link to="/contact" className="text-sm hover:text-accent cursor-pointer">Contact</Link>
-            </li>
-          </ul>
-          {user ? (
-            <div className="relative">
-              <button
-                onClick={toggleDropdown}
-                className="hidden lg:inline-block lg:ml-auto lg:mr-3 text-2xl text-secondary cursor-pointer"
-              >
-                <img className="w-10 h-10 rounded-full" src={user.photoURL || userimage} alt="User" />
-              </button>
-              {dropdownOpen && (
-                <div className="absolute right-0 top-14 w-48 bg-white border rounded-lg shadow-lg dropdown">
-                  <div className="flex flex-col justify-center px-4 py-2 text-sm text-gray-700">
-                    <p>{user.displayName}</p>
-                    <p className="text-xs">{user.email}</p>
-                  </div>
-                  <hr />
-                  <Link
-                    to="/dashboard/boards"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Dashboard
-                  </Link>
-                  <Link
-                    to="/profile"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Profile
-                  </Link>
-                  <button
-                    onClick={handleLogOut}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Log Out
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <Link
-              to="/login"
-              className="hidden lg:inline-block lg:ml-auto lg:mr-3 py-2 px-6 text-sm font-bold rounded-xl transition duration-200 bg-secondary hover:bg-accent text-white"
-            >
-              Log In
+              <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z"></path>
+            </svg>
+          </button>
+        </div>
+        <ul className="mx-auto hidden lg:flex lg:items-center lg:space-x-6">
+          <li>
+            <Link to="/" className="text-sm hover:text-accent cursor-pointer">
+              Home
             </Link>
+          </li>
+          <li>
+            <Link
+              to="/about"
+              className="text-sm hover:text-accent cursor-pointer"
+            >
+              About Us
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/services"
+              className="text-sm hover:text-accent cursor-pointer"
+            >
+              Services
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/pricing"
+              className="text-sm hover:text-accent cursor-pointer"
+            >
+              Pricing
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/contact"
+              className="text-sm hover:text-accent cursor-pointer"
+            >
+              Contact
+            </Link>
+          </li>
+          {currentUser && (
+            <li>
+              <Link
+                to="/dashboard"
+                className="text-sm hover:text-accent cursor-pointer"
+              >
+                Dashboard
+              </Link>
+            </li>
           )}
-        </motion.nav>
+        </ul>
+        {currentUser ? (
+          <div className="relative">
+            <button
+              onClick={toggleDropdown}
+              className="hidden lg:inline-block lg:ml-auto lg:mr-3 text-2xl text-secondary cursor-pointer"
+            >
+              <img
+                className="w-10 h-10 rounded-full"
+                src={currentUser.photoURL || userimage}
+                alt="User"
+              />
+            </button>
+            {dropdownOpen && (
+              <div className="absolute right-0 top-14 w-48 bg-white border rounded-lg shadow-lg dropdown">
+                <div className="flex flex-col justify-center px-4 py-2 text-sm text-gray-700">
+                  <p>{currentUser.displayName}</p>
+                  <p className="text-xs">{currentUser.email}</p>
+                </div>
+                <hr />
+                <Link
+                  to="/dashboard/boards"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  to="/profile"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  Profile
+                </Link>
+                <button
+                  onClick={handleLogOut}
+                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  Log Out
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <Link
+            to="/login"
+            className="hidden lg:inline-block lg:ml-auto lg:mr-3 py-2 px-6 text-sm font-bold rounded-xl transition duration-200 bg-secondary hover:bg-accent text-white"
+          >
+            Log In
+          </Link>
+        )}
+      </motion.nav>
 
       {/* Mobile Menu */}
       <AnimatePresence>
@@ -200,16 +237,16 @@ const Navbar = () => {
             </ul>
             <div className="mt-auto">
               <div className="pt-6">
-                {user ? (
+                {currentUser ? (
                   <Link to="/profile" className="flex items-center mb-4">
                     <img
                       className="w-10 h-10 rounded-full mr-3"
-                      src={user.photoURL || userimage}
+                      src={currentUser.photoURL || userimage}
                       alt="User"
                     />
                     <div className="flex flex-col">
-                      <span className="text-sm font-semibold">{user.displayName}</span>
-                      <span className="text-xs text-gray-500">{user.email}</span>
+                      <span className="text-sm font-semibold">{currentUser.displayName}</span>
+                      <span className="text-xs text-gray-500">{currentUser.email}</span>
                     </div>
                     <button
                       onClick={handleLogOut}

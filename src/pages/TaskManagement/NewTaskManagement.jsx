@@ -1,376 +1,381 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
-import { FaUserPlus } from "react-icons/fa";
-import ColumnContainer from "./ColumnContainer";
-import { CiCirclePlus } from "react-icons/ci";
-import {
-  DndContext,
-  DragOverlay,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import { arrayMove, SortableContext } from "@dnd-kit/sortable";
-import { createPortal } from "react-dom";
-import TaskCard from "./TaskCard";
 import { useParams, useLocation } from "react-router";
 import axios from "axios";
+import useAxiosPublic from "../../Hooks/useAxiosPublic";
+import TaskManagementHeader from "./TaskManagementHeader";
+import AddMemberModal from "./AddMemberModal";
+import ColumnsSection from "./ColumnsSection";
+import { useQuery } from "@tanstack/react-query";
+
 import Modal from "react-modal";
 import "./ModalStyles.css"; // Ensure this file exists and contains modal styles
+import { useSensors, useSensor, PointerSensor } from "@dnd-kit/core"; // Add this import
+import { arrayMove } from "@dnd-kit/sortable";
 
-// Set the app element for accessibility
-Modal.setAppElement("#root"); // Ensure your app's root element has the id "root"
+Modal.setAppElement("#root");
 
 export default function NewTaskManagement() {
-  const { id } = useParams();
-  const location = useLocation();
-  const [board, setBoard] = useState(null);
-  const [columns, setColumns] = useState([]);
-  const [tasks, setTasks] = useState([]);
-  const [activeColumn, setActiveColumn] = useState(null);
-  const [activeTask, setActiveTask] = useState(null);
-  const [members, setMembers] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [suggestedUsers, setSuggestedUsers] = useState([]);
-  const [selectedUsers, setSelectedUsers] = useState([]);
-  const searchTimeout = useRef(null);
+    const { id } = useParams();
+    const location = useLocation();
+    const [board, setBoard] = useState(null);
+    const [members, setMembers] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [suggestedUsers, setSuggestedUsers] = useState([]);
+    const [selectedUsers, setSelectedUsers] = useState([]);
+    const searchTimeout = useRef(null);
+    const axiosPublic = useAxiosPublic();
+    const [currentColumns, setCurrentColumns] = useState([]);
+    const [tasks, setTasks] = useState([]);
+    const [activeColumn, setActiveColumn] = useState(null);
+    const [activeTask, setActiveTask] = useState(null);
+    const [isAddingList, setIsAddingList] = useState(false);
 
-  useEffect(() => {
-    const fetchBoardData = async () => {
-      try {
-        const response = await axios.get(`http://localhost:5000/boards/${id}`);
-        setBoard(response.data);
-        setMembers(response.data.members || []);
-      } catch (error) {
-        console.error("Error fetching board data:", error);
-      }
-    };
-    fetchBoardData();
-  }, [id]);
+    // siam vai's code starts here
+    useEffect(() => {
+        const fetchBoardData = async () => {
+            try {
+                const response = await axios.get(`http://localhost:5000/boards/${id}`);
+                setBoard(response.data);
+                setMembers(response.data.members || []);
+            } catch (error) {
+                console.error("Error fetching board data:", error);
+            }
+        };
+        fetchBoardData();
+    }, [id]);
+    // siam vai's code ends here
 
-  const columnId = useMemo(() => columns.map((col) => col.id), [columns]);
-
-  const generateId = () => Math.floor(Math.random() * 10001);
-
-  const createNewColumn = () => {
-    const columnToAdd = {
-      id: generateId(),
-      type: "Column",
-      tittle: `Column ${columns.length + 1}`,
-    };
-    setColumns([...columns, columnToAdd]);
-  };
-
-  const updateColumn = (id, tittle) => {
-    const newColumn = columns.map((col) => {
-      if (col.id !== id) return col;
-      return { ...col, tittle };
-    });
-    setColumns(newColumn);
-  };
-
-  const createTask = (columnId, columnTittle) => {
-    const newTask = {
-      id: generateId(),
-      type: "Task",
-      columnId,
-      columnTittle,
-      taskTittle: `Task ${tasks.length + 1}`,
-    };
-    setTasks([...tasks, newTask]);
-  };
-
-  const addMember = (memberName) => {
-    const newMember = {
-      id: generateId(),
-      name: memberName,
-    };
-    setMembers([...members, newMember]);
-  };
-
-  const addTaskToList = (taskTitle, columnId) => {
-    const newTask = {
-      id: generateId(),
-      type: "Task",
-      columnId,
-      taskTittle: taskTitle,
-    };
-    setTasks([...tasks, newTask]);
-  };
-
-  const fetchSuggestedUsers = async (query) => {
-    try {
-      const response = await axios.get(
-        `http://localhost:5000/users/search?query=${query}`
-      );
-      setSuggestedUsers(response.data);
-    } catch (error) {
-      console.error("Error fetching suggested users:", error);
-    }
-  };
-
-  const handleSearchChange = (e) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-
-    if (searchTimeout.current) {
-      clearTimeout(searchTimeout.current);
-    }
-
-    searchTimeout.current = setTimeout(() => {
-      if (query.trim()) {
-        fetchSuggestedUsers(query);
-      } else {
-        setSuggestedUsers([]);
-      }
-    }, 300); // Debounce for 300ms
-  };
-
-  const handleUserSelect = (user) => {
-    if (!selectedUsers.some((selected) => selected.id === user.id)) {
-      setSelectedUsers((prevSelectedUsers) => [...prevSelectedUsers, user]);
-    }
-  };
-
-  const handleRemoveSelectedUser = (userId) => {
-    setSelectedUsers(selectedUsers.filter((user) => user.id !== userId));
-  };
-
-  const handleAddSelectedUsers = () => {
-    selectedUsers.forEach((user) => addMember(user.name));
-    setSelectedUsers([]);
-    setIsModalOpen(false);
-  };
-
-  const onDragStart = (event) => {
-    if (event.active.data.current?.type === "Column") {
-      setActiveColumn({
-        id: event.active.data.current?.id,
-        tittle: event.active.data.current?.tittle,
-        type: "Column",
-      });
-    }
-    if (event.active.data.current?.type === "Task") {
-      setActiveTask({
-        id: event.active.data.current?.id,
-        taskTittle: event.active.data.current?.taskTittle,
-        type: "Task",
-      });
-    }
-  };
-
-  const onDragEnd = (event) => {
-    setActiveColumn(null);
-    setActiveTask(null);
-    const { active, over } = event;
-    if (!over) return;
-    const activeId = active.id;
-    const overId = over.id;
-    if (activeId == overId) return;
-    setColumns((columns) => {
-      const activeColumnIndex = columns.findIndex((col) => col.id == activeId);
-      const overColumnIndex = columns.findIndex((col) => col.id == overId);
-      return arrayMove(columns, activeColumnIndex, overColumnIndex);
-    });
-  };
-
-  const onDragOver = (event) => {
-    const { active, over } = event;
-    if (!over) return;
-    const activeId = active.id;
-    const overId = over.id;
-    if (activeId == overId) return;
-    const isActiveTask = active.data.current?.type === "Task";
-    const isOverTask = over.data.current?.type === "Task";
-    if (!isActiveTask) return;
-    if (isActiveTask && isOverTask) {
-      setTasks((tasks) => {
-        const activeIndex = tasks.findIndex((t) => t.id === activeId);
-        const overIndex = tasks.findIndex((t) => t.id === overId);
-        tasks[activeIndex].columnId = tasks[overIndex].columnId;
-        return arrayMove(tasks, activeIndex, overIndex);
-      });
-    }
-
-    const isOverAColumn = over.data.current?.type === "Column";
-    if (isActiveTask && isOverAColumn) {
-      setTasks((tasks) => {
-        const activeIndex = tasks.findIndex((t) => t.id === activeId);
-        tasks[activeIndex].columnId = overId;
-        return arrayMove(tasks, activeIndex, activeIndex);
-      });
-    }
-  };
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 3,
-      },
+    // this state contains the column lists 
+    const { refetch: columnRefetch, data: columns = [], isLoading } = useQuery({
+        queryKey: ["columns"],
+        queryFn: async () => {
+            const result = await axiosPublic.get("/columns");
+            return result.data;
+        }
     })
-  );
+    useEffect(() => {
+        if (!isLoading) {
+            const boardColumns = columns.filter(column => column.boardId == id)
+            setCurrentColumns(boardColumns)
+        }
+    }, [columns]);
 
-  return (
-    <div
-      style={{
-        backgroundColor: board?.theme || location.state?.theme || "#f4f5f7",
-        minHeight: "100vh",
-      }}
-      className="flex flex-col"
-    >
-      {/* Header Section */}
-      <header className="bg-white shadow-md p-4">
-        <div className="container mx-auto flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800">
-              {board?.name || "Untitled Board"}
-            </h1>
-            <p className="text-sm text-gray-500">
-              {board?.visibility || "Public"}
-            </p>
-          </div>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center"
-          >
-            <FaUserPlus className="mr-2" /> Add Member
-          </button>
+    // this state contains task lists 
+    const { refetch: taskRefetch, data: dbTasks = [], isLoading: taskLoading } = useQuery({
+        queryKey: ["dbTasks"],
+        queryFn: async () => {
+            const result = await axiosPublic.get("/tasks");
+            return result.data;
+        }
+    })
+
+    useEffect(() => {
+        if (!taskLoading) {
+            const boardTasks = dbTasks.filter(task => task.boardId == id)
+            setTasks(boardTasks)
+        }
+    }, [dbTasks]);
+
+    // need to study about useMEMO 
+    const columnId = useMemo(() => currentColumns.map(col => col.id), [currentColumns]);
+
+    // the below function is used to generate the id of new currentColumns 
+    const generateId = () => {
+        // generate a random number between 0 and 1000
+        return Math.floor(Math.random() * 10001);
+    }
+
+    // the below function adds new column to the column list 
+    const createNewColumn = (e) => {
+        e.preventDefault();
+        const columnTittle = e.target.columnName.value;
+        const columnToAdd = {
+            id: columnTittle + generateId(),
+            type: "Column",
+            boardId: id,
+            tittle: columnTittle || `Column ${currentColumns.length + 1}`,
+        };
+        // adding new column to local state 
+        setCurrentColumns([...currentColumns, columnToAdd]);
+        // adding new column to database
+        axiosPublic.post("/columns", columnToAdd)
+            .then(res => {
+                console.log("column post response", res.data)
+            })
+            .catch(err => {
+                console.log("Column post error", err)
+            })
+        setIsAddingList(false)
+
+    }
+    const updateColumn = (id, tittle) => {
+        const columnInfo = { id, tittle }
+        const newColumn = currentColumns.map(col => {
+            if (col.id !== id) return col;
+            return { ...col, tittle }
+        })
+        setCurrentColumns(newColumn)
+        axiosPublic.put('/columnName', columnInfo)
+            .then(res => {
+                console.log("Column Name is updated", res)
+            })
+            .catch(err => {
+                console.log("Column Name update Failed", err);
+            })
+    }
+    const createTask = (e, columnId, columnTittle, setIsAddingTask) => {
+        e.preventDefault();
+        const tittle = e.target.taskTittle.value;
+        console.log(tittle, "tittle")
+        const newTask = {
+            id: tittle + generateId(),
+            type: "Task",
+            boardId: id,
+            columnId,
+            columnTittle,
+            taskTittle: tittle || `Task ${tasks.length + 1}`
+        }
+        // adding new task to local state
+        setTasks([...tasks, newTask])
+        // adding new task to database
+        axiosPublic.post("tasks", { ...newTask, order: tasks.length + 1 })
+            .then(res => {
+                console.log("task post response", res.data)
+            })
+            .catch(err => {
+                console.log("task post error", err)
+            })
+        setIsAddingTask(false)
+    }
+
+    //   siam vai's code starts here
+    const addMember = async (member) => {
+        if (!member.userId) {
+            console.error("Invalid member data:", member);
+            alert("Invalid member data. Please ensure the user has a valid ID.");
+            return;
+        }
+
+        const updatedMembers = [...members, { userId: member.userId, role: "member" }];
+        setMembers(updatedMembers);
+
+        try {
+            const validMembers = updatedMembers.map((m) => ({
+                userId: m.userId.toString(), // Ensure userId is a string
+                role: m.role || "member",   // Default role
+            }));
+
+            await axios.put(`http://localhost:5000/boards/${id}`, { members: validMembers });
+            console.log("Member added successfully");
+
+            // Refetch the board data to update the UI
+            const response = await axios.get(`http://localhost:5000/boards/${id}`);
+            setBoard(response.data);
+            setMembers(response.data.members || []);
+        } catch (error) {
+            console.error("Error adding member to the board:", error);
+            alert("Failed to add member. Please check the data and try again.");
+        }
+    };
+
+    const fetchSuggestedUsers = async (query) => {
+        try {
+            const response = await axios.get(
+                `http://localhost:5000/users/search?query=${query}`
+            );
+            setSuggestedUsers(response.data);
+        } catch (error) {
+            console.error("Error fetching suggested users:", error);
+        }
+    };
+
+    const handleSearchChange = (e) => {
+        const query = e.target.value;
+        setSearchQuery(query);
+
+        if (searchTimeout.current) {
+            clearTimeout(searchTimeout.current);
+        }
+
+        searchTimeout.current = setTimeout(() => {
+            if (query.trim()) {
+                fetchSuggestedUsers(query);
+            } else {
+                setSuggestedUsers([]);
+            }
+        }, 300); // Debounce for 300ms
+    };
+
+    const handleUserSelect = (user) => {
+        const normalizedUser = { ...user, id: user.id || user._id }; // Normalize id
+        if (!selectedUsers.some((selected) => selected.id === normalizedUser.id)) {
+            setSelectedUsers((prevSelectedUsers) => [...prevSelectedUsers, normalizedUser]);
+        }
+    };
+
+    const handleRemoveSelectedUser = (userId) => {
+        setSelectedUsers(selectedUsers.filter((user) => user.id !== userId));
+    };
+
+    const handleAddSelectedUsers = async () => {
+        for (const user of selectedUsers) {
+            if (!user.id) {
+                console.error("Invalid user object:", user);
+                alert("One or more selected users have invalid data. Please try again.");
+                continue;
+            }
+
+            await addMember({
+                userId: user.id,
+                name: user.name,
+                email: user.email,
+                role: "member", // Default role
+            });
+        }
+        setSelectedUsers([]);
+        setIsModalOpen(false);
+    };
+
+    //   siam vai's code ends  here
+
+
+    const onDragStart = event => {
+        console.log(event, "event")
+        setTimeout(() => {
+            if (event.active.data.current?.type === "Column") {
+                setActiveColumn({ id: event.active.data.current?.id, tittle: event.active.data.current?.tittle, type: "Column" })
+            }
+            if (event.active.data.current?.type === "Task") {
+                setActiveTask({ id: event.active.data.current?.id, taskTittle: event.active.data.current?.taskTittle, type: "Task" })
+            }
+        }, 10)
+    }
+    const onDragEnd = event => {
+        setActiveColumn(null)
+        setActiveTask(null)
+        const { active, over } = event;
+        if (!over) return;
+        const activeId = active.id;
+        const overId = over.id;
+        if (activeId == overId) return;
+        if (active.data.current?.type === "Column" && over.data.current?.type === "Column") {
+            setCurrentColumns(currentColumns => {
+                const activeColumnIndex = currentColumns.findIndex(col => col.id == activeId)
+                const overColumnIndex = currentColumns.findIndex(col => col.id == overId)
+                const updatedColumns = arrayMove(currentColumns, activeColumnIndex, overColumnIndex)
+                axiosPublic.put("/columns", updatedColumns)
+                    .then(res => {
+                        console.log("column set update", res)
+                        columnRefetch();
+                    })
+                    .catch(err => {
+                        console.log("column swap error", err)
+                    })
+                return updatedColumns;
+            })
+        }
+        console.log("current task", currentTask)
+    }
+    const onDragOver = event => {
+        const { active, over } = event;
+        console.log("active", active, "over", over)
+        if (!over) return;
+        const activeId = active.id;
+        const overId = over.id;
+        if (activeId == overId) return;
+        const isActiveTask = active.data.current?.type === "Task";
+        const isOverTask = over.data.current?.type === "Task";
+        if (!isActiveTask) return;
+        // im dropping a task over another task
+        if (isActiveTask && isOverTask) {
+
+            const activeIndex = tasks.findIndex((t) => t.id === activeId)
+            const overIndex = tasks.findIndex((t) => t.id === overId)
+            tasks[activeIndex].columnId = tasks[overIndex].columnId;
+            tasks[activeIndex].columnTittle = tasks[overIndex].columnTittle;
+            const newTaskArray = arrayMove(tasks, activeIndex, overIndex)
+            setTasks(newTaskArray);
+            // currentTask = newTaskArray;
+            axiosPublic.put("/tasks", newTaskArray)
+                .then(res => {
+                    console.log("task is updated", res)
+                })
+                .catch(err => {
+                    console.log("task update error", err);
+                })
+
+        }
+
+        const isOverAColumn = over.data.current?.type === "Column";
+        // im dropping a task over a column
+        if (isActiveTask && isOverAColumn) {
+
+            const activeIndex = tasks.findIndex((t) => t.id === activeId)
+            tasks[activeIndex].columnId = overId;
+            tasks[activeIndex].columnTittle = over.data.current?.tittle;
+            const newTaskArray = arrayMove(tasks, activeIndex, activeIndex)
+            setTasks(newTaskArray);
+            // currentTask = newTaskArray;
+            axiosPublic.put("/tasks", newTaskArray)
+                .then(res => {
+                    console.log("task is updated", res)
+                })
+                .catch(err => {
+                    console.log("task update error", err);
+                })
+        }
+    }
+
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 3,
+            },
+        })
+    );
+
+    return (
+        <div
+            style={{
+                backgroundColor: board?.theme || location.state?.theme || "#f4f5f7",
+                minHeight: "100vh",
+            }}
+            className="flex flex-col"
+        >
+            <TaskManagementHeader board={board} members={members} setIsModalOpen={setIsModalOpen} />
+            <main className="flex-grow p-6 pb-2">
+                <div className="container mx-auto">
+                    <ColumnsSection
+                        sensors={sensors}
+                        onDragStart={onDragStart}
+                        onDragEnd={onDragEnd}
+                        onDragOver={onDragOver}
+                        columnId={columnId}
+                        currentColumns={currentColumns}
+                        updateColumn={updateColumn}
+                        createTask={createTask}
+                        tasks={tasks}
+                        isAddingList={isAddingList}
+                        setIsAddingList={setIsAddingList}
+                        createNewColumn={createNewColumn}
+                        activeColumn={activeColumn}
+                        activeTask={activeTask}
+                    />
+                </div>
+            </main>
+            <AddMemberModal
+                isModalOpen={isModalOpen}
+                setIsModalOpen={setIsModalOpen}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                suggestedUsers={suggestedUsers}
+                handleSearchChange={handleSearchChange}
+                handleUserSelect={handleUserSelect}
+                selectedUsers={selectedUsers}
+                handleRemoveSelectedUser={handleRemoveSelectedUser}
+                handleAddSelectedUsers={handleAddSelectedUsers}
+            />
         </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="flex-grow p-6">
-        <div className="container mx-auto">
-          {/* Members Section */}
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-800">Members</h2>
-            <ul className="flex flex-wrap gap-4 mt-2">
-              {members.map((member) => (
-                <li
-                  key={member.id}
-                  className="px-4 py-2 bg-gray-100 rounded shadow text-gray-700"
-                >
-                  {member.name}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Columns Section */}
-          <DndContext
-            sensors={sensors}
-            onDragStart={onDragStart}
-            onDragEnd={onDragEnd}
-            onDragOver={onDragOver}
-          >
-            <div className="flex gap-4 overflow-x-auto">
-              <SortableContext items={columnId}>
-                {columns.map((col) => (
-                  <ColumnContainer
-                    key={col.id}
-                    column={col}
-                    updateColumn={updateColumn}
-                    createTask={createTask}
-                    tasks={tasks.filter((task) => task.columnId === col.id)}
-                    addTaskToList={addTaskToList}
-                    className="bg-white shadow-md rounded p-4 w-72"
-                  />
-                ))}
-              </SortableContext>
-              <button
-                onClick={createNewColumn}
-                className="h-10 px-4 w-60 cursor-pointer rounded-lg bg-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-300 flex items-center justify-center"
-              >
-                <CiCirclePlus className="text-xl mr-2" /> Add Another List
-              </button>
-            </div>
-
-            {createPortal(
-              <DragOverlay>
-                {activeColumn && (
-                  <ColumnContainer
-                    column={activeColumn}
-                    updateColumn={updateColumn}
-                    tasks={tasks.filter(
-                      (task) => task.columnId === activeColumn.id
-                    )}
-                    createTask={createTask}
-                  />
-                )}
-                {activeTask && <TaskCard task={activeTask} />}
-              </DragOverlay>,
-              document.body
-            )}
-          </DndContext>
-        </div>
-      </main>
-
-      {/* Modal */}
-      <Modal
-        isOpen={isModalOpen}
-        onRequestClose={() => setIsModalOpen(false)}
-        contentLabel="Add Member Modal"
-        className="modal-content"
-        overlayClassName="modal-overlay"
-      >
-        <h2 className="text-lg font-semibold mb-4">Add Member</h2>
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={handleSearchChange}
-          placeholder="Search for users..."
-          className="w-full p-2 border rounded mb-4"
-        />
-        <ul>
-          {suggestedUsers.map((user) => (
-            <li
-              key={user.id}
-              className="p-2 border-b cursor-pointer hover:bg-gray-100"
-              onClick={() => handleUserSelect(user)}
-            >
-              <h6 className="text-lg">{user.name}</h6>
-              <p className="text-xs">({user.email})</p>
-            </li>
-          ))}
-        </ul>
-        <div className="flex justify-between items-center mt-4">
-          <h3 className="text-md font-semibold mt-4">Selected Users</h3>
-          <h3>({selectedUsers.length})</h3>
-        </div>
-        <ul>
-          {selectedUsers.map((user) => (
-            <li
-              key={user.id}
-              className="p-2 border-b flex justify-between items-center"
-            >
-              <span>
-                <h6 className="text-lg">{user.name}</h6>
-                <p className="text-xs">({user.email})</p>
-              </span>
-              <button
-                onClick={() => handleRemoveSelectedUser(user.id)}
-                className="text-red-500 text-sm"
-              >
-                Remove
-              </button>
-            </li>
-          ))}
-        </ul>
-        <div className="flex justify-between mt-4">
-          <button
-            onClick={() => setIsModalOpen(false)}
-            className="px-4 py-2 bg-red-500 text-white rounded"
-          >
-            Close
-          </button>
-          <button
-            onClick={handleAddSelectedUsers}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Add
-          </button>
-        </div>
-      </Modal>
-    </div>
-  );
+    );
 }

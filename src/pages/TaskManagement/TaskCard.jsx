@@ -28,25 +28,20 @@ const TaskCard = ({ task }) => {
   return (
     <>
 
-      <div style={style} ref={setNodeRef} {...attributes} {...listeners} className="bg-white rounded-2xl p-4 shadow-lg w-64"
-        onClick={() => setIsModalOpen(true)}
+      <div style={style} ref={setNodeRef} {...attributes} {...listeners} className="bg-white rounded-2xl p-4 shadow-lg w-[250px] border-sky-500 hover:border "
+        onClick={() => document.getElementById(task.id).showModal()}
       >
         <div style={{ touchAction: "none" }}>
 
           <div className='flex justify-between items-center'>
             <h3 className="text-[12px] font-medium text-gray-900"> {taskTittle}</h3>
-            <div  className="flex items-center text-cyan-600 space-x-1">
+            <div className="flex items-center text-cyan-600 space-x-1">
               <span className="text-base"><LiaFileSolid /></span>
               <p className="text-xs font-medium">4</p>
             </div>
           </div>
 
 
-          {/* <div className="flex space-x-2 mt-2">
-      <p className="bg-gray-100 text-gray-700 px-2  rounded-md  text-[10px] font-medium">#UI007</p>
-      <p className="bg-blue-100 text-blue-600 px-2  rounded-md  text-[10px] font-medium">Design</p>
-      <p className="bg-yellow-100 text-yellow-600 px-2  rounded-md  text-[10px] font-medium">Backlog</p>
-    </div> */}
 
           {/* Member img */}
           <div className="flex items-center justify-between mt-3">
@@ -90,7 +85,8 @@ const TaskCard = ({ task }) => {
         </div>
       </div>
 
-      <TaskModal task={task} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}></TaskModal>
+      <TaskModal task={task} ></TaskModal>
+      
 
     </>
   );

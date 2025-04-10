@@ -88,13 +88,7 @@ const Boards = () => {
         <h2 className="text-xl font-bold">Your Boards</h2>
        <div className="flex gap-3 ">
 
-       <button 
-        onClick={() => setOpen(!open)}
-        className="px-3 py-2 rounded-full text-2xl text-primary "
-        >
-
-<TbBellRinging2Filled />
-        </button>
+       
 
 
 
@@ -108,32 +102,7 @@ const Boards = () => {
         
        </div>
 
-{/* notification dropdown */}
 
-{open && (
-        <div className="absolute right-0 mt-44 w-80 bg-white rounded-lg shadow-lg z-50">
-           <div className="flex justify-between items-center px-4 py-3 border-b">
-            <h3 className="font-bold text-lg text-gray-700">Notifications</h3>
-            <button onClick={() => setOpen(false)} className="text-gray-500 hover:text-red-500 text-xl">
-              <IoClose />
-            </button>
-          </div>
-          <ul className="max-h-60 overflow-y-auto text-sm">
-            <li className="p-4 hover:bg-gray-100 transition">
-              You’ve been assigned a new task: <span className="font-medium">Design Header</span>
-              <div className="text-xs text-gray-400">2 mins ago</div>
-            </li>
-            <li className="p-4 hover:bg-gray-100 transition">
-              Niti mentioned you in a comment
-              <div className="text-xs text-gray-400">10 mins ago</div>
-            </li>
-            <li className="p-4 hover:bg-gray-100 transition">
-              Reminder: Complete <span className="font-medium">UI Fixes</span> today
-              <div className="text-xs text-gray-400">1 hour ago</div>
-            </li>
-          </ul>
-        </div>
-      )}
 
 
       </div>
