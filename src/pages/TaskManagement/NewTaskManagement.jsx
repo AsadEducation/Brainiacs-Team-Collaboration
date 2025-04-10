@@ -24,8 +24,7 @@ import useAxiosPublic from "../../Hooks/useAxiosPublic";
 
 
 
-// Set the app element for accessibility
-Modal.setAppElement("#root"); // Ensure your app's root element has the id "root"
+Modal.setAppElement("#root");
 
 export default function NewTaskManagement() {
     const { id } = useParams();

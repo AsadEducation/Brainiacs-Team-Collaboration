@@ -16,7 +16,7 @@ const DashboardLayout = () => {
           <label htmlFor="my-drawer-2" role="button" className="btn bg-primary fixed bottom-3 right-3 drawer-button rounded-none text-white lg:hidden z-50">
             <RiMenu2Line className="text-2xl"></RiMenu2Line>
           </label>
-          <Outlet/>
+          <Outlet />
 
           {/* Chat Box */}
           <ChatBox />
@@ -50,10 +50,16 @@ const DashboardLayout = () => {
               <Link to="/settings">Settings</Link>
             </li>
             <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
+              <Link to="/dashboard/activity-log">Activity Log</Link>
+            </li>
+            <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
               <Link to="/ecommerce">Ecommerce</Link>
             </li>
             <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
-              <Link to="/">Home</Link>
+              <Link to="/dashboard/leaderBoard">LeaderBoard</Link>
+            </li>
+            <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
+              <Link to="/">Home</Link>             
             </li>
           </ul>
         </div>
