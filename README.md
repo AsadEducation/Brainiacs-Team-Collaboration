@@ -1,7 +1,7 @@
 ## 🌐 Testing Live Link
 
 Click the link below to view the testing Live of development branch:  
-🔗 **[View Live Project](https://brainiacs-team-collaboration.vercel.app)**
+🔗 **[View Live Project](https://brainiacs-1000.netlify.app)**
 
 <hr>
 <h3>Rule sets:</h3>
@@ -18,6 +18,8 @@ e:\Brainiacs-Team-Collaboration\
 │   │── assets/       
 │   │── components/
 │   │   │── shared/   
+│   │   │── buttons/
+│   │   │── modals/
 │   │── context/         
 │   │── hooks/           
 │   │── layouts/
@@ -26,12 +28,15 @@ e:\Brainiacs-Team-Collaboration\
 │   │   │── Sign Up
 │   │   │── Home 
 │   │   │── Dashboard/   
+│   │   │── Profile/
 │   │── routes/          
+│   │── services/
 │   │── utils/          
 │   │── App.jsx          
 │   │── main.jsx        
 │── .env                 
 │── package.json        
+│── postcss.config.js    
 │── tailwind.config.js  
 │── vite.config.js       
 │── README.md         
