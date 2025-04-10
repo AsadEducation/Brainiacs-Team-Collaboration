@@ -33,6 +33,7 @@ const Login = () => {
         Swal.fire("Successfully Logged In")
         navigate("/")
       })
+      
       .catch(err => console.log("error", err))
   };
   
