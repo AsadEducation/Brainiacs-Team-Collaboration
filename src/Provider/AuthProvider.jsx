@@ -44,7 +44,7 @@ const AuthProvider = ({ children }) => {
         };
     }, []);
     const authInfo = {
-        currentUser: user, // Provide currentUser for consistency
+        user, // Ensure `user` is passed correctly
         loading,
         signUpUser,
         logInUser,

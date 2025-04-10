@@ -5,18 +5,47 @@ import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router';
 
 const GoogleButton = () => {
-    const navigate=useNavigate()
-    const {signUpGoogleUser}=useAuth()
-    const handleGoogle=()=>{
+    const navigate = useNavigate();
+    const { signUpGoogleUser } = useAuth();
+
+    const handleGoogle = () => {
         signUpGoogleUser()
-        .then(res=>{
-            console.log("success",res)
-            Swal.fire("Successfully Logged in")
-            navigate("/")
-        })
-        .catch(err=>console.log("error",err))
-        // TODO: add post api for saving user info
-      }
+            .then(res => {
+                const user = res.user;
+                console.log("Google Login Success:", user);
+
+                // Prepare user data for the database
+                const newUser = {
+                    name: user.displayName || "Unknown",
+                    email: user.email,
+                    role: "user"
+                };
+
+                // Save user data to the database
+                fetch("http://localhost:5000/users", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(newUser),
+                })
+                    .then(response => response.json())
+                    .then(result => {
+                        console.log("Google User Added to DB:", result);
+                        Swal.fire("Successfully Logged in");
+                        navigate("/");
+                    })
+                    .catch(err => {
+                        console.error("Error saving Google user to DB:", err);
+                        Swal.fire("Failed to save user data");
+                    });
+            })
+            .catch(err => {
+                console.error("Google Login Error:", err);
+                Swal.fire("Something went wrong");
+            });
+    };
+
     return (
         <button onClick={handleGoogle} className="p-2 border border-gray-300 rounded-full cursor-pointer hover:bg-secondary">
             <img className="w-7 md:w-10" src={google} alt="" />
