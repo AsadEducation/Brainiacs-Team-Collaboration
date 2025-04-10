@@ -29,11 +29,24 @@ const GoogleButton = () => {
                     },
                     body: JSON.stringify(newUser),
                 })
-                    .then(response => response.json())
+                    .then(response => {
+                        if (response.status === 400) {
+                            console.log("User already exists in the database.");
+                            Swal.fire("Successfully Logged in");
+                            navigate("/");
+                            return;
+                        }
+                        if (!response.ok) {
+                            throw new Error("Failed to save user to the database");
+                        }
+                        return response.json();
+                    })
                     .then(result => {
-                        console.log("Google User Added to DB:", result);
-                        Swal.fire("Successfully Logged in");
-                        navigate("/");
+                        if (result) {
+                            console.log("Google User Added to DB:", result);
+                            Swal.fire("Successfully Logged in");
+                            navigate("/");
+                        }
                     })
                     .catch(err => {
                         console.error("Error saving Google user to DB:", err);

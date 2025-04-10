@@ -29,11 +29,14 @@ const Login = () => {
     const { email, password } = data;
     logInUser(email, password)
       .then(res => {
-        console.log("success", res)
-        Swal.fire("Successfully Logged In")
-        navigate("/")
+        console.log("success", res);
+        Swal.fire("Successfully Logged In");
+        navigate("/"); // Redirect to home page
       })
-      .catch(err => console.log("error", err))
+      .catch(err => {
+        console.log("error", err);
+        Swal.fire("Login failed. Please check your credentials and try again.");
+      });
   };
   
 

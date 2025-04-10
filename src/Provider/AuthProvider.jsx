@@ -39,33 +39,59 @@ const AuthProvider = ({ children }) => {
         return signOut(auth);
     };
 
+    const fetchUserDataWithRetry = async (email, token, retries = 3) => {
+        for (let attempt = 1; attempt <= retries; attempt++) {
+            try {
+                const response = await axios.get(`http://localhost:5000/user/${email}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                return response.data; // Return user data if successful
+            } catch (error) {
+                if (error.response && error.response.status === 404) {
+                    console.warn(`User not found for email: ${email}. Stopping retries.`);
+                    throw new Error("User not found");
+                } else if (attempt < retries) {
+                    console.warn(`Retrying fetch user data (Attempt ${attempt})...`);
+                    await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retrying
+                } else {
+                    throw error; // Throw error if retries are exhausted or another error occurs
+                }
+            }
+        }
+    };
+
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // User is signed in, fetch additional user data from the server
                 try {
-                    const token = await user.getIdToken(); // Get Firebase token
-                    localStorage.setItem("authToken", token); // Store token in localStorage
+                    const token = await user.getIdToken();
+                    localStorage.setItem("authToken", token);
 
-                    const response = await axios.get("http://localhost:5000/user", {
-                        headers: { Authorization: `Bearer ${token}` }, // Include token in Authorization header
-                        params: { email: user.email }, // Optional: Pass email as a query parameter
-                    });
+                    const userData = await fetchUserDataWithRetry(user.email, token);
+                    console.log(userData.email);
 
-                    setCurrentUser(response.data); // Set user data from the server
+                    setCurrentUser(userData);
                 } catch (error) {
-                    console.error("Error fetching user data:", error);
-                    setCurrentUser(null);
+                    if (error.message === "User not found") {
+                        console.warn("User not found in the database. Proceeding with default user data.");
+                        setCurrentUser({
+                            email: user.email,
+                            name: user.displayName || "Unknown",
+                            role: "user",
+                        });
+                    } else {
+                        console.error("Error fetching user data:", error);
+                        setCurrentUser(null);
+                    }
                 }
             } else {
-                // User is signed out
                 setCurrentUser(null);
-                localStorage.removeItem("authToken"); // Remove token from localStorage
+                localStorage.removeItem("authToken");
             }
             setLoading(false);
         });
 
-        return () => unsubscribe(); // Cleanup the listener on unmount
+        return () => unsubscribe();
     }, []);
 
     if (loading) {

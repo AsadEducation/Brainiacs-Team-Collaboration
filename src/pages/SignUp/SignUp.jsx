@@ -32,16 +32,25 @@ const SignUp = () => {
           },
           body: JSON.stringify(newUser),
         })
-          .then(response => response.json())
+          .then(response => {
+            if (!response.ok) {
+              throw new Error("Failed to save user to the database");
+            }
+            return response.json();
+          })
           .then(result => {
             console.log("User Added to DB:", result); // Log database response
             Swal.fire(`Welcome ${userName} to Brainiacs`);
-            navigate("/");
+            navigate("/"); // Redirect to home page
+          })
+          .catch(err => {
+            console.error("Error saving user to DB:", err);
+            Swal.fire("Failed to save user data. Please try again.");
           });
       })
       .catch(err => {
-        console.log("Signup Error:", err); // Log signup error
-        Swal.fire(`Something Went Wrong`);
+        console.error("Signup Error:", err); // Log signup error
+        Swal.fire("Signup failed. Please check your details and try again.");
       });
   };
 
