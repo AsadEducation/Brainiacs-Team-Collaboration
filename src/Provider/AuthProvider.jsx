@@ -39,7 +39,7 @@ const AuthProvider = ({ children }) => {
         return signOut(auth);
     };
 
-    const fetchUserDataWithRetry = async (email, token, retries = 3) => {
+    const fetchUserDataWithRetry = async (email, token, retries = 2) => {
         for (let attempt = 1; attempt <= retries; attempt++) {
             try {
                 const response = await axios.get(`http://localhost:5000/user/${email}`, {
@@ -52,7 +52,7 @@ const AuthProvider = ({ children }) => {
                     throw new Error("User not found");
                 } else if (attempt < retries) {
                     console.warn(`Retrying fetch user data (Attempt ${attempt})...`);
-                    await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retrying
+                    await new Promise(resolve => setTimeout(resolve, 500)); // Reduced wait time
                 } else {
                     throw error; // Throw error if retries are exhausted or another error occurs
                 }
@@ -67,7 +67,7 @@ const AuthProvider = ({ children }) => {
                     const token = await user.getIdToken();
                     localStorage.setItem("authToken", token);
 
-                    const userData = await fetchUserDataWithRetry(user.email, token);
+                    const userData = await fetchUserDataWithRetry(user.email, token, 1); // Reduced retries
                     console.log(userData.email);
 
                     setCurrentUser(userData);

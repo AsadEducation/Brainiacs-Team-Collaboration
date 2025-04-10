@@ -32,8 +32,9 @@ const GoogleButton = () => {
                     .then(response => {
                         if (response.status === 400) {
                             console.log("User already exists in the database.");
-                            Swal.fire("Successfully Logged in");
-                            navigate("/");
+                            Swal.fire("Successfully Logged in").then(() => {
+                                navigate("/"); // Redirect to home page after alert
+                            });
                             return;
                         }
                         if (!response.ok) {
@@ -44,8 +45,9 @@ const GoogleButton = () => {
                     .then(result => {
                         if (result) {
                             console.log("Google User Added to DB:", result);
-                            Swal.fire("Successfully Logged in");
-                            navigate("/");
+                            Swal.fire("Successfully Logged in").then(() => {
+                                navigate("/"); // Redirect to home page after alert
+                            });
                         }
                     })
                     .catch(err => {
