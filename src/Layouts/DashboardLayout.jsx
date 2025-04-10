@@ -61,6 +61,9 @@ const DashboardLayout = () => {
             <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
               <Link to="/">Home</Link>             
             </li>
+            <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
+              <Link to="/dashboard/messenger">Messenger</Link>
+            </li>
           </ul>
         </div>
       </div>
