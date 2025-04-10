@@ -41,14 +41,14 @@ const LeaderBoard = () => {
     return (
 
         <div className=" px-4 py-10">
-        <h2 className="text-3xl font-bold text-center text-purple-600 mb-10">🎉 Reward System</h2>
+        <h2 className="text-3xl font-bold text-center text-secondary mb-10">🎉 Reward System 🎉</h2>
   
     
         {/* User Reward Summary  */}
 <div className="bg-white border rounded-xl p-6 max-w-md mx-auto shadow-lg mb-10">
   <div className="flex justify-between items-center mb-2">
     <span className="text-lg font-semibold">👤 opu</span>
-    <span className="text-lg font-semibold text-purple-700">Points: {currentPoints}</span>
+    <span className="text-lg font-semibold text-secondary">Points: {currentPoints}</span>
   </div>
 
   <div className="mb-2">
@@ -70,7 +70,7 @@ const LeaderBoard = () => {
       </p>
       <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
         <div
-          className="bg-purple-500 h-4 transition-all duration-500"
+          className="bg-secondary h-4 transition-all duration-500"
           style={{ width: `${progressToNext}%` }}
         ></div>
       </div>
@@ -86,7 +86,7 @@ const LeaderBoard = () => {
 
   
         {/* Badges Display */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
           {reward.map((badge) => (
             <div key={badge.id}
              className={`border rounded-lg p-4 shadow-sm hover:shadow-lg transition-all ${currentPoints >= badge.pointsRequired ? 'bg-green-100' : 'bg-gray-100'}`}>
@@ -108,14 +108,14 @@ const LeaderBoard = () => {
 
 {/* leader board */}
 
-        <div>
- <h2 className=" text-4xl font-bold text-center text-orange-600 my-8">
+        <div className='max-w-6xl mx-auto mt-24'>
+ <h2 className=" text-4xl text-secondary font-bold text-center  my-8">
 
 Leader Board
 
  </h2>
 
-<div className="overflow-x-auto pt-10">
+<div className="overflow-x-auto  pt-10">
       <table className="sm:table-auto md:table lg:table w-full">
     
         <thead >
