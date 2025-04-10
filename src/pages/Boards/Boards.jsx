@@ -88,9 +88,7 @@ const Boards = () => {
         <h2 className="text-xl font-bold">Your Boards</h2>
        <div className="flex gap-3 ">
 
-       
-
-
+<button></button>
 
        <button
           onClick={() => setIsModalOpen(true)}
