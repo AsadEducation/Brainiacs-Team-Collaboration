@@ -53,7 +53,9 @@ const Boards = () => {
       members: [
         {
           userId: currentUser._id,
-          role: "admin",
+          name: currentUser.name, // Pass user's name
+          email: currentUser.email, // Include user's email
+          role: "member",
         },
       ],
       createdAt: new Date().toISOString(),
