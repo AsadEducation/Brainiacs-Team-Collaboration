@@ -103,6 +103,9 @@ const Navbar = () => {
             <li>
               <Link to="/contact" className="text-sm hover:text-accent cursor-pointer">Contact</Link>
             </li>
+            {user&& <li>
+              <Link to="/dashboard" className="text-sm hover:text-accent cursor-pointer">Dashboard</Link>
+            </li>}
           </ul>
           {user ? (
             <div className="relative">
