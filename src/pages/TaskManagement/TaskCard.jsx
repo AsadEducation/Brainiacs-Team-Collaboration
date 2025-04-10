@@ -29,13 +29,13 @@ const TaskCard = ({ task }) => {
     <>
 
       <div style={style} ref={setNodeRef} {...attributes} {...listeners} className="bg-white rounded-2xl p-4 shadow-lg w-[250px] border-sky-500 hover:border "
-        onClick={() => setIsModalOpen(true)}
+        onClick={() => document.getElementById(task.id).showModal()}
       >
         <div style={{ touchAction: "none" }}>
 
           <div className='flex justify-between items-center'>
             <h3 className="text-[12px] font-medium text-gray-900"> {taskTittle}</h3>
-            <div  className="flex items-center text-cyan-600 space-x-1">
+            <div className="flex items-center text-cyan-600 space-x-1">
               <span className="text-base"><LiaFileSolid /></span>
               <p className="text-xs font-medium">4</p>
             </div>
@@ -85,7 +85,8 @@ const TaskCard = ({ task }) => {
         </div>
       </div>
 
-      <TaskModal task={task} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}></TaskModal>
+      <TaskModal task={task} ></TaskModal>
+      
 
     </>
   );

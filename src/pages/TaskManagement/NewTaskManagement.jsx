@@ -334,17 +334,17 @@ export default function NewTaskManagement() {
             <header className="bg-white/20 shadow-md px-4 py-3">
                 <div className="container mx-auto flex justify-between items-center">
                     <div className="flex items-center gap-2" >
-                        <h1 className="text-2xl font-bold text-white">
+                        <h1 className="text-xl font-bold text-white">
                             {board?.name || "Untitled Board"}
                         </h1>
-                        <p className="text-base text-gray-50">
+                        <p className=" text-gray-50">
                             ({board?.visibility || "Public"})
                         </p>
                     </div>
                     <div className="flex items-center gap-2">
                         {/* Members Section */}
                         <div className="flex items-center gap-2">
-                            <h2 className="text-lg font-semibold text-gray-700">Members:</h2>
+                            <h2 className="text-base font-semibold text-gray-700">Members:</h2>
                             <ul className="flex flex-wrap gap-1 ">
                                 {members.map((member) => (
                                     <li
