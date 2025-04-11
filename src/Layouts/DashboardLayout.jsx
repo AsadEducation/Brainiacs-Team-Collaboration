@@ -27,36 +27,39 @@ const DashboardLayout = () => {
           <label htmlFor="my-drawer-2" aria-label="close sidebar" className="drawer-overlay"></label>
           <ul className="menu custom-gradient-side-bar text-base-content min-h-full w-56 py-4 px-0 gap-2 text-[12px]">
             {/* Sidebar content */}
-            <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
+            {/* <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
               <Link className="flex items-center gap-3">
                 <FaImage /> Inbox
               </Link>
-            </li>
-            <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
+            </li> */}
+            {/* <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
               <Link className="flex items-center gap-3">
                 <LuFileUp /> Drive file
               </Link>
-            </li>
+            </li> */}
             <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
               <Link to="/dashboard/boards">Boards</Link>
             </li>
-            <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
+            {/* <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
               <Link to="/updates">Updates</Link>
-            </li>
-            <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
+            </li> */}
+            {/* <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
               <Link to="/projects">Projects</Link>
-            </li>
-            <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
+            </li> */}
+            {/* <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
               <Link to="/settings">Settings</Link>
-            </li>
+            </li> */}
             <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
               <Link to="/dashboard/activity-log">Activity Log</Link>
             </li>
-            <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
+            {/* <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
               <Link to="/ecommerce">Ecommerce</Link>
-            </li>
+            </li> */}
             <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
               <Link to="/dashboard/leaderBoard">LeaderBoard</Link>
+            </li>
+            <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
+              <Link to="/dashboard/myProfile">My Profile</Link>
             </li>
             <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
               <Link to="/">Home</Link>             
