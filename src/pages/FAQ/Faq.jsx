@@ -110,12 +110,12 @@ const Faq = () => {
                     onClick={() => toggleAnswer(adjustedIndex)}>
                    
                     <span
-                      className={`text-xl mr-4 ${
+                      className={`text-xl mr-4  ${
                         openIndex === adjustedIndex ? "text-[#4DA1A9]" : "text-black"
                       }`}>
                       {openIndex === adjustedIndex ? "−" : "+"}
                     </span>
-                    <h3 className="text-lg md:text-base lg:text-lg font-medium">{faq.question}</h3>
+                    <h3 className="text-lg md:text-base lg:text-lg font-medium ">{faq.question}</h3>
                   </div>
 
                   {/* FAQ Answer */}
