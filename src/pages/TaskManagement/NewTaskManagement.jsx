@@ -78,7 +78,7 @@ export default function NewTaskManagement() {
     }, [dbTasks]);
 
     // need to study about useMEMO 
-    const columnId = useMemo(() => currentColumns.map(col => col.id), [currentColumns]);
+    const columnId = useMemo(() => currentColumns?.map(col => col.id), [currentColumns]);
 
     // the below function is used to generate the id of new currentColumns 
     const generateId = () => {
@@ -99,7 +99,7 @@ export default function NewTaskManagement() {
         // adding new column to local state 
         setCurrentColumns([...currentColumns, columnToAdd]);
         // adding new column to database
-        axiosPublic.post("/columns", columnToAdd)
+        axiosPublic.post("/columns", {...columnToAdd,order:currentColumns.length+1})
             .then(res => {
                 console.log("column post response", res.data)
             })
@@ -252,6 +252,7 @@ export default function NewTaskManagement() {
         }, 10)
     }
     const onDragEnd = event => {
+        
         setActiveColumn(null)
         setActiveTask(null)
         const { active, over } = event;
@@ -327,6 +328,7 @@ export default function NewTaskManagement() {
         }
     }
 
+    
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: {
@@ -334,7 +336,23 @@ export default function NewTaskManagement() {
             },
         })
     );
+    
+    const handleColumnDelete=(column)=>{
+        console.log("column delete request for id :",column.id)
+        setCurrentColumns(()=>{
+            const newCurrentColumn=currentColumns.filter(col=>col.id!=column.id)
+            return newCurrentColumn;
+        })
+        axiosPublic.delete(`/columns?id=${column.id}`)
+        .then(res=>{
+            console.log("Column Deleted",res)
+        })
+        .catch(err=>{
+            console.log("Column Delete Failed",err)
+        })
+        
 
+    }
     return (
         <div
             style={{
@@ -361,6 +379,7 @@ export default function NewTaskManagement() {
                         createNewColumn={createNewColumn}
                         activeColumn={activeColumn}
                         activeTask={activeTask}
+                        handleColumnDelete={handleColumnDelete}
                     />
                 </div>
             </main>
