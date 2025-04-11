@@ -4,6 +4,7 @@ import { SortableContext } from "@dnd-kit/sortable"; // Corrected import
 import { createPortal } from "react-dom";
 import ColumnContainer from "./ColumnContainer";
 import TaskCard from "./TaskCard";
+import ChatBox from "../../Component/Shared/ChatBox/ChatBox";
 
 export default function ColumnsSection({
     sensors,
@@ -20,20 +21,24 @@ export default function ColumnsSection({
     createNewColumn,
     activeColumn,
     activeTask,
+    handleColumnDelete
 }) {
+    
+    
     return (
         <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragOver={onDragOver}>
             <div className="m-auto flex min-h-[calc(100vh-110px)] w-full overflow-x-auto overflow-y-hidden  bg-gradient-to-bl from-secondary to-secondary/70">
                 <div className="mx-auto flex gap-4">
                     <div className="flex gap-2 pb-2">
                         <SortableContext items={columnId}>
-                            {currentColumns.map((col) => (
+                            {currentColumns?.map((col) => (
                                 <ColumnContainer
                                     key={col.id}
                                     column={col}
                                     updateColumn={updateColumn}
                                     createTask={createTask}
                                     tasks={tasks.filter((task) => task.columnId === col.id)}
+                                    handleColumnDelete={handleColumnDelete}
                                 />
                             ))}
                         </SortableContext>
@@ -66,10 +71,17 @@ export default function ColumnsSection({
                             onClick={() => setIsAddingList(true)}
                             className="h-10 px-4 w-60 cursor-pointer rounded-lg bg-[#F1F2F4] text-[#172B4D] text-[12px] font-semibold ring-gray-500 hover:ring-1 flex gap-2 items-center"
                         >
-                            Add Another List
+                            {
+                                currentColumns?.length < 1 ?
+                                    "Add A List" :
+                                    "Add Another List"
+                            }
                         </button>
                     )}
                 </div>
+                
+                {/* Ai bot chatbox */}
+                <ChatBox></ChatBox>
             </div>
             {createPortal(
                 <DragOverlay dropAnimation={{ duration: 200 }}>
@@ -80,6 +92,7 @@ export default function ColumnsSection({
                             updateColumn={updateColumn}
                             tasks={tasks.filter((task) => task.columnId === activeColumn.id)}
                             createTask={createTask}
+                            handleColumnDelete={handleColumnDelete}
                         />
                     )}
                     {activeTask && <TaskCard key={activeTask.id} task={activeTask} />}
