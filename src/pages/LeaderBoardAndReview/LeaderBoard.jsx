@@ -52,7 +52,7 @@ Leader Board
                 <div className="flex items-center gap-3">
                   <div className="avatar">
                     <div className=" sm:h-20 sm:w-20 md:h-24 md:w-24 lg:h-40 lg:w-40">
-                      <img src={datas.avater} alt='' />
+                      <img src={datas.avatar} alt='' />
                     </div>
                   </div>
                 </div>
