@@ -2,8 +2,9 @@ import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useMemo, useState } from "react";
 import TaskCard from "./TaskCard";
+import { FaTrashCan } from "react-icons/fa6";
 
-const ColumnContainer = ({ column, updateColumn, createTask, tasks }) => {
+const ColumnContainer = ({ column, updateColumn, createTask, tasks,handleColumnDelete }) => {
     const [isAddingTask, setIsAddingTask] = useState(false)
     const taskIds = useMemo(() => {
         return tasks.map(task => task.id)
@@ -23,7 +24,7 @@ const ColumnContainer = ({ column, updateColumn, createTask, tasks }) => {
     // }
     return (
         <div ref={setNodeRef} style={style} className=" h-fit w-72 p-2 bg-[#F1F2F4] rounded-xl ">
-            <div className="py-1"  {...attributes} {...listeners}>
+            <div className="py-1 flex group"  {...attributes} {...listeners}>
                 {
                     !editMode ?
                         <h3 onClick={() => { setEditMode(true) }} className=" w-full px-4 text-start rounded-md  text-[12px] py-1 font-semibold flex items-center text-[#172B4D] hover:text-gray-90 cursor-pointer ">{column.tittle}</h3>
@@ -40,6 +41,7 @@ const ColumnContainer = ({ column, updateColumn, createTask, tasks }) => {
                                 className="border border-slate-400 outline-none focus:border-slate-600  text-slate-800 text-[12px] font-semibold mx-4" type="text" />
                         </>
                 }
+                <button onClick={()=>handleColumnDelete(column)} className="opacity-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gray-50 p-1  rounded-md text-red-500 hover:cursor-pointer"><FaTrashCan /> </button>
             </div>
             <div className="max-h-[calc(100vh-195px)] h-fit overflow-y-scroll overflow-x-hidden pb-2">
                 <div className=" flex flex-col items-center gap-2">
@@ -65,13 +67,7 @@ const ColumnContainer = ({ column, updateColumn, createTask, tasks }) => {
                                 </div>
                             </form>
                         </div>
-                        {/* <div className="bg-white rounded-md border border-sky-500">
-                            <form onSubmit={(e) => { createTask(e, column.id, column.tittle, setIsAddingTask) }} className=" w-full px-4 text-start rounded-md mt-2 text-[12px] py-1 font-semibold flex items-center text-[#172B4D] hover:text-gray-900" >
-                                <input type="text" name="taskTittle" />
-                                <button type='submit' className='bg-primary text-white px-2 py-1 cursor-pointer' >Add</button>
-                                <button>fasd</button>
-                            </form>
-                        </div> */}
+                        
                     </>
                     :
                     <div className="">
@@ -83,7 +79,6 @@ const ColumnContainer = ({ column, updateColumn, createTask, tasks }) => {
 };
 
 export default ColumnContainer;
-
 
 
 

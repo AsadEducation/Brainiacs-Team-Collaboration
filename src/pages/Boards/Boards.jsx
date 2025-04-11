@@ -1,33 +1,37 @@
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useNavigate } from "react-router";
-import { TbBellRinging2Filled } from "react-icons/tb";
-import { IoClose } from 'react-icons/io5';
+import { AuthContext } from "../../Provider/AuthProvider";
+import BoardsHeader from "./BoardsHeader";
+import BoardCard from "./BoardCard"; // Import BoardCard
+import CreateBoardModal from "./CreateBoardModal"; // Import CreateBoardModal
+import EditBoardModal from "./EditBoardModal"; // Import EditBoardModal
+
 const Boards = () => {
   const navigate = useNavigate();
+  const { currentUser } = useContext(AuthContext);
   const [boards, setBoards] = useState([]);
   const [newBoard, setNewBoard] = useState("");
+  const [description, setDescription] = useState("");
   const [visibility, setVisibility] = useState("Public");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editBoard, setEditBoard] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [theme, setTheme] = useState("#3b82f6");
-  const [open, setOpen] = useState(false);
-
+  const [searchQuery, setSearchQuery] = useState("");
 
   const themeOptions = [
-    { name: "Blue", color: "#3b82f6" },
-    { name: "Green", color: "#22c55e" },
-    { name: "Red", color: "#ef4444" },
-    { name: "Yellow", color: "#eab308" },
-    { name: "Purple", color: "#8b5cf6" },
+    { name: "Sky Blue", color: "#e0f2fe" },
+    { name: "Lavender", color: "#f3e8ff" },
+    { name: "Mint Green", color: "#d1fae5" },
+    { name: "Warm Beige", color: "#fef3c7" },
+    { name: "Soft Gray", color: "#e5e7eb" },
   ];
 
   useEffect(() => {
     const fetchBoards = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/boards");
+        const response = await axios.get(`http://localhost:5000/boards`);
         setBoards(response.data);
       } catch (error) {
         console.error("Error fetching boards:", error);
@@ -38,38 +42,55 @@ const Boards = () => {
 
   const createBoard = async () => {
     if (!newBoard) return alert("Board name is required!");
+    if (!currentUser?._id) return alert("User is not authenticated!");
 
-    const currentUser = { id: "currentUserId", name: "Current User" }; // Replace with actual user data
-    const newBoardData = { name: newBoard, visibility, theme, creator: currentUser, members: [currentUser] };
+    const newBoardData = {
+      name: newBoard,
+      description, // Include description
+      visibility,
+      theme,
+      createdBy: currentUser._id,
+      members: [
+        {
+          userId: currentUser._id,
+          name: currentUser.name, // Pass user's name
+          email: currentUser.email, // Include user's email
+          role: "member",
+        },
+      ],
+      createdAt: new Date().toISOString(),
+    };
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/boards",
+        `http://localhost:5000/boards`,
         newBoardData
       );
       setBoards([...boards, response.data]);
+      setIsModalOpen(false);
       setNewBoard("");
+      setDescription(""); // Reset description
       setVisibility("Public");
       setTheme("#3b82f6");
-      setIsModalOpen(false);
     } catch (error) {
       console.error("Error creating board:", error);
-      alert("Failed to create board. Please try again.");
+      alert(
+        `Failed to create board: ${
+          error.response?.data?.error || error.message
+        }`
+      );
     }
   };
 
-  const openEditModal = (board) => {
-    setEditBoard(board);
-    setIsEditModalOpen(true);
-  };
-
   const updateBoard = async () => {
-    if (!editBoard.name) return alert("Board name is required!");
+    if (!editBoard?.name) return alert("Board name is required!");
 
     try {
       await axios.put(`http://localhost:5000/boards/${editBoard._id}`, {
         name: editBoard.name,
+        description: editBoard.description, // Include description
         visibility: editBoard.visibility,
+        theme: editBoard.theme,
       });
 
       setBoards(
@@ -78,186 +99,73 @@ const Boards = () => {
       setIsEditModalOpen(false);
     } catch (error) {
       console.error("Error updating board:", error);
-      alert("Failed to update board. Please try again.");
     }
   };
 
+  const deleteBoard = async (boardId) => {
+    if (!window.confirm("Are you sure you want to delete this board?")) return;
+
+    try {
+      await axios.delete(`http://localhost:5000/boards/${boardId}`);
+      setBoards(boards.filter((board) => board._id !== boardId));
+    } catch (error) {
+      console.error("Error deleting board:", error);
+    }
+  };
+
+  const filteredBoards = boards.filter((board) =>
+    board.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="p-6">
-      <div className="flex  justify-between  items-center mb-4">
-        <h2 className="text-xl font-bold">Your Boards</h2>
-       <div className="flex gap-3 ">
-
-       <button 
-        onClick={() => setOpen(!open)}
-        className="px-3 py-2 rounded-full text-2xl text-primary "
-        >
-
-<TbBellRinging2Filled />
-        </button>
-
-       <button
-          onClick={() => setIsModalOpen(true)}
-          className="btn border-none text-white btn-primary"
-        >
-          + Create Board
-        </button>
-
-        
-       </div>
-
-
-
-        {/* notification dropdown */}
-
-        {open && (
-<div className="absolute right-0 mt-44 w-80 bg-white rounded-lg shadow-lg z-50">
-   <div className="flex justify-between items-center px-4 py-3 border-b">
-    <h3 className="font-bold text-lg text-gray-700">Notifications</h3>
-    <button onClick={() => setOpen(false)} className="text-gray-500 hover:text-red-500 text-xl">
-      <IoClose />
-    </button>
-  </div>
-  <ul className="max-h-60 overflow-y-auto text-sm">
-    <li className="p-4 hover:bg-gray-100 transition">
-      You’ve been assigned a new task: <span className="font-medium">Design Header</span>
-      <div className="text-xs text-gray-400">2 mins ago</div>
-    </li>
-    <li className="p-4 hover:bg-gray-100 transition">
-      Niti mentioned you in a comment
-      <div className="text-xs text-gray-400">10 mins ago</div>
-    </li>
-    <li className="p-4 hover:bg-gray-100 transition">
-      Reminder: Complete <span className="font-medium">UI Fixes</span> today
-      <div className="text-xs text-gray-400">1 hour ago</div>
-    </li>
-  </ul>
-</div>
-)}
-
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {boards.length > 0 ? (
-          boards.map((board) => (
-            <motion.div
+      <BoardsHeader
+        onCreateBoard={() => setIsModalOpen(true)}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+      />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {filteredBoards.length > 0 ? (
+          filteredBoards.map((board) => (
+            <BoardCard
               key={board._id}
-              className="p-8 shadow-lg rounded-lg cursor-pointer relative"
-              style={{ backgroundColor: board.theme }}
-              onClick={() =>
-                navigate(`/dashboard/boards/${board._id}`, {
-                  state: { theme: board.theme },
-                })
-              }
-            >
-              <h3 className="text-lg font-semibold">{board.name}</h3>
-              <p className="text-sm text-white">
-                Visibility: {board.visibility}
-              </p>
-              <div className="absolute top-2 right-2 flex gap-2">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openEditModal(board);
-                  }}
-                  className="btn btn-sm btn-info"
-                >
-                  Edit
-                </button>
-              </div>
-            </motion.div>
+              board={board}
+              onEdit={(board) => {
+                setEditBoard(board);
+                setIsEditModalOpen(true);
+              }}
+              onDelete={deleteBoard}
+              navigate={navigate}
+            />
           ))
         ) : (
-          <p className="text-gray-500">
-            No boards available. Create a new one!
-          </p>
+          <p className="text-gray-500">No boards match your search.</p>
         )}
       </div>
 
-      {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center backdrop-blur-xs z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h3 className="text-lg font-bold mb-3">Create New Board</h3>
-            <input
-              type="text"
-              placeholder="Board Name"
-              value={newBoard}
-              onChange={(e) => setNewBoard(e.target.value)}
-              className="input input-bordered w-full mb-3"
-            />
-            <select
-              value={visibility}
-              onChange={(e) => setVisibility(e.target.value)}
-              className="select select-bordered w-full mb-3"
-            >
-              <option value="Public">Public</option>
-              <option value="Private">Private</option>
-              <option value="Team Only">Team Only</option>
-            </select>
-            <div className="flex gap-2 mb-3">
-              {themeOptions.map((option) => (
-                <div
-                  key={option.name}
-                  className={`w-6 h-6 rounded-full cursor-pointer border-2 ${
-                    theme === option.color ? "border-black" : "border-transparent"
-                  }`}
-                  style={{ backgroundColor: option.color }}
-                  onClick={() => setTheme(option.color)}
-                ></div>
-              ))}
-            </div>
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="btn btn-error"
-              >
-                Cancel
-              </button>
-              <button onClick={createBoard} className="btn btn-success">
-                Create
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <CreateBoardModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onCreate={createBoard}
+        newBoard={newBoard}
+        setNewBoard={setNewBoard}
+        description={description} // Pass description
+        setDescription={setDescription} // Pass setDescription
+        visibility={visibility}
+        setVisibility={setVisibility}
+        theme={theme}
+        setTheme={setTheme}
+        themeOptions={themeOptions}
+      />
 
-      {isEditModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center backdrop-blur-xs z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h3 className="text-lg font-bold mb-3">Edit Board</h3>
-            <input
-              type="text"
-              placeholder="Board Name"
-              value={editBoard?.name || ""}
-              onChange={(e) =>
-                setEditBoard({ ...editBoard, name: e.target.value })
-              }
-              className="input input-bordered w-full mb-3"
-            />
-            <select
-              value={editBoard?.visibility || "Public"}
-              onChange={(e) =>
-                setEditBoard({ ...editBoard, visibility: e.target.value })
-              }
-              className="select select-bordered w-full mb-3"
-            >
-              <option value="Public">Public</option>
-              <option value="Private">Private</option>
-              <option value="Team Only">Team Only</option>
-            </select>
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setIsEditModalOpen(false)}
-                className="btn btn-error"
-              >
-                Cancel
-              </button>
-              <button onClick={updateBoard} className="btn btn-success">
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditBoardModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSave={updateBoard}
+        editBoard={editBoard}
+        setEditBoard={setEditBoard}
+        themeOptions={themeOptions}
+      />
     </div>
   );
 };
