@@ -8,10 +8,13 @@ import {
   FaPhoneAlt,
   FaPoll,
   FaVideo,
+  FaArrowLeft, // Import icons
+  FaArrowRight, // Import icons
 } from "react-icons/fa";
 import { FaCirclePlus } from "react-icons/fa6";
 import { AiOutlineSend } from "react-icons/ai";
 import useAuth from "../../Hooks/useAuth"; // Import useAuth
+import { MdEmojiEmotions } from "react-icons/md";
 
 const Messenger = () => {
   const { currentUser } = useAuth(); // Access currentUser from AuthContext
@@ -31,6 +34,12 @@ const Messenger = () => {
   const attachDropdownRef = useRef(null); // Ref for dropdown
   const lastMessageRef = useRef(null); // Ref for the last message
   const [showMessageOptions, setShowMessageOptions] = useState(null); // State to track which message's options are visible
+  const [isUserScrolling, setIsUserScrolling] = useState(false); // Track if the user is scrolling
+  const [pinnedMessages, setPinnedMessages] = useState([]);
+  const [currentPinnedIndex, setCurrentPinnedIndex] = useState(0);
+  const [showReactionDropdown, setShowReactionDropdown] = useState(null); // Track which message's reaction dropdown is visible
+  // Remove this state
+  // Remove this array
 
   useEffect(() => {
     if (currentUser) {
@@ -40,21 +49,24 @@ const Messenger = () => {
 
   useEffect(() => {
     // Fetch the list of boards the user is a member of
-    fetch("http://localhost:5000/boards") // Updated API endpoint
+    fetch("http://localhost:5000/boards")
       .then((res) => res.json())
       .then((data) => {
-        setBoards(data);
-        if (data.length > 0) {
+        const userBoards = data.filter((board) =>
+          board.members.some((member) => member.userId === currentUser?._id)
+        ); // Filter boards where the user is a member
+        setBoards(userBoards);
+        if (userBoards.length > 0) {
           const defaultBoard =
-            data.find((board) => board._id === boardId) || data[0];
-          setSelectedBoard(defaultBoard); // Set the board based on route or default to the first board
+            userBoards.find((board) => board._id === boardId) || userBoards[0];
+          setSelectedBoard(defaultBoard);
           if (!boardId) {
-            navigate(`/dashboard/messenger/${defaultBoard._id}`); // Redirect to the first board if no boardId is provided
+            navigate(`/dashboard/messenger/${defaultBoard._id}`);
           }
         }
       })
       .catch((err) => console.error("Error fetching boards:", err));
-  }, [boardId, navigate]);
+  }, [boardId, currentUser, navigate]);
 
   const handleBoardSelect = (board) => {
     setSelectedBoard(board);
@@ -110,6 +122,17 @@ const Messenger = () => {
 
     fetchBoardData();
   }, [selectedBoard]);
+
+  const getUnseenMessageCount = (messages) => {
+    return messages.filter((msg) => !msg.seenBy?.includes(currentUser._id)).length;
+  };
+
+  useEffect(() => {
+    // Scroll to the last message only if the user is not scrolling up
+    if (!isUserScrolling && lastMessageRef.current) {
+      lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -259,7 +282,172 @@ const Messenger = () => {
       console.error("Error deleting message:", error);
     }
   };
+
+  const markMessageAsSeen = async (messageId) => {
+    if (!currentUser || !selectedBoard) return;
   
+    try {
+      const response = await fetch(
+        `http://localhost:5000/boards/${selectedBoard._id}/messages/${messageId}/seen`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ seenBy: currentUser._id }),
+        }
+      );
+  
+      if (response.ok) {
+        const updatedMessage = await response.json();
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.messageId === messageId ? updatedMessage : msg
+          )
+        );
+      } else {
+        console.error("Failed to mark message as seen");
+      }
+    } catch (error) {
+      console.error("Error marking message as seen", error);
+    }
+  };
+
+  const pinMessage = async (messageId, duration) => {
+    if (!currentUser || !selectedBoard) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:5000/boards/${selectedBoard._id}/messages/${messageId}/pin`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            pinnedBy: currentUser._id,
+            pinDuration: duration, // Duration in days
+          }),
+        }
+      );
+
+      if (response.ok) {
+        const updatedMessage = await response.json();
+        setPinnedMessages((prev) => [...prev, updatedMessage]);
+      } else {
+        console.error("Failed to pin message");
+      }
+    } catch (error) {
+      console.error("Error pinning message:", error);
+    }
+  };
+
+  const unpinMessage = async (messageId) => {
+    if (!currentUser || !selectedBoard) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:5000/boards/${selectedBoard._id}/messages/${messageId}/unpin`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        setPinnedMessages((prev) =>
+          prev.filter((msg) => msg.messageId !== messageId)
+        );
+      } else {
+        console.error("Failed to unpin message");
+      }
+    } catch (error) {
+      console.error("Error unpinning message:", error);
+    }
+  };
+
+  const reactToMessage = async (messageId, reaction) => {
+    if (!currentUser || !selectedBoard) return;
+  
+    try {
+      const response = await fetch(
+        `http://localhost:5000/boards/${selectedBoard._id}/messages/${messageId}/react`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId: currentUser._id, reaction }),
+        }
+      );
+  
+      if (response.ok) {
+        const updatedMessage = await response.json();
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.messageId === messageId ? updatedMessage : msg
+          )
+        );
+      } else {
+        console.error("Failed to react to message");
+      }
+    } catch (error) {
+      console.error("Error reacting to message:", error);
+    }
+  };
+
+  // Remove this function
+
+  useEffect(() => {
+    // Filter out expired pinned messages
+    const now = new Date();
+    setPinnedMessages((prev) =>
+      prev.filter((msg) => new Date(msg.pinExpiry) > now)
+    );
+  }, [messages]);
+
+  const handlePreviousPinned = () => {
+    setCurrentPinnedIndex((prev) =>
+      prev === 0 ? pinnedMessages.length - 1 : prev - 1
+    );
+  };
+
+  const handleNextPinned = () => {
+    setCurrentPinnedIndex((prev) =>
+      prev === pinnedMessages.length - 1 ? 0 : prev + 1
+    );
+  };
+  
+  useEffect(() => {
+    // Mark messages as seen when the user views the chat
+    if (messages.length > 0) {
+      messages.forEach((msg) => {
+        if (!msg.seenBy?.includes(currentUser._id)) {
+          markMessageAsSeen(msg.messageId);
+        }
+      });
+    }
+  }, [messages, currentUser]);
+
+  const handleScroll = (event) => {
+    const { scrollTop, scrollHeight, clientHeight } = event.target;
+    if (scrollTop + clientHeight < scrollHeight - 10) {
+      setIsUserScrolling(true); // User is scrolling up
+    } else {
+      setIsUserScrolling(false); // User is at the bottom
+    }
+  };
+
+  const getSeenByNames = (seenBy) => {
+    const otherMembers = members.filter(
+      (member) => seenBy?.includes(member.userId) && member.userId !== currentUser._id
+    );
+    const otherNames = otherMembers.map((member) => member.name).join(", ");
+    const seenByYou = seenBy?.includes(currentUser._id) ? "You" : "";
+    return [seenByYou, otherNames].filter(Boolean).join(", ");
+  };
 
   return (
     <div className="messenger-container flex flex-col md:flex-row h-screen bg-gray-100">
@@ -273,7 +461,7 @@ const Messenger = () => {
         {selectedBoard ? (
           <>
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 border-b pb-2">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4  pb-2">
               <motion.h2
                 className="text-lg font-bold text-primary mb-2 md:mb-0"
                 initial={{ y: -20 }}
@@ -297,7 +485,7 @@ const Messenger = () => {
                     <FaEllipsisV className="text-xl" />
                   </button>
                   {showOptions && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg z-10">
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-10">
                       <ul className="py-2">
                         <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
                           Create Poll
@@ -322,7 +510,34 @@ const Messenger = () => {
             </div>
 
             {/* Chat Window */}
-            <div className="chat-window flex-1 border rounded-lg overflow-y-scroll bg-gray-50 shadow-inner p-4">
+            <div
+              className="chat-window flex-1 rounded-lg overflow-y-scroll bg-gray-50 shadow-inner p-4"
+              onScroll={handleScroll} // Attach the scroll handler
+            >
+              {pinnedMessages.length > 0 && (
+                <div className="sticky -top-3 bg-yellow-100 p-2 rounded-lg shadow z-10">
+                  <div className="flex justify-between items-center">
+                    <button
+                      className="text-primary hover:text-accent"
+                      onClick={handlePreviousPinned}
+                    >
+                      <FaArrowLeft className="text-xl" /> {/* Previous icon */}
+                    </button>
+                    <div className="text-center">
+                      <p className="font-bold">{pinnedMessages[currentPinnedIndex]?.text}</p>
+                      <p className="text-sm text-gray-500">
+                        Pinned by: {getSenderName(pinnedMessages[currentPinnedIndex]?.pinnedBy)}
+                      </p>
+                    </div>
+                    <button
+                      className="text-primary hover:text-accent"
+                      onClick={handleNextPinned}
+                    >
+                      <FaArrowRight className="text-xl" /> {/* Next icon */}
+                    </button>
+                  </div>
+                </div>
+              )}
               {messages.length > 0 ? (
                 messages.map((msg, index) => {
                   const isSender = msg.senderId === currentUser._id; // Check if the message is from the current user
@@ -344,21 +559,17 @@ const Messenger = () => {
                       <div
                         className={`mb-4 flex ${isSender ? "justify-end" : "justify-start"}`}
                       >
-                        <div
-                          className="flex flex-row-reverse items-center gap-2"
-                          onClick={() =>
-                            setClickedMessageId(
-                              clickedMessageId === msg.messageId ? null : msg.messageId
-                            )
-                          } // Toggle clickedMessageId on click
-                        >
+                        <div className="flex items-center gap-2">
+                         
+                          {/* Message bubble */}
                           <div
-                            className={`relative max-w-full sm:max-w-xs md:max-w-sm lg:max-w-md p-4 rounded-2xl shadow-lg cursor-pointer ${
+                            className={`relative max-w-full sm:max-w-xs md:max-w-sm lg:max-w-md p-4 rounded-2xl shadow-lg ${
                               isSender
-                                ? "bg-primary text-white rounded-br-none text-right" // Align outgoing messages to the end
-                                : "bg-gray-200 text-gray-800 rounded-bl-none text-left" // Align incoming messages to the start
+                                ? "bg-primary text-white rounded-br-none text-right"
+                                : "bg-gray-200 text-gray-800 rounded-bl-none text-left"
                             }`}
                           >
+                          
                             <p className={`text-sm font-semibold mb-1 ${isSender ? "text-end" : "text-start"}`}>
                               {getSenderName(msg.senderId)}
                             </p>
@@ -369,14 +580,51 @@ const Messenger = () => {
                             ) : (
                               <>
                                 <p className="text-base leading-relaxed">{msg.text}</p>
-                                {clickedMessageId === msg.messageId && ( // Show time only if the message is clicked
-                                  <p className={`text-xs text-gray-400 mt-2 ${isSender ? "text-right" : "text-left"}`}>
-                                    {formatTime(msg.timestamp)}
-                                  </p>
-                                )}
+                               
                               </>
                             )}
+                              {/* Display reactions */}
+                              {msg.reactions && (
+                              <div className="w-8 text-lg bg-gray-500 mt-1 p-1 rounded-lg">
+                                {Object.entries(msg.reactions).map(([emoji, users]) =>
+                                  users.includes(currentUser._id) ? emoji : null
+                                )}
+                              </div>
+                            )}
                           </div>
+                           {/* Reaction dropdown for incoming messages */}
+                           {!isSender && !msg.deletedBy && (
+                            <div className="relative">
+                              <button
+                                className="text-gray-500 hover:text-gray-700"
+                                onClick={() =>
+                                  setShowReactionDropdown(
+                                    showReactionDropdown === msg.messageId ? null : msg.messageId
+                                  )
+                                }
+                              >
+                                <MdEmojiEmotions />
+                              </button>
+                              {showReactionDropdown === msg.messageId && (
+                                <div className="absolute -top-18 bg-white rounded-lg shadow-lg z-10 p-2">
+                                  <div className="flex gap-2">
+                                    {["👍", "❤️", "😂", "😮", "😢", "😡"].map((emoji) => (
+                                      <div
+                                        key={emoji}
+                                        className="cursor-pointer hover:bg-gray-100 p-2 rounded"
+                                        onClick={() => {
+                                          reactToMessage(msg.messageId, emoji);
+                                          setShowReactionDropdown(null);
+                                        }}
+                                      >
+                                        {emoji}
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
                           {isSender && !msg.deletedBy && (
                             <div className="relative">
                               <button
@@ -396,8 +644,27 @@ const Messenger = () => {
                                     <li
                                       className="px-4 py-2 text-black cursor-pointer"
                                       onClick={() => {
+                                        const duration = parseInt(
+                                          prompt("Enter pin duration (1, 3, 7, or 15 days):", "1"),
+                                          10
+                                        );
+                                        if ([1, 3, 7, 15].includes(duration)) {
+                                          pinMessage(msg.messageId, duration);
+                                        } else {
+                                          alert("Invalid duration");
+                                        }
+                                        setShowMessageOptions(null);
+                                      }}
+                                    >
+                                      Pin
+                                    </li>
+                                    <li
+                                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
+                                      onClick={() => {
                                         const newText = prompt("Edit your message:", msg.text);
-                                        if (newText !== null) editMessage(msg.messageId, newText);
+                                        if (newText) {
+                                          editMessage(msg.messageId, newText);
+                                        }
                                         setShowMessageOptions(null);
                                       }}
                                     >
@@ -419,6 +686,18 @@ const Messenger = () => {
                           )}
                         </div>
                       </div>
+                      {clickedMessageId === msg.messageId && ( // Show time and seen-by names only if the message is clicked
+                                  <>
+                                    <p className={`text-xs text-gray-400 mt-2 ${isSender ? "text-right" : "text-left"}`}>
+                                      {formatTime(msg.timestamp)}
+                                    </p>
+                                    {!isSender && msg.seenBy?.length > 0 && (
+                                      <p className="text-xs text-gray-400 mt-1">
+                                        Seen by: {getSeenByNames(msg.seenBy)}
+                                      </p>
+                                    )}
+                                  </>
+                                )}
                     </div>
                   );
                 })
@@ -428,7 +707,7 @@ const Messenger = () => {
             </div>
 
             {/* Message Input */}
-            <div className="mt-4 flex flex-col sm:flex-row items-center relative">
+            <div className="mt-4 flex flex-col sm:flex-row items-center relative shadow-md p-4 rounded-lg">
               <div className="relative mr-2 mb-2 sm:mb-0" ref={attachDropdownRef}>
                 <button
                   className="text-primary hover:text-accent"
@@ -490,20 +769,29 @@ const Messenger = () => {
       >
         <h2 className="text-lg font-bold mb-4 text-primary">Your Boards</h2>
         <ul className="space-y-2">
-          {boards.map((board) => (
-            <motion.li
-              key={board._id}
-              className={`p-3 rounded-lg cursor-pointer ${
-                selectedBoard?._id === board._id
-                  ? "bg-primary text-white"
-                  : "bg-gray-100 text-gray-800"
-              } shadow hover:shadow-lg`}
-              whileHover={{ scale: 1.05 }}
-              onClick={() => handleBoardSelect(board)}
-            >
-              {board.name}
-            </motion.li>
-          ))}
+          {boards.map((board) => {
+            const unseenCount = board._id === selectedBoard?._id ? getUnseenMessageCount(messages) : 0;
+
+            return (
+              <motion.li
+                key={board._id}
+                className={`p-3 rounded-lg cursor-pointer ${
+                  selectedBoard?._id === board._id
+                    ? "bg-primary text-white"
+                    : "bg-gray-100 text-gray-800"
+                } shadow hover:shadow-lg`}
+                whileHover={{ scale: 1.05 }}
+                onClick={() => handleBoardSelect(board)}
+              >
+                {board.name}
+                {unseenCount > 0 && (
+                  <span className="ml-2 text-sm text-red-500">
+                    {unseenCount} unseen
+                  </span>
+                )}
+              </motion.li>
+            );
+          })}
         </ul>
       </motion.div>
     </div>

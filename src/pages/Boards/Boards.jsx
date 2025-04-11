@@ -35,6 +35,7 @@ const Boards = () => {
         setBoards(response.data);
       } catch (error) {
         console.error("Error fetching boards:", error);
+        alert("Failed to fetch boards. Please try again later."); // User-friendly error message
       }
     };
     fetchBoards();
@@ -113,9 +114,13 @@ const Boards = () => {
     }
   };
 
-  const filteredBoards = boards.filter((board) =>
-    board.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredBoards = boards
+    .filter((board) =>
+      board.members.some((member) => member.userId === currentUser?._id)
+    )
+    .filter((board) =>
+      board.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
   return (
     <div className="p-6">
