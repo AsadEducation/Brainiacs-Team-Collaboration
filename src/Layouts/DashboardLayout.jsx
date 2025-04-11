@@ -4,31 +4,36 @@ import { LuFileUp } from 'react-icons/lu'
 import { RiMenu2Line } from 'react-icons/ri'
 import { Link, Outlet } from 'react-router-dom'
 import ChatBox from '../Component/Shared/ChatBox/ChatBox'
-import { IoMdClose } from 'react-icons/io'
+import { IoIosArrowBack, IoIosArrowForward, IoMdClose } from 'react-icons/io'
 
 const DashboardLayout = () => {
-  const [isDrawerOpen,setIsDrawerOpen]=useState(true)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(true)
   return (
     <div>
-      <div className={`drawer ${isDrawerOpen&& "drawer-open"}`} >
-      {/* <div className="drawer lg:drawer-open"> */}
+      <div className={`drawer ${isDrawerOpen && "drawer-open"}`} >
+        {/* <div className="drawer lg:drawer-open"> */}
         <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
         <div className="drawer-content flex flex-col bg-[#F6F4F0] relative">
 
           {/* Page content here */}
-          <label onClick={()=>setIsDrawerOpen(prev=>{return !prev})} role="button" className={`btn bg-[#37577C] fixed bottom-3 drawer-button rounded-none text-white transition-all duration-300 border-none z-50  ${isDrawerOpen?"left-56 px-0":"left-5 px-2"} `}>
-            {isDrawerOpen?
-            <>
-            <IoMdClose className='text-2xl' />
-            </>
-            :
-            <RiMenu2Line className="text-2xl"></RiMenu2Line>
+          <label onClick={() => setIsDrawerOpen(prev => { return !prev })} role="button" className={`btn bg-[#3F5E82] fixed top-3 drawer-button rounded-none text-white transition-all duration-300 border-none z-50 shadow-none ${isDrawerOpen ? "left-56 px-0" : "left-3 px-0"} `}>
+            {isDrawerOpen ?
+              <>
+                <IoIosArrowBack />
+              </>
+              :
+              <IoIosArrowForward />
             }
           </label>
           {/* <label htmlFor="my-drawer-2" role="button" className="btn bg-primary fixed bottom-3 right-3 drawer-button rounded-none text-white lg:hidden z-50">
             <RiMenu2Line className="text-2xl"></RiMenu2Line>
           </label> */}
-          <Outlet />
+          <div className='flex'>
+            <div className={`w-3 h-screen custom-gradient-side-bar shadow-none ${isDrawerOpen&&"hidden"}`}></div>
+            <div className='flex-1'> 
+            <Outlet />
+            </div>
+          </div>
 
           {/* Chat Box */}
           {/* <ChatBox /> */}
@@ -71,7 +76,7 @@ const DashboardLayout = () => {
               <Link to="/dashboard/leaderBoard">LeaderBoard</Link>
             </li>
             <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
-              <Link to="/">Home</Link>             
+              <Link to="/">Home</Link>
             </li>
             <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
               <Link to="/dashboard/messenger">Messenger</Link>
