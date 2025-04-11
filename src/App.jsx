@@ -9,6 +9,7 @@ import Boards from "./pages/Boards/Boards.jsx";
 import NewTaskManagement from "./pages/TaskManagement/NewTaskManagement.jsx";
 import LeaderBoard from "./pages/LeaderBoardAndReview/LeaderBoard.jsx";
 import ActivityLog from './dashboard-pages/ActivityLog.jsx'
+import Messenger from "./dashboard-pages/Messenger/Messenger.jsx";
 
 function App() {
   return (
@@ -28,6 +29,8 @@ function App() {
         <Route path="leaderBoard" element={<LeaderBoard></LeaderBoard>} />
         <Route path="boards/:id" element={<NewTaskManagement />} />  
         <Route path="activity-log" element={<ActivityLog/>} />
+        <Route path="messenger/:boardId" element={<Messenger />} />
+        <Route path="messenger" element={<Messenger />} /> {/* Default route */}
       </Route>
 
     </Routes>
