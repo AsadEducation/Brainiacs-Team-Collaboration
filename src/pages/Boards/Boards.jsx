@@ -28,7 +28,7 @@ const Boards = () => {
   useEffect(() => {
     const fetchBoards = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/boards`);
+        const response = await axios.get(`/boards`);
         setBoards(response.data);
       } catch (error) {
         console.error("Error fetching boards:", error);
@@ -45,7 +45,7 @@ const Boards = () => {
           return;
         }
 
-        const response = await axios.get(`http://localhost:5000/user`, {
+        const response = await axios.get(`/user`, {
           params: { email: currentUser.email },
         });
         console.log("Current User:", response.data);
@@ -80,7 +80,7 @@ const Boards = () => {
     };
 
     try {
-      const response = await axios.post(`http://localhost:5000/boards`, newBoardData);
+      const response = await axios.post(`/boards`, newBoardData);
       setBoards([...boards, response.data]);
       resetForm();
       setIsModalOpen(false);
@@ -105,7 +105,7 @@ const Boards = () => {
     if (!editBoard?.name) return alert("Board name is required!");
 
     try {
-      await axios.put(`http://localhost:5000/boards/${editBoard._id}`, {
+      await axios.put(`/boards/${editBoard._id}`, {
         name: editBoard.name,
         visibility: editBoard.visibility,
         theme: editBoard.theme,
@@ -123,7 +123,7 @@ const Boards = () => {
     if (!window.confirm("Are you sure you want to delete this board?")) return;
 
     try {
-      await axios.delete(`http://localhost:5000/boards/${boardId}`);
+      await axios.delete(`/boards/${boardId}`);
       setBoards(boards.filter((board) => board._id !== boardId));
     } catch (error) {
       console.error("Error deleting board:", error);

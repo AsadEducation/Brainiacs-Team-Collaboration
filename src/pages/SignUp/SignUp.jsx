@@ -25,7 +25,7 @@ const SignUp = () => {
     signUpUser(email, password)
       .then(res => {
         console.log("Signup Success:", res.user); // Log signup success data
-        fetch("http://localhost:5000/users", {
+        fetch("/users", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
