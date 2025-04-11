@@ -35,8 +35,7 @@ const DashboardLayout = () => {
             </div>
           </div>
 
-          {/* Chat Box */}
-          {/* <ChatBox /> */}
+          
         </div>
 
         {/* Sidebar */}

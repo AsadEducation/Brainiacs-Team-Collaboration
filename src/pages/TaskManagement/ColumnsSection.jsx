@@ -4,6 +4,7 @@ import { SortableContext } from "@dnd-kit/sortable"; // Corrected import
 import { createPortal } from "react-dom";
 import ColumnContainer from "./ColumnContainer";
 import TaskCard from "./TaskCard";
+import ChatBox from "../../Component/Shared/ChatBox/ChatBox";
 
 export default function ColumnsSection({
     sensors,
@@ -22,6 +23,8 @@ export default function ColumnsSection({
     activeTask,
     handleColumnDelete
 }) {
+    
+    
     return (
         <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragOver={onDragOver}>
             <div className="m-auto flex min-h-[calc(100vh-110px)] w-full overflow-x-auto overflow-y-hidden  bg-gradient-to-bl from-secondary to-secondary/70">
@@ -69,13 +72,16 @@ export default function ColumnsSection({
                             className="h-10 px-4 w-60 cursor-pointer rounded-lg bg-[#F1F2F4] text-[#172B4D] text-[12px] font-semibold ring-gray-500 hover:ring-1 flex gap-2 items-center"
                         >
                             {
-                                currentColumns?.length<1?
-                                "Add A List":
-                                "Add Another List"
+                                currentColumns?.length < 1 ?
+                                    "Add A List" :
+                                    "Add Another List"
                             }
                         </button>
                     )}
                 </div>
+                
+                {/* Ai bot chatbox */}
+                <ChatBox></ChatBox>
             </div>
             {createPortal(
                 <DragOverlay dropAnimation={{ duration: 200 }}>
