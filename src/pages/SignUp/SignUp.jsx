@@ -18,9 +18,10 @@ const SignUp = () => {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     const { userName, email, password } = data;
     const newUser = { name: userName, email, role: "user" }; // Include role
+<<<<<<< HEAD
     console.log("Form Data:", data); // Log form data
     signUpUser(email, password)
       .then(res => {
@@ -42,7 +43,34 @@ const SignUp = () => {
       .catch(err => {
         console.log("Signup Error:", err); // Log signup error
         Swal.fire(`Something Went Wrong`);
+=======
+    try {
+      const res = await signUpUser(email, password);
+      console.log("Signup Success:", res.user); // Log signup success data
+
+      // Save user to the database
+      const response = await fetch("http://localhost:5000/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newUser),
+>>>>>>> d47c4bf03acde4446f968d65b5a12ace36d5213c
       });
+
+      if (!response.ok) {
+        throw new Error("Failed to save user to the database");
+      }
+
+      const result = await response.json();
+      console.log("User Added to DB:", result); // Log database response
+      Swal.fire(`Welcome ${userName} to Brainiacs`).then(() => {
+        navigate("/"); // Redirect to home page after alert
+      });
+    } catch (err) {
+      console.error("Error:", err);
+      Swal.fire("Signup failed. Please check your details and try again.");
+    }
   };
 
   // TODO: Make facebook and linkedin signup functionality

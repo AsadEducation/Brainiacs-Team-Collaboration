@@ -24,16 +24,17 @@ const Login = () => {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = async (data) => {
     const { email, password } = data;
-    logInUser(email, password)
-      .then(res => {
-        console.log("success", res)
-        Swal.fire("Successfully Logged In")
-        navigate("/")
-      })
-      .catch(err => console.log("error", err))
+    try {
+      const res = await logInUser(email, password);
+      console.log("success", res);
+      Swal.fire("Successfully Logged In");
+      navigate("/"); // Redirect to home page
+    } catch (err) {
+      console.error("error", err);
+      Swal.fire("Login failed. Please check your credentials and try again.");
+    }
   };
   
 

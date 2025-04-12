@@ -1,28 +1,31 @@
 import { useState, useEffect, useContext } from "react";
-import { motion } from "framer-motion";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { AuthContext } from "../../Provider/AuthProvider";
-
-
+import BoardsHeader from "./BoardsHeader";
+import BoardCard from "./BoardCard"; // Import BoardCard
+import CreateBoardModal from "./CreateBoardModal"; // Import CreateBoardModal
+import EditBoardModal from "./EditBoardModal"; // Import EditBoardModal
 
 const Boards = () => {
   const navigate = useNavigate();
-  const { currentUser } = useContext(AuthContext); // Assuming AuthContext provides currentUser
+  const { currentUser } = useContext(AuthContext);
   const [boards, setBoards] = useState([]);
   const [newBoard, setNewBoard] = useState("");
+  const [description, setDescription] = useState("");
   const [visibility, setVisibility] = useState("Public");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editBoard, setEditBoard] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [theme, setTheme] = useState("#3b82f6");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const themeOptions = [
-    { name: "Blue", color: "#3b82f6" },
-    { name: "Green", color: "#22c55e" },
-    { name: "Red", color: "#ef4444" },
-    { name: "Yellow", color: "#eab308" },
-    { name: "Purple", color: "#8b5cf6" },
+    { name: "Sky Blue", color: "#e0f2fe" },
+    { name: "Lavender", color: "#f3e8ff" },
+    { name: "Mint Green", color: "#d1fae5" },
+    { name: "Warm Beige", color: "#fef3c7" },
+    { name: "Soft Gray", color: "#e5e7eb" },
   ];
 
   useEffect(() => {
@@ -37,6 +40,7 @@ const Boards = () => {
     fetchBoards();
   }, []);
 
+<<<<<<< HEAD
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
@@ -57,48 +61,52 @@ const Boards = () => {
     fetchCurrentUser();
   }, [currentUser]);
 
+=======
+>>>>>>> d47c4bf03acde4446f968d65b5a12ace36d5213c
   const createBoard = async () => {
     if (!newBoard) return alert("Board name is required!");
-
-    const currentUser = {
-      _id: "65a1b2c3d4e5f6a7b8c9d0e1",
-      name: "Siam",
-    };
+    if (!currentUser?._id) return alert("User is not authenticated!");
 
     const newBoardData = {
       name: newBoard,
-      visibility: visibility,
-      theme: theme,
+      description, // Include description
+      visibility,
+      theme,
       createdBy: currentUser._id,
       members: [
         {
           userId: currentUser._id,
-          role: "admin",
+          name: currentUser.name, // Pass user's name
+          email: currentUser.email, // Include user's email
+          role: "member",
         },
       ],
       createdAt: new Date().toISOString(),
     };
 
     try {
+<<<<<<< HEAD
       const response = await axios.post(`/boards`, newBoardData);
+=======
+      const response = await axios.post(
+        `http://localhost:5000/boards`,
+        newBoardData
+      );
+>>>>>>> d47c4bf03acde4446f968d65b5a12ace36d5213c
       setBoards([...boards, response.data]);
-      resetForm();
       setIsModalOpen(false);
+      setNewBoard("");
+      setDescription(""); // Reset description
+      setVisibility("Public");
+      setTheme("#3b82f6");
     } catch (error) {
       console.error("Error creating board:", error);
-      alert(`Failed to create board: ${error.response?.data?.error || error.message}`);
+      alert(
+        `Failed to create board: ${
+          error.response?.data?.error || error.message
+        }`
+      );
     }
-  };
-
-  const resetForm = () => {
-    setNewBoard("");
-    setVisibility("Public");
-    setTheme("#3b82f6");
-  };
-
-  const openEditModal = (board) => {
-    setEditBoard(board);
-    setIsEditModalOpen(true);
   };
 
   const updateBoard = async () => {
@@ -107,15 +115,17 @@ const Boards = () => {
     try {
       await axios.put(`/boards/${editBoard._id}`, {
         name: editBoard.name,
+        description: editBoard.description, // Include description
         visibility: editBoard.visibility,
         theme: editBoard.theme,
       });
 
-      setBoards(boards.map((board) => (board._id === editBoard._id ? editBoard : board)));
+      setBoards(
+        boards.map((board) => (board._id === editBoard._id ? editBoard : board))
+      );
       setIsEditModalOpen(false);
     } catch (error) {
       console.error("Error updating board:", error);
-      alert("Failed to update board. Please try again.");
     }
   };
 
@@ -127,164 +137,62 @@ const Boards = () => {
       setBoards(boards.filter((board) => board._id !== boardId));
     } catch (error) {
       console.error("Error deleting board:", error);
-      alert("Failed to delete board. Please try again.");
     }
   };
 
+  const filteredBoards = boards.filter((board) =>
+    board.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="p-6">
-      <div className="flex justify-end mb-4">
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="btn btn-primary"
-        >
-          Create Board
-        </button>
-      </div>
+      <BoardsHeader
+        onCreateBoard={() => setIsModalOpen(true)}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+      />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {boards.length > 0 ? (
-          boards.map((board) => (
-            <motion.div
+        {filteredBoards.length > 0 ? (
+          filteredBoards.map((board) => (
+            <BoardCard
               key={board._id}
-              className="p-4 shadow rounded cursor-pointer"
-              style={{ backgroundColor: board.theme }} // Apply theme color as background
-              onClick={() => navigate(`/dashboard/boards/${board._id}`)}
-            >
-              <h3 className="text-lg font-bold">{board.name}</h3>
-              <p className="text-sm text-gray-100">{board.visibility}</p>
-              <div className="flex justify-end gap-2 mt-2">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openEditModal(board);
-                  }}
-                  className="btn btn-sm "
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    deleteBoard(board._id);
-                  }}
-                  className="btn btn-sm btn-error"
-                >
-                  Delete
-                </button>
-              </div>
-            </motion.div>
+              board={board}
+              onEdit={(board) => {
+                setEditBoard(board);
+                setIsEditModalOpen(true);
+              }}
+              onDelete={deleteBoard}
+              navigate={navigate}
+            />
           ))
         ) : (
-          <p className="text-gray-500">No boards available. Create a new board to get started.</p>
+          <p className="text-gray-500">No boards match your search.</p>
         )}
       </div>
 
-      {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center backdrop-blur-xs z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h3 className="text-lg font-bold mb-3">Create New Board</h3>
-            <input
-              type="text"
-              placeholder="Board Name"
-              value={newBoard}
-              onChange={(e) => setNewBoard(e.target.value)}
-              className="input input-bordered w-full mb-3"
-              required
-            />
-            <select
-              value={visibility}
-              onChange={(e) => setVisibility(e.target.value)}
-              className="select select-bordered w-full mb-3"
-            >
-              <option value="Public">Public</option>
-              <option value="Private">Private</option>
-              <option value="Team Only">Team Only</option>
-            </select>
-            <div className="mb-3">
-              <label className="block text-sm font-medium mb-1">Theme Color</label>
-              <div className="flex gap-2">
-                {themeOptions.map((option) => (
-                  <div
-                    key={option.name}
-                    className={`w-6 h-6 rounded-full cursor-pointer border-2 ${
-                      theme === option.color ? "border-black" : "border-transparent"
-                    }`}
-                    style={{ backgroundColor: option.color }}
-                    onClick={() => setTheme(option.color)}
-                    title={option.name}
-                  />
-                ))}
-              </div>
-            </div>
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => {
-                  setIsModalOpen(false);
-                  resetForm();
-                }}
-                className="btn btn-error"
-              >
-                Cancel
-              </button>
-              <button onClick={createBoard} className="btn btn-success">
-                Create
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <CreateBoardModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onCreate={createBoard}
+        newBoard={newBoard}
+        setNewBoard={setNewBoard}
+        description={description} // Pass description
+        setDescription={setDescription} // Pass setDescription
+        visibility={visibility}
+        setVisibility={setVisibility}
+        theme={theme}
+        setTheme={setTheme}
+        themeOptions={themeOptions}
+      />
 
-      {isEditModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center backdrop-blur-xs z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h3 className="text-lg font-bold mb-3">Edit Board</h3>
-            <input
-              type="text"
-              placeholder="Board Name"
-              value={editBoard?.name || ""}
-              onChange={(e) => setEditBoard({ ...editBoard, name: e.target.value })}
-              className="input input-bordered w-full mb-3"
-              required
-            />
-            <select
-              value={editBoard?.visibility || "Public"}
-              onChange={(e) => setEditBoard({ ...editBoard, visibility: e.target.value })}
-              className="select select-bordered w-full mb-3"
-            >
-              <option value="Public">Public</option>
-              <option value="Private">Private</option>
-              <option value="Team Only">Team Only</option>
-            </select>
-            <div className="mb-3">
-              <label className="block text-sm font-medium mb-1">Theme Color</label>
-              <div className="flex gap-2">
-                {themeOptions.map((option) => (
-                  <div
-                    key={option.name}
-                    className={`w-6 h-6 rounded-full cursor-pointer border-2 ${
-                      editBoard?.theme === option.color ? "border-black" : "border-transparent"
-                    }`}
-                    style={{ backgroundColor: option.color }}
-                    onClick={() => setEditBoard({ ...editBoard, theme: option.color })}
-                    title={option.name}
-                  />
-                ))}
-              </div>
-            </div>
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setIsEditModalOpen(false)}
-                className="btn btn-error"
-              >
-                Cancel
-              </button>
-              <button onClick={updateBoard} className="btn btn-success">
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditBoardModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSave={updateBoard}
+        editBoard={editBoard}
+        setEditBoard={setEditBoard}
+        themeOptions={themeOptions}
+      />
     </div>
   );
 };
