@@ -54,7 +54,13 @@ const DashboardLayout = () => {
               </Link>
             </li> */}
             <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
+              <Link to="/">Home</Link>
+            </li>
+            <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
               <Link to="/dashboard/boards">Boards</Link>
+            </li>
+            <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
+              <Link to="/dashboard/messenger">Messenger</Link>
             </li>
             {/* <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
               <Link to="/updates">Updates</Link>
@@ -77,13 +83,7 @@ const DashboardLayout = () => {
             <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
               <Link to="/dashboard/myProfile">My Profile</Link>
             </li>
-            <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
-              <Link to="/">Home</Link>             
-              <Link to="/">Home</Link>
-            </li>
-            <li className="hover:bg-white/10 px-2 backdrop-blur-3xl text-white rounded-sm">
-              <Link to="/dashboard/messenger">Messenger</Link>
-            </li>
+            
           </ul>
         </div>
       </div>

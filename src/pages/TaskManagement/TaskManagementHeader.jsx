@@ -1,7 +1,11 @@
 import React from "react";
 import { FaUserPlus } from "react-icons/fa";
+import { SiMessenger } from "react-icons/si"; // Import SiMessenger
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 export default function TaskManagementHeader({ board, members, setIsModalOpen }) {
+    const navigate = useNavigate(); // Initialize navigate
+
     return (
         <header className="shadow-md px-4 py-3"
         style={{
@@ -34,11 +38,18 @@ export default function TaskManagementHeader({ board, members, setIsModalOpen })
                         </ul>
                     </div>
                     <button
+                        onClick={() => navigate(`/dashboard/messenger/${board?._id}`)} // Navigate to messenger
+                        className="p-2 bg-primary cursor-pointer text-white rounded  flex items-center"
+                    >
+                        <SiMessenger className="text-lg" />
+                    </button>
+                    <button
                         onClick={() => setIsModalOpen(true)}
-                        className="p-2 bg-blue-500 rounded hover:bg-blue-600 flex items-center"
+                        className="p-2 bg-primary cursor-pointer text-white rounded  flex items-center"
                     >
                         <FaUserPlus className="text-lg" />
                     </button>
+                    
                 </div>
             </div>
         </header>

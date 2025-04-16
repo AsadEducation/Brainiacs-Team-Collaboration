@@ -9,9 +9,11 @@ import { Link, useNavigate } from "react-router";
 import useAuth from "../../Hooks/useAuth";
 import GoogleButton from "./GoogleButton";
 import Swal from "sweetalert2";
+import { useState } from "react";
+
 const SignUp = () => {
-  const navigate=useNavigate()
-  const { signUpUser } = useAuth()
+  const navigate = useNavigate();
+  const { signUpUser } = useAuth();
   const {
     register,
     handleSubmit,
@@ -20,13 +22,12 @@ const SignUp = () => {
 
   const onSubmit = async (data) => {
     const { userName, email, password } = data;
-    const newUser = { name: userName, email, role: "user" }; // Include role
+    const newUser = { name: userName, email, role: "user" };
     try {
       const res = await signUpUser(email, password);
-      console.log("Signup Success:", res.user); // Log signup success data
+      console.log("Signup Success:", res.user);
 
-      // Save user to the database
-      const response = await fetch("http://localhost:5000/users", {
+      const response = await fetch("https://new-server-brainaics.onrender.com/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -39,9 +40,9 @@ const SignUp = () => {
       }
 
       const result = await response.json();
-      console.log("User Added to DB:", result); // Log database response
+      console.log("User Added to DB:", result);
       Swal.fire(`Welcome ${userName} to Brainiacs`).then(() => {
-        navigate("/"); // Redirect to home page after alert
+        navigate("/dashboard");
       });
     } catch (err) {
       console.error("Error:", err);
@@ -49,17 +50,10 @@ const SignUp = () => {
     }
   };
 
-  // TODO: Make facebook and linkedin signup functionality
-
   return (
     <div className="flex items-center justify-center px-5 py-5 pt-20 text-white min-h-screen bg-[#F0F4F3] ">
       <div className="rounded-4xl shadow-2xl w-full overflow-hidden max-w-lg md:max-w-7xl bg-white  scale-75 ">
-        {/* <div className="hidden md:block absolute top-10">
-          <img className="w-32" src={logo} alt="" />
-        </div> */}
         <div className="flex flex-col-reverse md:flex-row w-full ">
-
-          {/* toggle functionality side */}
           <div className="flex flex-col justify-center items-center md:w-1/3 py-10 px-10 text-center bg-secondary">
             <h2 className="text-white text-2xl md:text-4xl mb-4 font-bold">
               Welcome Back!
@@ -71,7 +65,6 @@ const SignUp = () => {
               Login
             </Link>
           </div>
-          {/* signup side */}
           <div className="text-black flex flex-col items-center justify-center gap-5 w-full md:w-2/3 py-10 px-10">
             <div>
               <h1 className="text-2xl md:text-4xl text-secondary font-medium text-center mb-6">
@@ -81,7 +74,6 @@ const SignUp = () => {
                 <button className="p-2 border border-gray-300 rounded-full cursor-pointer">
                   <img className="w-7 md:w-10" src={facebook} alt="" />
                 </button>
-                {/* Google button  */}
                 <GoogleButton></GoogleButton>
                 <button className="p-3 border border-gray-300 rounded-full cursor-pointer">
                   <img className="w-5 md:w-8" src={linkedin} alt="" />
@@ -89,13 +81,10 @@ const SignUp = () => {
               </div>
               <p className="text-center">or use your email for registration</p>
             </div>
-
-            {/* Registration form  */}
             <form
               className="flex flex-col items-center justify-center gap-4"
               onSubmit={handleSubmit(onSubmit)}
             >
-              {/* username input  */}
               <div className="relative w-full">
                 <img
                   src={user}
@@ -110,8 +99,6 @@ const SignUp = () => {
                   {...register("userName")}
                 />
               </div>
-
-              {/* email input  */}
               <div className="relative w-full">
                 <img
                   src={email}
@@ -124,11 +111,8 @@ const SignUp = () => {
                   className="w-full lg:w-lg p-5 pl-12 mt-2 bg-gray-200 rounded-lg focus:outline-none text-xl"
                   placeholder="Enter email"
                   {...register("email")}
-
                 />
               </div>
-
-              {/* password input  */}
               <div className="relative w-full">
                 <img
                   src={password}
@@ -146,11 +130,9 @@ const SignUp = () => {
                 />
                 <br />
               </div>
-                {/* error message  */}
-                {errors.password && <div className="w-96">
-                  <span className="text-red-600 mt-2 ">Password should contain at least one special character,one uppercase,one lowercase,one number and 6 characters</span>
-                  </div>}
-
+              {errors.password && <div className="w-96">
+                <span className="text-red-600 mt-2 ">Password should contain at least one special character,one uppercase,one lowercase,one number and 6 characters</span>
+              </div>}
               <button
                 type="submit"
                 className="mx-auto w-2xs text-xl text-white bg-secondary cursor-pointer hover:bg-accent py-4 px-16 mt-5 rounded-full focus:outline-none"

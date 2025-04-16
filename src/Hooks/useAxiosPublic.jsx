@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosPublic=axios.create({
-    baseURL:"http://localhost:5000",
+    baseURL:"https://new-server-brainaics.onrender.com",
 })
 
 const useAxiosPublic = () => {

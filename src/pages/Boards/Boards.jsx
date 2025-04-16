@@ -31,14 +31,19 @@ const Boards = () => {
   useEffect(() => {
     const fetchBoards = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/boards`);
+        const response = await axios.get(`https://new-server-brainaics.onrender.com/boards`);
         setBoards(response.data);
       } catch (error) {
         console.error("Error fetching boards:", error);
+        alert("Failed to fetch boards. Please try again later."); // User-friendly error message
       }
     };
     fetchBoards();
   }, []);
+
+  useEffect(() => {
+    console.log("Current User:", currentUser); // Log currentUser for debugging
+  }, [currentUser]);
 
   const createBoard = async () => {
     if (!newBoard) return alert("Board name is required!");
@@ -63,7 +68,7 @@ const Boards = () => {
 
     try {
       const response = await axios.post(
-        `http://localhost:5000/boards`,
+        `https://new-server-brainaics.onrender.com/boards`,
         newBoardData
       );
       setBoards([...boards, response.data]);
@@ -86,7 +91,7 @@ const Boards = () => {
     if (!editBoard?.name) return alert("Board name is required!");
 
     try {
-      await axios.put(`http://localhost:5000/boards/${editBoard._id}`, {
+      await axios.put(`https://new-server-brainaics.onrender.com/boards/${editBoard._id}`, {
         name: editBoard.name,
         description: editBoard.description, // Include description
         visibility: editBoard.visibility,
@@ -106,16 +111,27 @@ const Boards = () => {
     if (!window.confirm("Are you sure you want to delete this board?")) return;
 
     try {
-      await axios.delete(`http://localhost:5000/boards/${boardId}`);
+      await axios.delete(`https://new-server-brainaics.onrender.com/boards/${boardId}`);
       setBoards(boards.filter((board) => board._id !== boardId));
     } catch (error) {
       console.error("Error deleting board:", error);
     }
   };
 
-  const filteredBoards = boards.filter((board) =>
-    board.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredBoards = boards
+  .filter((board) =>
+    currentUser &&
+    board.members?.some((member) => member.userId === currentUser._id)
+  )
+  .filter((board) => {
+    const lowerCaseQuery = searchQuery.toLowerCase();
+    const lowerCaseName = board.name.toLowerCase();
+    return (
+      lowerCaseName.startsWith(lowerCaseQuery.slice(0, 3)) && // Match first 3 letters
+      lowerCaseName.includes(lowerCaseQuery) // Further matches
+    );
+  });
+
 
   return (
     <div className="p-6">
