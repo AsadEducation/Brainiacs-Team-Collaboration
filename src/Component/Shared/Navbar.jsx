@@ -118,14 +118,14 @@ const Navbar = () => {
               Pricing
             </Link>
           </li>
-          <li>
+          {/* <li>
             <Link
               to="/contact"
               className="text-sm hover:text-accent cursor-pointer"
             >
               Contact
             </Link>
-          </li>
+          </li> */}
           {currentUser && (
             <li>
               <Link
@@ -163,7 +163,7 @@ const Navbar = () => {
                   Dashboard
                 </Link>
                 <Link
-                  to="/profile"
+                  to="/dashboard/myProfile"
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 >
                   Profile
@@ -229,11 +229,11 @@ const Navbar = () => {
                   Pricing
                 </Link>
               </li>
-              <li className="mb-1">
+              {/* <li className="mb-1">
                 <Link to="/contact" className="block p-4 text-sm font-semibold text-primary hover:bg-blue-50 hover:text-secondary rounded">
                   Contact
                 </Link>
-              </li>
+              </li> */}
             </ul>
             <div className="mt-auto">
               <div className="pt-6">

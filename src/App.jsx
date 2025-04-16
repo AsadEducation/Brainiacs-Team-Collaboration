@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router";
+import { Route, Routes, Navigate } from "react-router";
 import "./App.css";
 import Home from "./pages/Home/Home.jsx";
 import MainLayout from "./Layouts/MainLayout";
@@ -11,6 +11,9 @@ import LeaderBoard from "./pages/LeaderBoardAndReview/LeaderBoard.jsx";
 import ActivityLog from './dashboard-pages/ActivityLog.jsx'
 import MyProfile from "./pages/MyProfile/MyProfile.jsx";
 import Messenger from "./dashboard-pages/Messenger/Messenger.jsx";
+import About from "./pages/About/About.jsx";
+import Services from "./pages/Services/Services.jsx";
+import Pricing from "./pages/Pricing/Pricing.jsx";
 
 function App() {
   return (
@@ -18,6 +21,9 @@ function App() {
 
       <Route path="/" element={<MainLayout />}>
         <Route index element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/pricing" element={<Pricing />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
       </Route>
@@ -25,10 +31,10 @@ function App() {
       {/* dashboard routes  */}
 
       <Route path="/dashboard" element={<DashboardLayout />}>
-        {/* <Route index element={<NewTaskManagement />} /> */}
-        <Route index path="boards" element={<Boards />} />
-        <Route path="leaderBoard" element={<LeaderBoard></LeaderBoard>} />
-        <Route path="myProfile" element={<MyProfile></MyProfile>} />
+        <Route index element={<Navigate to="boards" replace />} />
+        <Route path="boards" element={<Boards />} />
+        <Route path="leaderBoard" element={<LeaderBoard />} />
+        <Route path="myProfile" element={<MyProfile />} />
         <Route path="boards/:id" element={<NewTaskManagement />} />  
         <Route path="activity-log" element={<ActivityLog/>} />
         <Route path="messenger/:boardId" element={<Messenger />} />
