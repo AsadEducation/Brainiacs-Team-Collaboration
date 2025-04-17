@@ -21,29 +21,6 @@ const SignUp = () => {
   const onSubmit = async (data) => {
     const { userName, email, password } = data;
     const newUser = { name: userName, email, role: "user" }; // Include role
-<<<<<<< HEAD
-    console.log("Form Data:", data); // Log form data
-    signUpUser(email, password)
-      .then(res => {
-        console.log("Signup Success:", res.user); // Log signup success data
-        fetch("/users", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newUser),
-        })
-          .then(response => response.json())
-          .then(result => {
-            console.log("User Added to DB:", result); // Log database response
-            Swal.fire(`Welcome ${userName} to Brainiacs`);
-            navigate("/");
-          });
-      })
-      .catch(err => {
-        console.log("Signup Error:", err); // Log signup error
-        Swal.fire(`Something Went Wrong`);
-=======
     try {
       const res = await signUpUser(email, password);
       console.log("Signup Success:", res.user); // Log signup success data
@@ -55,7 +32,6 @@ const SignUp = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(newUser),
->>>>>>> d47c4bf03acde4446f968d65b5a12ace36d5213c
       });
 
       if (!response.ok) {

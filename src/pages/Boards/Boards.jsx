@@ -40,7 +40,6 @@ const Boards = () => {
     fetchBoards();
   }, []);
 
-<<<<<<< HEAD
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
@@ -61,8 +60,6 @@ const Boards = () => {
     fetchCurrentUser();
   }, [currentUser]);
 
-=======
->>>>>>> d47c4bf03acde4446f968d65b5a12ace36d5213c
   const createBoard = async () => {
     if (!newBoard) return alert("Board name is required!");
     if (!currentUser?._id) return alert("User is not authenticated!");
@@ -85,14 +82,7 @@ const Boards = () => {
     };
 
     try {
-<<<<<<< HEAD
       const response = await axios.post(`/boards`, newBoardData);
-=======
-      const response = await axios.post(
-        `http://localhost:5000/boards`,
-        newBoardData
-      );
->>>>>>> d47c4bf03acde4446f968d65b5a12ace36d5213c
       setBoards([...boards, response.data]);
       setIsModalOpen(false);
       setNewBoard("");
