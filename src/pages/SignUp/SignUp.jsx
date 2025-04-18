@@ -10,6 +10,7 @@ import useAuth from "../../Hooks/useAuth";
 import GoogleButton from "./GoogleButton";
 import Swal from "sweetalert2";
 import { useState } from "react";
+import { uploadFile } from "../../utils/Upload";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -19,11 +20,24 @@ const SignUp = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
-
+  const [selectedFile, setSelectedFile] = useState(null); 
   const onSubmit = async (data) => {
     const { userName, email, password } = data;
     const newUser = { name: userName, email, role: "user" };
+
     try {
+      let photoURL = null;
+
+      // Upload the selected file if it exists
+      if (selectedFile) {
+        const uploadResponse = await uploadFile(
+          selectedFile,
+          `${userName}_profile`
+        );
+        photoURL = uploadResponse.url; // Get the uploaded photo URL
+        newUser.photo = photoURL; // Add photo URL to the user object
+      }
+
       const res = await signUpUser(email, password);
       console.log("Signup Success:", res.user);
 
@@ -61,7 +75,10 @@ const SignUp = () => {
             <p className="text-white text-lg md:text-xl mb-8">
               To keep connected with us please login with your personal info
             </p>
-            <Link to="/login" className="text-lg text-white border-2 rounded-full py-1 md:py-3 px-10 md:px-14  hover:bg-accent ">
+            <Link
+              to="/login"
+              className="text-lg text-white border-2 rounded-full py-1 md:py-3 px-10 md:px-14  hover:bg-accent "
+            >
               Login
             </Link>
           </div>
@@ -125,14 +142,36 @@ const SignUp = () => {
                   className="w-full lg:w-lg p-5 pl-12 mt-2 bg-gray-200 rounded-lg focus:outline-none text-xl"
                   placeholder="Enter password"
                   {...register("password", {
-                    required: true, pattern: /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,}$/
+                    required: true,
+                    pattern:
+                      /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,}$/,
                   })}
                 />
                 <br />
               </div>
-              {errors.password && <div className="w-96">
-                <span className="text-red-600 mt-2 ">Password should contain at least one special character,one uppercase,one lowercase,one number and 6 characters</span>
-              </div>}
+              {errors.password && (
+                <div className="w-96">
+                  <span className="text-red-600 mt-2 ">
+                    Password should contain at least one special character,one
+                    uppercase,one lowercase,one number and 6 characters
+                  </span>
+                </div>
+              )}
+              <div className="relative w-full">
+                <label
+                  htmlFor="photo"
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                >
+                  Upload Profile Photo
+                </label>
+                <input
+                  type="file"
+                  id="photo"
+                  accept="image/*"
+                  className="w-full lg:w-lg p-2 bg-gray-200 rounded-lg focus:outline-none text-xl"
+                  onChange={(e) => setSelectedFile(e.target.files[0])} // Set the selected file
+                />
+              </div>
               <button
                 type="submit"
                 className="mx-auto w-2xs text-xl text-white bg-secondary cursor-pointer hover:bg-accent py-4 px-16 mt-5 rounded-full focus:outline-none"

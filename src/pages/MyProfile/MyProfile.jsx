@@ -6,7 +6,7 @@ const MyProfile = () => {
   const { currentUser } = useAuth();
 
   useEffect(() => {
-    fetch("https://new-server-brainaics.onrender.com/myProfile")
+    fetch("http://localhost:5000/myProfile")
       .then((res) => res.json())
       .then((data) => setSummary(data))
       .catch((err) => console.error(err));

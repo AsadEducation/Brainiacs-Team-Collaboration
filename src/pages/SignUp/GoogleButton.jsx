@@ -16,9 +16,10 @@ const GoogleButton = () => {
 
                 // Prepare user data for the database
                 const newUser = {
-                    name: user.displayName || "Unknown",
+                    displayName: user.displayName || "Unknown",
                     email: user.email,
-                    role: "user"
+                    role: "user",
+                    photoURL: user.photoURL || null, // Include photoURL
                 };
 
                 // Save user data to the database
