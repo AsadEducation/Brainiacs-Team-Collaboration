@@ -74,19 +74,6 @@ const ChatWindow = ({
   }, []);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowReactionDropdown(null); // Close the reaction dropdown
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [dropdownRef]);
-
-  useEffect(() => {
     const fetchPinnedMessages = async () => {
       try {
         if (!boardId) {
