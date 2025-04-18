@@ -24,12 +24,16 @@ export default function NewTaskManagement() {
     const [suggestedUsers, setSuggestedUsers] = useState([]);
     const [selectedUsers, setSelectedUsers] = useState([]);
     const searchTimeout = useRef(null);
-    const axiosPublic = useAxiosPublic();
+    const axiosPublic = useAxiosPublic(); //using base url from useAxiosPublic hook
     const [currentColumns, setCurrentColumns] = useState([]);
     const [tasks, setTasks] = useState([]);
     const [activeColumn, setActiveColumn] = useState(null);
     const [activeTask, setActiveTask] = useState(null);
     const [isAddingList, setIsAddingList] = useState(false);
+
+
+    
+
 
     // siam vai's code starts here
     useEffect(() => {
@@ -45,6 +49,8 @@ export default function NewTaskManagement() {
         fetchBoardData();
     }, [id]);
     // siam vai's code ends here
+
+    
 
     // this state contains the column lists 
     const { refetch: columnRefetch, data: columns = [], isLoading } = useQuery({

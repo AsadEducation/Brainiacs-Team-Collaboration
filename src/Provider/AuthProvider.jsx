@@ -3,8 +3,11 @@ import React, { createContext, useEffect, useState } from 'react';
 import { auth } from '../Firebase/firebase.config';
 import { GoogleAuthProvider } from 'firebase/auth';
 import axios from "axios";
+import useAxiosPublic from '../Hooks/useAxiosPublic';
 
 export const AuthContext = createContext();
+
+const axiosPublic = useAxiosPublic();
 
 const AuthProvider = ({ children }) => {
     const googleProvider = new GoogleAuthProvider();
@@ -36,7 +39,7 @@ const AuthProvider = ({ children }) => {
     const fetchUserDataWithRetry = async (email, token, retries = 2) => {
         for (let attempt = 1; attempt <= retries; attempt++) {
             try {
-                const response = await axios.get(`http://localhost:5000/user/${email}`, {
+                const response = await axiosPublic.get(`/user/${email}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 return response.data; // Return user data if successful
