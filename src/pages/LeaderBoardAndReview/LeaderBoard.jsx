@@ -5,19 +5,16 @@ const LeaderBoard = () => {
     const [data, setData] = useState([])
 
     useEffect(() => {
-        fetch('/leaderboard.json')
+        fetch('http://localhost:5000/leaderboard')
           .then(res => res.json())
           .then(data => setData(data))
           .catch(err => console.error(err));
       }, []);
 
    
-         
-
     return (
 
         <div className=" px-4 ">
-       
 
 {/* leader board */}
 
@@ -43,23 +40,23 @@ Leader Board
         </thead>
         <tbody>
          
-          {data.map((datas) => (
-            <tr key={datas.id}
+          {data.map((user , index) => (
+            <tr key={user.email}
             className="text-xs sm:text-sm md:text-base lg:text-lg border-b"
             >
-                <td className='font-semibold sm:text-base md:text-lg lg:text-lg '>1</td>
+                <td className='font-semibold sm:text-base md:text-lg lg:text-lg '>{index + 1}</td>
               <td>
                 <div className="flex items-center gap-3">
                   <div className="avatar">
                     <div className=" sm:h-20 sm:w-20 md:h-24 md:w-24 lg:h-40 lg:w-40">
-                      <img src={datas.avatar} alt='' />
+                      <img src={user.avatar} alt='' />
                     </div>
                   </div>
                 </div>
               </td>
-              <td className='font-semibold sm:text-base md:text-lg lg:text-lg '>{datas.name}</td>
-              <td className='font-semibold sm:text-base md:text-lg lg:text-lg '>{datas.points}</td>
-              <td className='font-semibold sm:text-base md:text-lg lg:text-lg '>{datas.badge} ⭐</td>
+              <td className='font-semibold sm:text-base md:text-lg lg:text-lg '>{user.name}</td>
+              <td className='font-semibold sm:text-base md:text-lg lg:text-lg '>{user.points}</td>
+              <td className='font-semibold sm:text-base md:text-lg lg:text-lg '>{user.badge} ⭐</td>
               
             </tr>
           ))}
