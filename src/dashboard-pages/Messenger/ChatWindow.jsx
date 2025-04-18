@@ -74,6 +74,19 @@ const ChatWindow = ({
   }, []);
 
   useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowReactionDropdown(null); // Close the reaction dropdown
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownRef]);
+
+  useEffect(() => {
     const fetchPinnedMessages = async () => {
       try {
         if (!boardId) {
@@ -222,6 +235,7 @@ const ChatWindow = ({
     <>
       <motion.div
         className="chat-window flex-1 rounded-lg overflow-y-scroll bg-gray-100 shadow-inner p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12"
+        style={{ overflowX: "hidden" }} // Prevent horizontal scrolling
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -229,7 +243,7 @@ const ChatWindow = ({
       >
         {pinnedMessages.length > 0 && (
           <motion.div
-            className="sticky -top-11 bg-white shadow-md rounded-lg p-2 z-20 flex flex-col sm:flex-row items-center justify-between gap-1 border border-gray-200"
+            className="sticky -top-11 bg-white shadow-md rounded-lg p-2 z-20 flex flex-wrap sm:flex-nowrap items-center justify-between gap-1 border border-gray-200"
             initial={{ scale: 0.95 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.3 }}
@@ -287,6 +301,7 @@ const ChatWindow = ({
             return (
               <div
                 key={msg.messageId}
+                className="w-full break-words" // Ensure text wraps within the container
                 ref={(el) => (messageRefs.current[msg.messageId] = el)} // Assign ref
                 onClick={() =>
                   setClickedMessageId(
@@ -503,57 +518,27 @@ const ChatWindow = ({
                           <MdEmojiEmotions />
                         </button>
                         {showReactionDropdown === msg.messageId && (
-                          <div className="absolute -top-18 bg-white rounded-lg shadow-lg z-10 p-2">
-                            <div className="flex gap-2">
+                          <div
+                            className="absolute bg-white rounded-lg shadow-lg z-10 p-2"
+                            style={{
+                              top: "-72px", // Adjust position to prevent overflow
+                              left: "50%",
+                              transform: "translateX(-50%)", // Set a max width
+                              overflow: "hidden", // Prevent content overflow
+                            }}
+                          >
+                            <div className="flex">
                               {["👍", "❤️", "😂", "😮", "😢", "😡"].map(
                                 (emoji) => (
                                   <div
                                     key={emoji}
-                                    className="cursor-pointer hover:shadow p-2 rounded text-2xl"
+                                    className="cursor-pointer hover:shadow p-2 rounded text-lg"
                                     onClick={async () => {
                                       try {
                                         await reactToMessage(
                                           msg.messageId,
                                           emoji
                                         ); // Add reaction to the database
-
-                                        console.log(
-                                          `User ${currentUser._id} reacted with ${emoji} to message ${msg.messageId}`
-                                        ); // Log the reaction
-
-                                        // Update the message in the messages state
-                                        setMessages((prevMessages) => {
-                                          const updatedMessages =
-                                            prevMessages.map((msg) =>
-                                              msg.messageId ===
-                                              reactionModal.reactions.messageId
-                                                ? {
-                                                    ...msg,
-                                                    reactions: {
-                                                      ...Object.fromEntries(
-                                                        Object.entries(
-                                                          msg.reactions
-                                                        ).map(
-                                                          ([key, users]) => [
-                                                            key,
-                                                            users.filter(
-                                                              (id) =>
-                                                                id !==
-                                                                currentUser._id
-                                                            ), // Remove user's previous reaction
-                                                          ]
-                                                        )
-                                                      ),
-                                                      [emoji]: [
-                                                        currentUser._id,
-                                                      ], // Replace with the new reaction
-                                                    },
-                                                  }
-                                                : msg
-                                            );
-                                          return updatedMessages;
-                                        });
-
                                         setShowReactionDropdown(null); // Close the dropdown
                                       } catch (error) {
                                         console.error(
