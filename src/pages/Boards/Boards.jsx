@@ -31,7 +31,7 @@ const Boards = () => {
   useEffect(() => {
     const fetchBoards = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/boards`);
+        const response = await axios.get(`/boards`);
         setBoards(response.data);
       } catch (error) {
         console.error("Error fetching boards:", error);
@@ -42,6 +42,23 @@ const Boards = () => {
   }, []);
 
   useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        if (!currentUser?.email) {
+          console.log("Current user is not available in AuthContext.");
+          return;
+        }
+
+        const response = await axios.get(`/user`, {
+          params: { email: currentUser.email },
+        });
+        console.log("Current User:", response.data);
+      } catch (error) {
+        console.error("Error fetching current user:", error);
+      }
+    };
+
+    fetchCurrentUser();
     console.log("Current User:", currentUser); // Log currentUser for debugging
   }, [currentUser]);
 
@@ -67,10 +84,7 @@ const Boards = () => {
     };
 
     try {
-      const response = await axios.post(
-        `http://localhost:5000/boards`,
-        newBoardData
-      );
+      const response = await axios.post(`/boards`, newBoardData);
       setBoards([...boards, response.data]);
       setIsModalOpen(false);
       setNewBoard("");
@@ -91,7 +105,7 @@ const Boards = () => {
     if (!editBoard?.name) return alert("Board name is required!");
 
     try {
-      await axios.put(`http://localhost:5000/boards/${editBoard._id}`, {
+      await axios.put(`/boards/${editBoard._id}`, {
         name: editBoard.name,
         description: editBoard.description, // Include description
         visibility: editBoard.visibility,
@@ -111,7 +125,7 @@ const Boards = () => {
     if (!window.confirm("Are you sure you want to delete this board?")) return;
 
     try {
-      await axios.delete(`http://localhost:5000/boards/${boardId}`);
+      await axios.delete(`/boards/${boardId}`);
       setBoards(boards.filter((board) => board._id !== boardId));
     } catch (error) {
       console.error("Error deleting board:", error);
