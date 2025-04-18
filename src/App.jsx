@@ -14,6 +14,7 @@ import Messenger from "./dashboard-pages/Messenger/Messenger.jsx";
 import About from "./pages/About/About.jsx";
 import Services from "./pages/Services/Services.jsx";
 import Pricing from "./pages/Pricing/Pricing.jsx";
+import NotFound from "./pages/NotFound/NotFound.jsx";
 
 function App() {
   return (
@@ -40,6 +41,9 @@ function App() {
         <Route path="messenger/:boardId" element={<Messenger />} />
         <Route path="messenger" element={<Messenger />} /> {/* Default route */}
       </Route>
+
+      {/* Catch-all route for 404 Not Found */}
+      <Route path="*" element={<NotFound />} />
 
     </Routes>
   );
