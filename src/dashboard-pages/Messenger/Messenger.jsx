@@ -49,6 +49,7 @@ const Messenger = () => {
   const [selectedPollOption, setSelectedPollOption] = useState(null); // Track selected poll option
   const messageRefs = useRef({}); // Store refs for each message
   const [showPollModal, setShowPollModal] = useState(false); // State for poll modal
+  const [selectedFile, setSelectedFile] = useState(null); // Add state for selected file
 
   useEffect(() => {
     if (currentUser) {
@@ -61,7 +62,7 @@ const Messenger = () => {
       if (!currentUser?._id) return; // Ensure currentUser is available
 
       try {
-        const response = await axios.get("https://new-server-brainaics.onrender.com/boards"); // Updated base URL
+        const response = await axios.get("http://localhost:5000/boards"); // Updated base URL
         const userBoards = response.data.filter((board) =>
           board.members?.some((member) => member.userId === currentUser._id)
         ); // Filter boards where the user is a member
@@ -119,7 +120,7 @@ const Messenger = () => {
 
       try {
         const response = await fetch(
-          `https://new-server-brainaics.onrender.com/boards/${selectedBoard._id}` // Updated base URL
+          `http://localhost:5000/boards/${selectedBoard._id}` // Updated base URL
         );
         if (response.ok) {
           const boardData = await response.json();
@@ -193,46 +194,42 @@ const Messenger = () => {
     }
   };
 
-  const sendMessage = async () => {
-    if (!newMessage.trim() || !currentUser || !selectedBoard) return; // Prevent sending empty messages or if user/board is not available
-
-    // Determine the sender's role
+  const sendMessage = async (messageData) => {
+    // Check if there's no text AND no attachment
+    if (!messageData.text?.trim() && !messageData.attachment) {
+      console.warn("Cannot send an empty message without an attachment.");
+      return;
+    }
+  
     const senderRole =
       currentUser._id === selectedBoard.createdBy ? "admin" : "member";
-
-    const messageData = {
-      senderId: currentUser._id, // Use currentUser's ID
-      senderName: currentUser.name, // Use currentUser's name
-      role: senderRole, // Add the sender's role
-      text: newMessage.trim(),
-      attachments: [], // Add attachment handling if needed
+  
+    const fullMessageData = {
+      senderId: currentUser._id,
+      senderName: currentUser.name,
+      role: senderRole,
+      text: messageData.text?.trim() || null, // Use optional chaining and fallback to null
+      attachments: messageData.attachment ? [messageData.attachment] : [], // Include the attachment URL
     };
-
-    console.log("Sending message:", messageData); // Log the message data
-
+  
+    console.log("Sending message:", fullMessageData);
+  
     try {
       const response = await fetch(
-        `https://new-server-brainaics.onrender.com/boards/${selectedBoard._id}/messages`, // Updated base URL
+        `http://localhost:5000/boards/${selectedBoard._id}/messages`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(messageData),
+          body: JSON.stringify(fullMessageData),
         }
       );
-
+  
       if (response.ok) {
         const result = await response.json();
-        setMessages((prevMessages) => [...prevMessages, result.message]); // Append the new message
+        setMessages((prevMessages) => [...prevMessages, result.message]);
         setNewMessage(""); // Clear the input field
-
-        // Scroll to the last message
-        setTimeout(() => {
-          if (lastMessageRef.current) {
-            lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
-          }
-        }, 100);
       } else {
         console.error("Failed to send message");
       }
@@ -246,7 +243,7 @@ const Messenger = () => {
 
     try {
       const response = await fetch(
-        `https://new-server-brainaics.onrender.com/boards/${selectedBoard._id}/messages/${messageId}`, // Updated base URL
+        `http://localhost:5000/boards/${selectedBoard._id}/messages/${messageId}`, // Updated base URL
         {
           method: "PATCH",
           headers: {
@@ -276,7 +273,7 @@ const Messenger = () => {
 
     try {
       const response = await fetch(
-        `https://new-server-brainaics.onrender.com/boards/${selectedBoard._id}/messages/${messageId}`, // Updated base URL
+        `http://localhost:5000/boards/${selectedBoard._id}/messages/${messageId}`, // Updated base URL
         {
           method: "DELETE",
           headers: {
@@ -309,7 +306,7 @@ const Messenger = () => {
 
     try {
       const response = await fetch(
-        `https://new-server-brainaics.onrender.com/boards/${selectedBoard._id}/messages/${messageId}/seen`,
+        `http://localhost:5000/boards/${selectedBoard._id}/messages/${messageId}/seen`,
         {
           method: "PATCH",
           headers: {
@@ -339,7 +336,7 @@ const Messenger = () => {
 
     try {
       const response = await fetch(
-        `https://new-server-brainaics.onrender.com/boards/${selectedBoard._id}/messages/${messageId}/pin`,
+        `http://localhost:5000/boards/${selectedBoard._id}/messages/${messageId}/pin`,
         {
           method: "PATCH",
           headers: {
@@ -368,7 +365,7 @@ const Messenger = () => {
 
     try {
       const response = await fetch(
-        `https://new-server-brainaics.onrender.com/boards/${selectedBoard._id}/messages/${messageId}/unpin`,
+        `http://localhost:5000/boards/${selectedBoard._id}/messages/${messageId}/unpin`,
         {
           method: "PATCH",
           headers: {
@@ -397,7 +394,7 @@ const Messenger = () => {
 
     try {
       const response = await fetch(
-        `https://new-server-brainaics.onrender.com/boards/${selectedBoard._id}/messages/${messageId}/react`, // Updated base URL
+        `http://localhost:5000/boards/${selectedBoard._id}/messages/${messageId}/react`, // Updated base URL
         {
           method: "PATCH",
           headers: {
@@ -429,7 +426,7 @@ const Messenger = () => {
   const handleCreatePoll = async (pollData) => {
     try {
       const response = await fetch(
-        `https://new-server-brainaics.onrender.com/boards/${selectedBoard._id}/polls`,
+        `http://localhost:5000/boards/${selectedBoard._id}/polls`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -453,7 +450,7 @@ const Messenger = () => {
   const votePoll = async (pollId, optionIndex) => {
     try {
       const response = await fetch(
-        `https://new-server-brainaics.onrender.com/boards/${selectedBoard._id}/polls/${pollId}/vote`,
+        `http://localhost:5000/boards/${selectedBoard._id}/polls/${pollId}/vote`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -477,7 +474,7 @@ const Messenger = () => {
   const removePoll = async (pollId) => {
     try {
       const response = await fetch(
-        `https://new-server-brainaics.onrender.com/boards/${selectedBoard._id}/polls/${pollId}`,
+        `http://localhost:5000/boards/${selectedBoard._id}/polls/${pollId}`,
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
@@ -622,6 +619,7 @@ const Messenger = () => {
               showAttachDropdown={showAttachDropdown}
               setShowAttachDropdown={setShowAttachDropdown}
               attachDropdownRef={attachDropdownRef}
+              setSelectedFile={setSelectedFile} // Pass setSelectedFile as a prop
             />
           </>
         ) : (
