@@ -16,13 +16,14 @@ const GoogleButton = () => {
 
                 // Prepare user data for the database
                 const newUser = {
-                    name: user.displayName || "Unknown",
+                    displayName: user.displayName || "Unknown",
                     email: user.email,
-                    role: "user"
+                    role: "user",
+                    photoURL: user.photoURL || null, // Include photoURL
                 };
 
                 // Save user data to the database
-                fetch("https://new-server-brainaics.onrender.com/users", {
+                fetch("http://localhost:5000/users", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

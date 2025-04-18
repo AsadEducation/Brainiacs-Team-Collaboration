@@ -23,6 +23,7 @@
     "firebase": "^11.5.0",
     "framer-motion": "^12.5.0",
     "gsap": "^3.12.7",
+    "imagekit": "^6.0.0",
     "keen-slider": "^6.8.6",
     "lucide-react": "^0.484.0",
     "react": "^19.0.0",

@@ -36,7 +36,7 @@ const AuthProvider = ({ children }) => {
     const fetchUserDataWithRetry = async (email, token, retries = 2) => {
         for (let attempt = 1; attempt <= retries; attempt++) {
             try {
-                const response = await axios.get(`https://new-server-brainaics.onrender.com/user/${email}`, {
+                const response = await axios.get(`http://localhost:5000/user/${email}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 return response.data; // Return user data if successful

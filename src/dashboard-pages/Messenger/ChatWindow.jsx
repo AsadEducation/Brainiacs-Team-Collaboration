@@ -10,6 +10,7 @@ import { MdEmojiEmotions } from "react-icons/md";
 import { IoCloseCircleOutline } from "react-icons/io5";
 import PinMessageModal from "./PinMessageModal"; // Import PinMessageModal
 import EditMessageModal from "./EditMessageModal"; // Import EditMessageModal
+import { FaUser } from "react-icons/fa6";
 
 const ChatWindow = ({
   boardId, // Accept boardId as a prop
@@ -55,6 +56,7 @@ const ChatWindow = ({
     text: "",
   }); // State for edit modal
   const [pollModal, setPollModal] = useState({ isOpen: false, poll: null }); // State for poll modal
+  const [previewAttachment, setPreviewAttachment] = useState(null); // State for attachment preview
 
   const dropdownRef = useRef(null);
 
@@ -78,7 +80,7 @@ const ChatWindow = ({
           console.error("boardId is not defined");
           return;
         }
-        const response = await fetch(`https://new-server-brainaics.onrender.com/boards/${boardId}`);
+        const response = await fetch(`http://localhost:5000/boards/${boardId}`);
         if (!response.ok) {
           throw new Error(
             `Failed to fetch: ${response.status} ${response.statusText}`
@@ -128,7 +130,7 @@ const ChatWindow = ({
                 ...msg,
                 reactions: {
                   ...msg.reactions,
-                  [emoji]: msg.reactions[emoji]?.filter((id) => id !== userId), // Ensure the user's ID is removed
+                  [emoji]: msg.reactions[emoji]?.filter((id) => id !== userId),
                 },
               }
             : msg
@@ -136,7 +138,16 @@ const ChatWindow = ({
       );
 
       // Call the backend to persist the change
-      await reactToMessage(messageId, emoji); // Toggle the reaction in the backend
+      await fetch(
+        `http://localhost:5000/boards/${boardId}/messages/${messageId}/reactions/${emoji}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId }),
+        }
+      );
 
       setReactionModal({ isOpen: false, reactions: {} }); // Close the modal
     } catch (error) {
@@ -148,7 +159,7 @@ const ChatWindow = ({
     try {
       // Call the backend API to unpin the message
       const response = await fetch(
-        `https://new-server-brainaics.onrender.com/boards/${boardId}/messages/${messageId}/unpin`,
+        `http://localhost:5000/boards/${boardId}/messages/${messageId}/unpin`,
         {
           method: "PATCH",
           headers: {
@@ -186,6 +197,27 @@ const ChatWindow = ({
     });
   };
 
+  const isImageOrVideo = (url) => {
+    const imageExtensions = ["jpg", "jpeg", "png", "gif", "bmp", "webp"];
+    const videoExtensions = ["mp4", "webm", "ogg", "mov"];
+    const extension = url.split(".").pop().toLowerCase();
+    return (
+      imageExtensions.includes(extension) || videoExtensions.includes(extension)
+    );
+  };
+
+  const isImage = (url) => {
+    const imageExtensions = ["jpg", "jpeg", "png", "gif", "bmp", "webp"];
+    const extension = url.split(".").pop().toLowerCase();
+    return imageExtensions.includes(extension);
+  };
+
+  const isVideo = (url) => {
+    const videoExtensions = ["mp4", "webm", "ogg", "mov"];
+    const extension = url.split(".").pop().toLowerCase();
+    return videoExtensions.includes(extension);
+  };
+
   return (
     <>
       <motion.div
@@ -197,8 +229,7 @@ const ChatWindow = ({
       >
         {pinnedMessages.length > 0 && (
           <motion.div
-            className="sticky -top-11 bg-white shadow-md rounded-lg p-2 z-20 flex flex-col sm:flex-row items-center justify-between
- gap-1 border border-gray-200"
+            className="sticky -top-11 bg-white shadow-md rounded-lg p-2 z-20 flex flex-col sm:flex-row items-center justify-between gap-1 border border-gray-200"
             initial={{ scale: 0.95 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.3 }}
@@ -210,16 +241,16 @@ const ChatWindow = ({
               <FaArrowLeft className="text-2xl" />
             </button>
             <div className="flex-1 text-center">
-              <p className="font-semibold  text-base sm:text-lg md:text-sm truncate">
+              <p className="font-semibold text-sm sm:text-base md:text-lg truncate">
                 {pinnedMessages[currentPinnedIndex]?.text ||
                   "No pinned message"}
               </p>
-              <p className="text-xs  mt-1">
+              <p className="text-xs sm:text-sm mt-1">
                 <span className="font-medium">Pinned by:</span>{" "}
                 {getSenderName(pinnedMessages[currentPinnedIndex]?.pinnedBy) ||
                   "Unknown"}
               </p>
-              <p className="text-xs">
+              <p className="text-xs sm:text-sm">
                 <span className="font-medium">Expires on:</span>{" "}
                 {formatExpiryTime(
                   pinnedMessages[currentPinnedIndex]?.pinExpiry
@@ -299,10 +330,22 @@ const ChatWindow = ({
                                 Pin
                               </li>
                               <li
-                                className="px-4 py-2 hover:shadow cursor-pointer"
-                                onClick={() =>
-                                  handleEditMessage(msg.messageId, msg.text)
-                                } // Open the edit modal
+                                className={`px-4 py-2 hover:shadow cursor-pointer ${
+                                  msg.text ||
+                                  !msg.attachments ||
+                                  msg.attachments.length === 0
+                                    ? ""
+                                    : "text-gray-400 cursor-not-allowed"
+                                }`}
+                                onClick={() => {
+                                  if (
+                                    msg.text ||
+                                    !msg.attachments ||
+                                    msg.attachments.length === 0
+                                  ) {
+                                    handleEditMessage(msg.messageId, msg.text);
+                                  }
+                                }}
                               >
                                 Edit
                               </li>
@@ -320,76 +363,131 @@ const ChatWindow = ({
                         )}
                       </div>
                     )}
-                    <div
-                      className={`relative max-w-full sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg p-4 rounded-2xl shadow-lg ${
-                        isSender
-                          ? "bg-primary text-white rounded-br-none"
-                          : "bg-gray-200 text-gray-800 rounded-bl-none"
-                      }`}
-                    >
-                      <p
-                        className={`text-xs sm:text-sm font-semibold mb-2 ${
-                          isSender ? "text-right" : "text-left"
+
+                    <div>
+                      <div
+                        className={`relative max-w-full sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg p-4 rounded-2xl shadow-lg ${
+                          isSender
+                            ? "bg-primary text-white rounded-br-none"
+                            : "bg-gray-200 text-gray-800 rounded-bl-none"
                         }`}
                       >
-                        {getSenderName(msg.senderId)}
-                      </p>
-                      {msg.deletedBy ? (
-                        <p className="text-sm italic text-gray-200">
-                          Message deleted by {msg.deletedBy} at{" "}
-                          {formatTime(msg.deletedAt)}
-                        </p>
-                      ) : (
-                        <>
-                          <p className="text-sm sm:text-base leading-relaxed">
-                            {msg.text}
+                        {msg.deletedBy ? (
+                          <p className="text-sm italic text-gray-200">
+                            Message deleted by {msg.deletedBy} at{" "}
+                            {formatTime(msg.deletedAt)}
                           </p>
-                          {!msg.deletedBy &&
-                            msg.reactions &&
-                            Object.keys(msg.reactions).length > 0 && (
-                              <div
-                                className={`absolute -bottom-4 ${
-                                  isSender
-                                    ? "px-2 py-1 left-1 bg-white"
-                                    : "px-2 py-1 right-1 bg-gray-200"
-                                } text-xs sm:text-sm mt-2 rounded-lg flex gap-2`}
-                              >
-                                {Object.entries(msg.reactions).map(
-                                  ([emoji, users]) =>
-                                    users.length > 0 && ( // Only show if there are reactions
-                                      <div
-                                        key={emoji}
-                                        className={`flex items-center gap-1 cursor-pointer ${
-                                          users.includes(currentUser._id)
-                                            ? "bg-primary text-white px-2 py-1 rounded-lg"
-                                            : ""
-                                        }`}
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          setReactionModal({
-                                            isOpen: true,
-                                            reactions: {
-                                              emoji,
-                                              users,
-                                              messageId: msg.messageId,
-                                            },
-                                          });
-                                        }}
+                        ) : (
+                          <>
+                            {/* Display text if available */}
+                            {msg.text && (
+                              <p className="text-sm sm:text-base leading-relaxed break-words">
+                                {msg.text}
+                              </p>
+                            )}
+                            {/* Display attachments if they exist */}
+                            {msg.attachments && msg.attachments.length > 0 && (
+                              <div className="mt-2">
+                                {msg.attachments.map((attachment, idx) => (
+                                  <div
+                                    key={idx}
+                                    className="cursor-pointer"
+                                    onClick={() =>
+                                      setPreviewAttachment(attachment)
+                                    } // Set preview attachment
+                                  >
+                                    {isImage(attachment) ? (
+                                      <img
+                                        src={attachment}
+                                        alt={`Attachment ${idx + 1}`}
+                                        className="w-full h-32 object-cover rounded-lg"
+                                      />
+                                    ) : isVideo(attachment) ? (
+                                      <video
+                                        src={attachment}
+                                        className="w-full h-32 object-cover rounded-lg"
+                                        muted
+                                        loop
+                                        autoPlay
+                                      />
+                                    ) : (
+                                      <a
+                                        href={attachment}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="block text-blue-500 underline text-sm sm:text-base mt-1"
                                       >
-                                        <span>{emoji}</span>
-                                        {users.length > 1 && (
-                                          <span className="text-xs text-gray-400">
-                                            {users.length}
-                                          </span>
-                                        )}
-                                      </div>
-                                    )
-                                )}
+                                        Open Attachment {idx + 1}
+                                      </a>
+                                    )}
+                                  </div>
+                                ))}
                               </div>
                             )}
-                        </>
-                      )}
+                            {!msg.deletedBy &&
+                              msg.reactions &&
+                              Object.keys(msg.reactions).length > 0 && (
+                                <div
+                                  className={`absolute -bottom-4 ${
+                                    isSender
+                                      ? "px-2 py-1 left-1 bg-white"
+                                      : "px-2 py-1 right-1 bg-gray-200"
+                                  } text-xs sm:text-sm mt-2 rounded-lg flex gap-2`}
+                                >
+                                  {Object.entries(msg.reactions).map(
+                                    ([emoji, users]) =>
+                                      users.length > 0 && ( // Only show if there are reactions
+                                        <div
+                                          key={emoji}
+                                          className={`flex items-center gap-1 cursor-pointer ${
+                                            users.includes(currentUser._id)
+                                              ? "bg-primary text-white px-2 py-1 rounded-lg"
+                                              : ""
+                                          }`}
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setReactionModal({
+                                              isOpen: true,
+                                              reactions: {
+                                                emoji,
+                                                users,
+                                                messageId: msg.messageId,
+                                              },
+                                            });
+                                          }}
+                                        >
+                                          <span>{emoji}</span>
+                                          {users.length > 1 && (
+                                            <span className="text-xs text-gray-400">
+                                              {users.length}
+                                            </span>
+                                          )}
+                                        </div>
+                                      )
+                                  )}
+                                </div>
+                              )}
+                          </>
+                        )}
+                      </div>
+                      <img
+                        src={
+                          isSender
+                            ? currentUser.photoURL || "/default-avatar.png"
+                            : getSenderName(msg.senderId)?.photoURL ||
+                              "/default-avatar.png"
+                        }
+                        alt={
+                          isSender
+                            ? "You"
+                            : getSenderName(msg.senderId)?.name || "Unknown"
+                        }
+                        className={`w-8 h-8 rounded-full ${
+                          isSender ? "hidden" : "relative -left-10 -top-8  z-10"
+                        }`}
+                      />
                     </div>
+
                     {!isSender && !msg.deletedBy && (
                       <div className="relative">
                         <button
@@ -533,7 +631,9 @@ const ChatWindow = ({
       {pollModal.isOpen && (
         <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-bold mb-4">{pollModal.poll.question}</h3>
+            <h3 className="text-lg font-bold mb-4">
+              {pollModal.poll.question}
+            </h3>
             <ul className="space-y-2">
               {pollModal.poll.options.map((option, index) => (
                 <li
@@ -671,6 +771,35 @@ const ChatWindow = ({
                   </li>
                 ))}
               </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Attachment Preview Modal */}
+      {previewAttachment && (
+        <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-3xl">
+            <button
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+              onClick={() => setPreviewAttachment(null)} // Close preview
+            >
+              <IoCloseCircleOutline className="text-2xl" />
+            </button>
+            <div className="flex justify-center items-center">
+              {isImage(previewAttachment) ? (
+                <img
+                  src={previewAttachment}
+                  alt="Attachment Preview"
+                  className="max-w-full max-h-[80vh] rounded-lg"
+                />
+              ) : isVideo(previewAttachment) ? (
+                <video
+                  src={previewAttachment}
+                  controls
+                  className="max-w-full max-h-[80vh] rounded-lg"
+                />
+              ) : null}
             </div>
           </div>
         </div>

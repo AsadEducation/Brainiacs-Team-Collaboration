@@ -31,7 +31,7 @@ const Boards = () => {
   useEffect(() => {
     const fetchBoards = async () => {
       try {
-        const response = await axios.get(`https://new-server-brainaics.onrender.com/boards`);
+        const response = await axios.get(`http://localhost:5000/boards`);
         setBoards(response.data);
       } catch (error) {
         console.error("Error fetching boards:", error);
@@ -68,7 +68,7 @@ const Boards = () => {
 
     try {
       const response = await axios.post(
-        `https://new-server-brainaics.onrender.com/boards`,
+        `http://localhost:5000/boards`,
         newBoardData
       );
       setBoards([...boards, response.data]);
@@ -91,7 +91,7 @@ const Boards = () => {
     if (!editBoard?.name) return alert("Board name is required!");
 
     try {
-      await axios.put(`https://new-server-brainaics.onrender.com/boards/${editBoard._id}`, {
+      await axios.put(`http://localhost:5000/boards/${editBoard._id}`, {
         name: editBoard.name,
         description: editBoard.description, // Include description
         visibility: editBoard.visibility,
@@ -111,7 +111,7 @@ const Boards = () => {
     if (!window.confirm("Are you sure you want to delete this board?")) return;
 
     try {
-      await axios.delete(`https://new-server-brainaics.onrender.com/boards/${boardId}`);
+      await axios.delete(`http://localhost:5000/boards/${boardId}`);
       setBoards(boards.filter((board) => board._id !== boardId));
     } catch (error) {
       console.error("Error deleting board:", error);
