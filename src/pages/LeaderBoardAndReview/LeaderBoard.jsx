@@ -30,7 +30,6 @@ Leader Board
     
         <thead >
           <tr className='font-bold  sm:text-base md:text-lg lg:text-xl '>
-          
             <th>Rank</th>
             <th>Image</th>
             <th>Name</th>
