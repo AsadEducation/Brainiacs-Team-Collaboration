@@ -39,7 +39,7 @@ export default function NewTaskManagement() {
     useEffect(() => {
         const fetchBoardData = async () => {
             try {
-                const response = await axios.get(`/boards/${id}`);
+                const response = await axiosPublic.get(`/boards/${id}`);
                 setBoard(response.data);
                 setMembers(response.data.members || []);
             } catch (error) {
@@ -172,11 +172,11 @@ export default function NewTaskManagement() {
                 role: m.role || "member",   // Default role
             }));
 
-            await axios.put(`/boards/${id}`, { members: validMembers });
+            await axiosPublic.put(`/boards/${id}`, { members: validMembers });
             console.log("Member added successfully");
 
             // Refetch the board data to update the UI
-            const response = await axios.get(`/boards/${id}`);
+            const response = await axiosPublic.get(`/boards/${id}`);
             setBoard(response.data);
             setMembers(response.data.members || []);
         } catch (error) {
@@ -187,7 +187,7 @@ export default function NewTaskManagement() {
 
     const fetchSuggestedUsers = async (query) => {
         try {
-            const response = await axios.get(
+            const response = await axiosPublic.get(
                 `/users/search?query=${query}`
             );
             setSuggestedUsers(response.data);

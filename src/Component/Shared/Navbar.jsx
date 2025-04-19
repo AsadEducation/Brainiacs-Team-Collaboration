@@ -10,7 +10,7 @@ import { MdOutlineLogout } from "react-icons/md";
 
 const Navbar = () => {
   const { currentUser, signOutUser } = useAuth(); // Use currentUser instead of user
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);  
   const [isVisible, setIsVisible] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   let lastScrollY = window.scrollY;
