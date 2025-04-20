@@ -37,8 +37,8 @@ const DashboardLayout = () => {
               })
             }
             role="button"
-            className={`btn bg-[#3F5E82] fixed top-0 drawer-button rounded-none text-white transition-all duration--3500 border-none shadow-none ${
-              isDrawerOpen ? "left-56 px-0" : "left-0 px-0"
+            className={`btn text-black font-bold text-xl md:text-2xl lg:text-2xl fixed top-0 drawer-button rounded-none transition-all duration--3500 border-none shadow-none ${
+              isDrawerOpen ? "left-54 px-0" : "left-0 px-0"
             } `}
           >
             {isDrawerOpen ? (
