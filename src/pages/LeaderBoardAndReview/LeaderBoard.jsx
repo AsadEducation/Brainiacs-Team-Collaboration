@@ -36,7 +36,7 @@ Leader Board
         <thead >
           <tr className='font-bold  sm:text-base md:text-lg lg:text-xl '>
             <th>Rank</th>
-            <th>Image</th>
+            <th className='pl-18'>Image</th>
             <th>Name</th>
             <th>Points</th>
             <th>Badge</th>
@@ -53,7 +53,7 @@ Leader Board
                 <div className="flex items-center gap-3">
                   <div className="avatar">
                     <div className=" h-20 w-20 md:h-24 md:w-24 lg:h-40 lg:w-40">
-                      <img src={user.avatar} alt='' />
+                      <img src={user.avatar || 'No Image'} alt={user?.name || 'No Image'} />
                     </div>
                   </div>
                 </div>
