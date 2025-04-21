@@ -12,32 +12,32 @@ const TaskCard = ({ task }) => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
-const axiosPublic = useAxiosPublic(); 
-const { currentUser } = useAuth();
+  const axiosPublic = useAxiosPublic();
+  const { currentUser } = useAuth();
 
 
-// completed done button clicking
-const handleTaskDone = async (e) => {
-  e.stopPropagation();
+  // completed done button clicking
+  const handleTaskDone = async (e) => {
+    e.stopPropagation();
 
-  const taskData = {
-    taskId: task.id,
-    taskTittle: task.taskTittle,
-    email: currentUser?.email,
-    completedAt: new Date(),
-  };
+    const taskData = {
+      taskId: task.id,
+      taskTittle: task.taskTittle,
+      email: currentUser?.email,
+      completedAt: new Date(),
+    };
 
-  try {
-    const res = await axiosPublic.post('/completedTask', taskData);
-    if (res.data.success) {
-      toast.success("Task completed & point added!");
-      setIsCompleted(true); 
+    try {
+      const res = await axiosPublic.post('/completedTask', taskData);
+      if (res.data.success) {
+        toast.success("Task completed & point added!");
+        setIsCompleted(true);
+      }
+    } catch (err) {
+      console.error("Error completing task", err);
+      toast.error("Something went wrong!");
     }
-  } catch (err) {
-    console.error("Error completing task", err);
-    toast.error("Something went wrong!");
-  }
-};
+  };
 
 
 
@@ -50,7 +50,7 @@ const handleTaskDone = async (e) => {
     transition,
     cursor: active ? "grabbing" : "grab"
   };
-  
+
 
   if (isDragging) {
     return (
@@ -70,23 +70,25 @@ const handleTaskDone = async (e) => {
           <div className='flex justify-between items-center'>
             <h3 className="text-[12px] font-medium text-gray-900"> {taskTittle}</h3>
             <button
-  className={`flex items-center px-1 py-1 rounded-full 
-    ${isCompleted ? 'bg-green-500 text-white cursor-not-allowed' : 'bg-cyan-600 text-black'}`}
-  disabled={isCompleted}
-  onClick={handleTaskDone}
->
-  <MdDone />
-</button>
+            disabled={isCompleted}
+            onClick={handleTaskDone}
+              className={
+             `flex items-center px-1 py-1 rounded-full 
+   ${isCompleted ? 'bg-green-500 text-white cursor-not-allowed' : 'bg-cyan-600 text-black'}`}
+        
+            >
+              <MdDone />
+            </button>
 
-            
+
           </div>
 
-{/* Date display */}
-{task.startDate && task.dueDate && (
-  <div className="text-[10px] text-gray-500 mt-1">
-    📅 {task.startDate} → {task.dueDate}
-  </div>
-)}
+          {/* Date display */}
+          {task.startDate && task.dueDate && (
+            <div className="text-[10px] text-gray-500 mt-1">
+              📅 {task.startDate} → {task.dueDate}
+            </div>
+          )}
 
           {/* Member img */}
           <div className="flex items-center justify-between mt-3">
@@ -131,7 +133,7 @@ const handleTaskDone = async (e) => {
       </div>
 
       <TaskModal task={task} ></TaskModal>
-      
+
       <ToastContainer />
     </>
   );
