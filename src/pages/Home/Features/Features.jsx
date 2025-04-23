@@ -16,7 +16,7 @@ const featuresData = [
             "Share and store files securely with cloud-based access control, ensuring privacy and data protection.",
         image:
             "/feature-images/secure-file.avif",
-        extraClass: 'lg: relative -top-30'
+        // extraClass: 'lg: relative -top-30'
 
     },
     {
@@ -35,7 +35,7 @@ const featuresData = [
             "Organize your workflow with to-do lists, kanban boards, and progress tracking for better productivity.",
         image:
             "/feature-images/project-management.jpg",
-        extraClass: 'lg: relative -top-30'
+        // extraClass: 'lg: relative -top-30'
 
 
     },

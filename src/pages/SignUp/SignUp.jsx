@@ -41,16 +41,13 @@ const SignUp = () => {
       const res = await signUpUser(email, password);
       console.log("Signup Success:", res.user);
 
-      const response = await fetch(
-        "http://localhost:5000/users",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newUser),
-        }
-      );
+      const response = await fetch("/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newUser),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to save user to the database");

@@ -24,18 +24,22 @@ export default function NewTaskManagement() {
     const [suggestedUsers, setSuggestedUsers] = useState([]);
     const [selectedUsers, setSelectedUsers] = useState([]);
     const searchTimeout = useRef(null);
-    const axiosPublic = useAxiosPublic();
+    const axiosPublic = useAxiosPublic(); //using base url from useAxiosPublic hook
     const [currentColumns, setCurrentColumns] = useState([]);
     const [tasks, setTasks] = useState([]);
     const [activeColumn, setActiveColumn] = useState(null);
     const [activeTask, setActiveTask] = useState(null);
     const [isAddingList, setIsAddingList] = useState(false);
 
+
+    
+
+
     // siam vai's code starts here
     useEffect(() => {
         const fetchBoardData = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/boards/${id}`);
+                const response = await axios.get(`/boards/${id}`);
                 setBoard(response.data);
                 setMembers(response.data.members || []);
             } catch (error) {
@@ -45,6 +49,8 @@ export default function NewTaskManagement() {
         fetchBoardData();
     }, [id]);
     // siam vai's code ends here
+
+    
 
     // this state contains the column lists 
     const { refetch: columnRefetch, data: columns = [], isLoading } = useQuery({
@@ -166,11 +172,11 @@ export default function NewTaskManagement() {
                 role: m.role || "member",   // Default role
             }));
 
-            await axios.put(`http://localhost:5000/boards/${id}`, { members: validMembers });
+            await axios.put(`/boards/${id}`, { members: validMembers });
             console.log("Member added successfully");
 
             // Refetch the board data to update the UI
-            const response = await axios.get(`http://localhost:5000/boards/${id}`);
+            const response = await axios.get(`/boards/${id}`);
             setBoard(response.data);
             setMembers(response.data.members || []);
         } catch (error) {
@@ -182,7 +188,7 @@ export default function NewTaskManagement() {
     const fetchSuggestedUsers = async (query) => {
         try {
             const response = await axios.get(
-                `http://localhost:5000/users/search?query=${query}`
+                `/users/search?query=${query}`
             );
             setSuggestedUsers(response.data);
         } catch (error) {

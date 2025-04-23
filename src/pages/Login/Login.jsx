@@ -11,7 +11,6 @@ import GoogleButton from "../SignUp/GoogleButton";
 import useAuth from "../../Hooks/useAuth";
 import Swal from "sweetalert2";
 import { useEffect, useState } from "react";
-import useAxiosPublic from "../../Hooks/useAxiosPublic";
 
 const Login = () => {
   const navigate = useNavigate();
