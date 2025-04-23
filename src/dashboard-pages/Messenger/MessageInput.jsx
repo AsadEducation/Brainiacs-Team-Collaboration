@@ -15,6 +15,7 @@ const MessageInput = ({
 }) => {
   const [fileName, setFileName] = useState(""); // State to store selected file name
   const [selectedFile, setLocalSelectedFile] = useState(null); // Local state for selected file
+  const [isLoading, setIsLoading] = useState(false); // Add loading state
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -55,6 +56,7 @@ const MessageInput = ({
       return; // ব্লক করবে শুধুমাত্র যখন টেক্সটও নাই, ফাইলও নাই
     }
 
+    setIsLoading(true); // Set loading to true
     let attachmentUrl = null;
 
     if (selectedFile) {
@@ -66,25 +68,27 @@ const MessageInput = ({
         attachmentUrl = uploadResponse.url; // Get the uploaded file's URL
       } catch (error) {
         console.error("Error uploading file:", error);
+        setIsLoading(false); // Reset loading state on error
         return; // Stop if the file upload fails
       }
     }
 
-    console.log("Message Data:", {
-      text: newMessage.trim() || null, // Use null if no text
-      attachment: attachmentUrl, // Use the uploaded file's URL
-    });
+    try {
+      await sendMessage({
+        text: newMessage.trim() || null, // Pass null if no text
+        attachment: attachmentUrl, // Pass the attachment URL to the sendMessage function
+      });
 
-    sendMessage({
-      text: newMessage.trim() || null, // Pass null if no text
-      attachment: attachmentUrl, // Pass the attachment URL to the sendMessage function
-    });
-
-    // Clear file and message input after sending
-    setFileName(""); // Clear the file name
-    setLocalSelectedFile(null); // Reset the local selected file
-    setSelectedFile(null); // Reset the parent selected file
-    setNewMessage(""); // Clear the message input
+      // Clear file and message input after sending
+      setFileName(""); // Clear the file name
+      setLocalSelectedFile(null); // Reset the local selected file
+      setSelectedFile(null); // Reset the parent selected file
+      setNewMessage(""); // Clear the message input
+    } catch (error) {
+      console.error("Error sending message:", error);
+    } finally {
+      setIsLoading(false); // Reset loading state
+    }
   };
 
   return (
@@ -152,12 +156,30 @@ const MessageInput = ({
       />
       {(newMessage.trim() || selectedFile) && (
         <motion.button
-          className="ml-0 sm:ml-4 mt-4 sm:mt-0 bg-primary text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:bg-primary transition duration-200"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
+          className={`ml-0 sm:ml-4 mt-4 sm:mt-0 bg-primary text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:bg-primary transition duration-200 ${
+            isLoading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          whileHover={!isLoading ? { scale: 1.1 } : {}}
+          whileTap={!isLoading ? { scale: 0.9 } : {}}
           onClick={handleSendMessage}
+          disabled={isLoading} // Disable button while loading
         >
-          <AiOutlineSend className="inline-block text-xl sm:text-2xl" />
+          {isLoading ? (
+            <motion.span
+              className="inline-block text-xl sm:text-2xl"
+              animate={{
+                x: [0, 50, 100, 200], 
+              }}
+              transition={{
+                duration: 1, // Duration of the animation
+                ease: "easeInOut", // Smooth transition
+              }}
+            >
+              <AiOutlineSend className="inline-block text-lg sm:text-xl" />
+            </motion.span>
+          ) : (
+            <AiOutlineSend className="inline-block text-xl sm:text-2xl" />
+          )}
         </motion.button>
       )}
     </motion.div>

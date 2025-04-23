@@ -3,14 +3,20 @@ import Countdown from "react-countdown";
 import confetti from "canvas-confetti";
 import { useRef } from "react";
 import "./EidSection.css"; // CSS for stars
-
+import eid from "../../../assets/eid.json";
+import { Player } from "@lottiefiles/react-lottie-player";
 const EidSection = () => {
   const eidDate = new Date("2025-04-10T00:00:00");
 
   const handleClaim = () => {
     const duration = 2 * 1000;
     const animationEnd = Date.now() + duration;
-    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1000 };
+    const defaults = {
+      startVelocity: 30,
+      spread: 360,
+      ticks: 60,
+      zIndex: 1000,
+    };
 
     const interval = setInterval(() => {
       const timeLeft = animationEnd - Date.now();
@@ -32,7 +38,8 @@ const EidSection = () => {
     if (completed) {
       return (
         <p className="text-lg sm:text-xl text-gray-700 dark:text-gray-300">
-          We had an amazing offer during Eid! Stay tuned for more exciting updates.
+          We had an amazing offer during Eid! Stay tuned for more exciting
+          updates.
         </p>
       );
     } else {
@@ -50,7 +57,7 @@ const EidSection = () => {
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, type: "spring" }}
       viewport={{ once: true }}
-      className="relative overflow-hidden bg-green-50 dark:bg-gray-900 py-10 px-4 md:px-20 text-center shadow-lg my-15"
+      className="relative overflow-hidden bg-green-50 dark:bg-gray-900 h-screen shadow-lg"
     >
       {/* Floating Stars */}
       {[...Array(30)].map((_, index) => (
@@ -65,45 +72,59 @@ const EidSection = () => {
         />
       ))}
 
-      <h2 className="text-3xl md:text-4xl font-bold text-green-700 dark:text-green-400 mb-4">
-        Eid-ul-Fitr Greetings
-      </h2>
+      <div className="p-6 flex items-center justify-between">
+        <div className="flex flex-col items-center justify-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-green-700 dark:text-green-400 mb-4">
+            Eid-ul-Fitr Greetings
+          </h2>
 
-      <p className="text-base sm:text-lg md:text-xl mb-6 text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
-        On behalf of the Brainiacs team, we wish you an advance Eid Mubarak.
-        <br />
-        “This Eid, Brainiacs users will enjoy a{" "}
-        <span className="font-semibold text-green-600 dark:text-green-400">
-          3-day free premium trial!
-        </span>
-        ”
-      </p>
+          <p className="text-base sm:text-lg md:text-xl mb-6 text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
+            On behalf of the Brainiacs team, we wish you an advance Eid Mubarak.
+            <br />
+            “This Eid, Brainiacs users will enjoy a{" "}
+            <span className="font-semibold text-green-600 dark:text-green-400">
+              3-day free premium trial!
+            </span>
+            ”
+          </p>
 
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 max-w-xl mx-auto relative z-10">
-        <h3 className="text-lg sm:text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100">
-          Expected Eid Date:{" "}
-          <span className="text-green-600 dark:text-green-400">April 10, 2025</span>
-        </h3>
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 max-w-xl mx-auto relative z-10">
+            <h3 className="text-lg sm:text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100">
+              Expected Eid Date:{" "}
+              <span className="text-green-600 dark:text-green-400">
+                April 10, 2025
+              </span>
+            </h3>
 
-        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-3">
-          Time remaining until Eid:
-        </p>
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-3">
+              Time remaining until Eid:
+            </p>
 
-        <motion.div
-          initial={{ scale: 0.95 }}
-          animate={{ scale: 1 }}
-          transition={{ type: "spring", stiffness: 300 }}
-          className="text-lg sm:text-2xl text-green-700 dark:text-green-300 font-bold"
-        >
-          <Countdown date={eidDate} renderer={renderer} />
-        </motion.div>
+            <motion.div
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 300 }}
+              className="text-lg sm:text-2xl text-green-700 dark:text-green-300 font-bold"
+            >
+              <Countdown date={eidDate} renderer={renderer} />
+            </motion.div>
 
-        <button
-          onClick={handleClaim}
-          className="mt-6 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition"
-        >
-          Claim Free Premium
-        </button>
+            <button
+              onClick={handleClaim}
+              className="mt-6 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition"
+            >
+              Claim Free Premium
+            </button>
+          </div>
+        </div>
+        <div className="w-1/3 h-full flex items-center justify-center relative">
+          <Player
+            autoplay
+            loop
+            src={eid}
+            style={{ height: "100%", width: "100%" }}
+          />
+        </div>
       </div>
     </motion.section>
   );
