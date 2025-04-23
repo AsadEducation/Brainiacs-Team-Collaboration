@@ -10,14 +10,11 @@ import logo from "../../assets/brainiacs logo.png";
 import GoogleButton from "../SignUp/GoogleButton";
 import useAuth from "../../Hooks/useAuth";
 import Swal from "sweetalert2";
-import { useEffect } from "react";
-import useAxiosPublic from "../../Hooks/useAxiosPublic";
+import { useEffect, useState } from "react";
+
 const Login = () => {
-
- 
-
-  const navigate = useNavigate()
-  const { logInUser } = useAuth()
+  const navigate = useNavigate();
+  const { logInUser } = useAuth();
   const {
     register,
     handleSubmit,
@@ -29,14 +26,14 @@ const Login = () => {
     try {
       const res = await logInUser(email, password);
       console.log("success", res);
-      Swal.fire("Successfully Logged In");
-      navigate("/"); // Redirect to home page
+      Swal.fire("Successfully Logged In").then(() => {
+        navigate("/dashboard"); // Redirect to dashboard page after alert
+      });
     } catch (err) {
       console.error("error", err);
       Swal.fire("Login failed. Please check your credentials and try again.");
     }
   };
-  
 
   return (
     <div className="flex items-center justify-center px-5 py-5 pt-20 text-white min-h-screen bg-[#F0F4F3] ">

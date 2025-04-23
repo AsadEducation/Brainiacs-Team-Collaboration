@@ -6,6 +6,7 @@ import BoardsHeader from "./BoardsHeader";
 import BoardCard from "./BoardCard"; // Import BoardCard
 import CreateBoardModal from "./CreateBoardModal"; // Import CreateBoardModal
 import EditBoardModal from "./EditBoardModal"; // Import EditBoardModal
+import useAxiosPublic from "../../Hooks/useAxiosPublic";
 
 const Boards = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const Boards = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [theme, setTheme] = useState("#3b82f6");
   const [searchQuery, setSearchQuery] = useState("");
+  const axiosPublic = useAxiosPublic(); // using baseURL from  axiosPublic hook [asad]
 
   const themeOptions = [
     { name: "Sky Blue", color: "#e0f2fe" },
@@ -31,14 +33,36 @@ const Boards = () => {
   useEffect(() => {
     const fetchBoards = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/boards`);
+        const response = await axiosPublic.get(`/boards`);
         setBoards(response.data);
       } catch (error) {
         console.error("Error fetching boards:", error);
+        alert("Failed to fetch boards. Please try again later."); // User-friendly error message
       }
     };
     fetchBoards();
   }, []);
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        if (!currentUser?.email) {
+          console.log("Current user is not available in AuthContext.");
+          return;
+        }
+
+        const response = await axiosPublic.get(`/user`, {
+          params: { email: currentUser.email },
+        });
+        console.log("Current User:", response.data);
+      } catch (error) {
+        console.error("Error fetching current user:", error);
+      }
+    };
+
+    fetchCurrentUser();
+    console.log("Current User:", currentUser); // Log currentUser for debugging
+  }, [currentUser]);
 
   const createBoard = async () => {
     if (!newBoard) return alert("Board name is required!");
@@ -62,10 +86,7 @@ const Boards = () => {
     };
 
     try {
-      const response = await axios.post(
-        `http://localhost:5000/boards`,
-        newBoardData
-      );
+      const response = await axiosPublic.post(`/boards`, newBoardData);
       setBoards([...boards, response.data]);
       setIsModalOpen(false);
       setNewBoard("");
@@ -86,7 +107,7 @@ const Boards = () => {
     if (!editBoard?.name) return alert("Board name is required!");
 
     try {
-      await axios.put(`http://localhost:5000/boards/${editBoard._id}`, {
+      await axiosPublic.put(`/boards/${editBoard._id}`, {
         name: editBoard.name,
         description: editBoard.description, // Include description
         visibility: editBoard.visibility,
@@ -106,16 +127,27 @@ const Boards = () => {
     if (!window.confirm("Are you sure you want to delete this board?")) return;
 
     try {
-      await axios.delete(`http://localhost:5000/boards/${boardId}`);
+      await axiosPublic.delete(`/boards/${boardId}`);
       setBoards(boards.filter((board) => board._id !== boardId));
     } catch (error) {
       console.error("Error deleting board:", error);
     }
   };
 
-  const filteredBoards = boards.filter((board) =>
-    board.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredBoards = boards
+  .filter((board) =>
+    currentUser &&
+    board.members?.some((member) => member.userId === currentUser._id)
+  )
+  .filter((board) => {
+    const lowerCaseQuery = searchQuery.toLowerCase();
+    const lowerCaseName = board.name.toLowerCase();
+    return (
+      lowerCaseName.startsWith(lowerCaseQuery.slice(0, 3)) && // Match first 3 letters
+      lowerCaseName.includes(lowerCaseQuery) // Further matches
+    );
+  });
+
 
   return (
     <div className="p-6">

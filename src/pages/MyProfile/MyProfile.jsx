@@ -1,17 +1,30 @@
 import { useEffect, useState } from "react";
 import useAuth from "../../Hooks/useAuth";
+import useAxiosPublic from "../../Hooks/useAxiosPublic";
 
 const MyProfile = () => {
   const [summary, setSummary] = useState(null);
   const { currentUser } = useAuth();
+  const axiosPublic = useAxiosPublic();
+
 
   useEffect(() => {
-    fetch("http://localhost:5000/myProfile")
-      .then((res) => res.json())
-      .then((data) => setSummary(data))
-      .catch((err) => console.error(err));
-  }, []);
+    if (!currentUser?.email) return;
 
+    // Step 1: Get profile summary
+    axiosPublic
+      .get(`/myProfile?email=${currentUser.email}`)
+      .then((res) => {
+        const data = res.data;
+        setSummary(data);
+
+        // Step 2: Optionally post it to save in DB
+        return axiosPublic.post("/myProfile", data);
+      })
+      .catch((err) => console.error("Profile fetch error:", err));
+  }, [currentUser?.email, axiosPublic]);
+
+  
   if (!summary) return <p className="text-center">Loading...</p>;
 
   const {
@@ -31,7 +44,14 @@ const MyProfile = () => {
 
       <div className="bg-white border rounded-xl p-6 max-w-md mx-auto shadow-lg mb-10">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-lg font-semibold">👤  {currentUser?.displayName || "Anonymous"}</span>
+          <div className="flex gap-2 items-center">
+          <img
+                          className="w-10 h-10 rounded-full"
+                          src={currentUser.photoURL || userimage}
+                          alt="User"
+                        />
+          <span className="text-lg font-semibold"> {currentUser?.name || "User"}</span>
+          </div>
           <span className="text-lg font-semibold text-secondary">
             Points: {points}
           </span>
@@ -76,7 +96,9 @@ const MyProfile = () => {
         {badges.map((badge) => (
           <div
             key={badge._id}
-            className={`border rounded-lg p-4 shadow-sm hover:shadow-lg transition-all ${points >= badge.pointsRequired ? "bg-green-100" : "bg-gray-100"}`}
+            className={`border rounded-lg p-4 shadow-sm hover:shadow-lg transition-all ${
+              points >= badge.pointsRequired ? "bg-green-100" : "bg-gray-100"
+            }`}
           >
             <img
               src={badge.image}

@@ -1,0 +1,32 @@
+.floating-star {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background-color: #fcd34d; /* Yellow color */
+  border-radius: 50%;
+  opacity: 0.8;
+  animation: floatUp 6s linear infinite, twinkle 1.5s infinite;
+  box-shadow: 0 0 8px 2px #fcd34d; /* Initial glow */
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(0);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-400px);
+    opacity: 0;
+  }
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.8;
+    box-shadow: 0 0 8px 2px #fcd34d; /* Glow at full opacity */
+  }
+  50% {
+    opacity: 0.4;
+    box-shadow: 0 0 4px 1px #fcd34d; /* Dimmed glow */
+  }
+}
