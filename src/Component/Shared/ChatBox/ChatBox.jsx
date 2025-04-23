@@ -35,7 +35,7 @@ const ChatBox = () => {
   const handleGemini = async (input) => {
     const response = await ai.models.generateContent({
       model: "gemini-2.0-flash",
-      contents: input,
+      contents: input+" and keep the response in concise",
     });
     setMessages((prev)=>[...prev, { text: response.text, sender: "bot" }])
   }
