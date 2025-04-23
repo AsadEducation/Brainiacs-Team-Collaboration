@@ -448,26 +448,36 @@ const Messenger = () => {
   };
 
   const votePoll = async (pollId, optionIndex) => {
+    if (!currentUser?._id) {
+      alert("You must be logged in to vote!");
+      return;
+    }
+  
     try {
       const response = await fetch(
         `http://localhost:5000/boards/${selectedBoard._id}/polls/${pollId}/vote`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId: currentUser._id, optionIndex }),
+          body: JSON.stringify({ 
+            userId: currentUser._id, 
+            optionIndex 
+          }),
         }
       );
-
+  
       if (response.ok) {
         const updatedPoll = await response.json();
         setPolls((prev) =>
           prev.map((poll) => (poll._id === pollId ? updatedPoll : poll))
         );
       } else {
-        console.error("Failed to vote on poll");
+        const errorData = await response.json();
+        alert(errorData.error || "Failed to vote");
       }
     } catch (error) {
       console.error("Error voting on poll:", error);
+      alert("Failed to vote. Please try again.");
     }
   };
 
@@ -610,6 +620,7 @@ const Messenger = () => {
               polls={polls} // Pass polls as a prop
               votePoll={votePoll} // Pass votePoll as a prop
               removePoll={removePoll} // Pass removePoll as a prop
+              setPolls={setPolls} // Pass setPolls as a prop
             />
             {/* Message Input */}
             <MessageInput
