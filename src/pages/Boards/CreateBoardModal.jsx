@@ -23,7 +23,7 @@ const CreateBoardModal = ({
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         transition={{ duration: 0.3 }}
-        className="p-8 rounded-xl shadow-2xl w-fit bg-white"
+        className="p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-md sm:max-w-lg bg-white"
         style={{ backgroundColor: theme }}
       >
         <h3 className="text-xl font-semibold mb-4 text-gray-800">Create New Board</h3>
@@ -65,13 +65,6 @@ const CreateBoardModal = ({
                 title={option.name}
               />
             ))}
-            <input
-              type="color"
-              value={theme}
-              onChange={(e) => setTheme(e.target.value)}
-              className="w-8 h-8 p-0 border cursor-pointer rounded-full"
-              title="Pick custom color"
-            />
           </div>
         </div>
         <div className="flex justify-end gap-3">
