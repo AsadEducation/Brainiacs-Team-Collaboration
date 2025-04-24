@@ -23,46 +23,28 @@ const SignUp = () => {
   const [selectedFile, setSelectedFile] = useState(null); 
   const onSubmit = async (data) => {
     const { userName, email, password } = data;
-    const newUser = {
-        _id: null, // Will be updated after Firebase user creation
-        displayName: userName,
-        email,
-        role: "user",
-        photoURL: null,
-    };
 
     try {
-        let photoURL = null;
+      let photoURL = null;
 
-        if (selectedFile) {
-            const uploadResponse = await uploadFile(selectedFile, `${userName}_profile`);
-            photoURL = uploadResponse.url;
-            newUser.photoURL = photoURL;
-        }
+      // Upload the selected file if it exists
+      if (selectedFile) {
+        const uploadResponse = await uploadFile(
+          selectedFile,
+          `${userName}_profile`
+        );
+        photoURL = uploadResponse.url; // Get the uploaded photo URL
+      }
 
-        const res = await signUpUser(email, password);
-        newUser._id = res.user.uid;
+      // Sign up the user and save to the database
+      await signUpUser(email, password, userName, photoURL);
 
-        const response = await fetch("http://localhost:5000/users", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(newUser),
-        });
-
-        if (!response.ok) {
-            throw new Error("Failed to save user to the database");
-        }
-
-        const result = await response.json();
-        console.log("User Added to DB:", result);
-        Swal.fire(`Welcome ${userName} to Brainiacs`).then(() => {
-            navigate("/dashboard");
-        });
+      Swal.fire(`Welcome ${userName} to Brainiacs`).then(() => {
+        navigate("/dashboard");
+      });
     } catch (err) {
-        console.error("Error:", err);
-        Swal.fire("Signup failed. Please check your details and try again.");
+      console.error("Error:", err);
+      Swal.fire("Signup failed. Please check your details and try again.");
     }
   };
 
