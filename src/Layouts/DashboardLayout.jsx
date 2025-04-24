@@ -80,7 +80,7 @@ const DashboardLayout = () => {
               />
               <div>
                 <h2 className="text-lg font-semibold">
-                  {currentUser?.name || "Unknown User"}
+                  {currentUser?.displayName || "Unknown User"}
                 </h2>
                 <span className="flex items-center space-x-1">
                   <Link

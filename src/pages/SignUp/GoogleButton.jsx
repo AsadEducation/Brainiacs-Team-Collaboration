@@ -12,18 +12,16 @@ const GoogleButton = () => {
         signUpGoogleUser()
             .then(res => {
                 const user = res.user;
-                console.log("Google Login Success:", user);
 
-                // Prepare user data for the database
                 const newUser = {
+                    _id: user.uid,
                     displayName: user.displayName || "Unknown",
                     email: user.email,
                     role: "user",
-                    photoURL: user.photoURL || null, // Include photoURL
+                    photoURL: user.photoURL || null,
                 };
 
-                // Save user data to the database
-                fetch("/users", {
+                fetch("http://localhost:5000/users", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -34,7 +32,7 @@ const GoogleButton = () => {
                         if (response.status === 400) {
                             console.log("User already exists in the database.");
                             Swal.fire("Successfully Logged in").then(() => {
-                                navigate("/dashboard"); // Redirect to dashboard page after alert
+                                navigate("/dashboard");
                             });
                             return;
                         }
@@ -47,7 +45,7 @@ const GoogleButton = () => {
                         if (result) {
                             console.log("Google User Added to DB:", result);
                             Swal.fire("Successfully Logged in").then(() => {
-                                navigate("/dashboard"); // Redirect to dashboard page after alert
+                                navigate("/dashboard");
                             });
                         }
                     })
