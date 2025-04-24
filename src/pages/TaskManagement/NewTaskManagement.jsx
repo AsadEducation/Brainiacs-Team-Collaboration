@@ -50,6 +50,12 @@ export default function NewTaskManagement() {
             text: "The requested board does not exist or has been deleted.",
           });
           setBoard(null); // Clear the board state
+        } else if (error.response?.status === 400) {
+          Swal.fire({
+            icon: "error",
+            title: "Invalid Board ID",
+            text: "The provided board ID is invalid. Please check and try again.",
+          });
         } else {
           Swal.fire({
             icon: "error",
@@ -214,7 +220,7 @@ export default function NewTaskManagement() {
 
     const updatedMembers = [
       ...members,
-      { userId: member.userId, role: "member" },
+      { userId: member.userId.toString(), role: "member" }, // Ensure userId is a string
     ];
     setMembers(updatedMembers);
 
@@ -223,6 +229,8 @@ export default function NewTaskManagement() {
         userId: m.userId.toString(), // Ensure userId is a string
         role: m.role || "member", // Default role
       }));
+
+      console.log("Sending updated members to server:", validMembers); // Log the payload
 
       await axiosPublic.put(`/boards/${id}`, { members: validMembers }); // Ensure `id` is correct
       console.log("Member added successfully");
@@ -239,11 +247,11 @@ export default function NewTaskManagement() {
         text: `${member.name} has been successfully added to the board!`,
       });
     } catch (error) {
-      console.error("Error adding member to the board:", error);
+      console.error("Error adding member to the board:", error.response?.data || error);
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: "Failed to add member. Please check the data and try again.",
+        text: error.response?.data?.error || "Failed to add member. Please try again.",
       });
     }
   };

@@ -9,6 +9,18 @@ export default function TaskManagementHeader({ board, members, setIsModalOpen })
     const navigate = useNavigate(); // Initialize navigate
 
     const addMember = async (newMember) => {
+        console.log("New Member Data:", newMember); // Log the newMember object
+
+        if (!newMember || !newMember.userId || !newMember.email || !newMember.displayName) {
+            console.error("Invalid member data:", newMember);
+            Swal.fire({
+                icon: "error",
+                title: "Invalid Member Data",
+                text: "The member data is incomplete or invalid. Please try again.",
+            });
+            return;
+        }
+
         try {
             const updatedMembers = [
                 ...members,
@@ -38,6 +50,7 @@ export default function TaskManagementHeader({ board, members, setIsModalOpen })
             });
         }
     };
+console.log(members);
 
     return (
         <header

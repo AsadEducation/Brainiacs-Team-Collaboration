@@ -21,7 +21,7 @@ import {
 
 const DashboardLayout = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
-  const { currentUser } = useAuth(); // Get current user data
+  const { currentUser } = useAuth();
 
   return (
     <div>
@@ -80,7 +80,7 @@ const DashboardLayout = () => {
               />
               <div>
                 <h2 className="text-lg font-semibold">
-                  {currentUser?.displayName }
+                  {currentUser?.displayName}
                 </h2>
                 <span className="flex items-center space-x-1">
                   <Link

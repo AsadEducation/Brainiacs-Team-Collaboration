@@ -53,7 +53,6 @@ const Messenger = () => {
 
   useEffect(() => {
     if (currentUser) {
-      console.log("Logged-in user data:", currentUser); // Log the logged-in user's data
     }
   }, [currentUser]);
 

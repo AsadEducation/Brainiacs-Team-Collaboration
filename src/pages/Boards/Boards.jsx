@@ -66,7 +66,7 @@ const Boards = () => {
   };
 
   const createBoard = async () => {
-    if (!newBoard) {
+    if (!newBoard.trim()) {
       Swal.fire({
         icon: "error",
         title: "Validation Error",
@@ -74,44 +74,35 @@ const Boards = () => {
       });
       return;
     }
-    if (!currentUser?._id) {
+    if (!currentUser?._id || typeof currentUser._id !== "string") {
       Swal.fire({
         icon: "error",
         title: "Authentication Error",
-        text: "User is not authenticated!",
+        text: "User ID is invalid or not available!",
       });
       return;
     }
 
     const newBoardData = {
-      name: newBoard,
-      description, // Include description
+      name: newBoard.trim(),
+      description: description.trim() || "",
       visibility,
       theme,
-      createdBy: currentUser._id,
-      members: [
-        {
-          userId: currentUser._id,
-          name: currentUser.displayName,
-          email: currentUser.email, // Include user's email
-          role: "member",
-        },
-      ],
-      createdAt: new Date().toISOString(),
+      createdBy: currentUser._id, // Pass the user ID as a string
     };
 
     try {
-      await axiosPublic.post(`/boards`, newBoardData);
+      const response = await axiosPublic.post(`/boards`, newBoardData);
+      console.log("Board Created:", response.data);
+
       setIsModalOpen(false);
       setNewBoard("");
-      setDescription(""); // Reset description
+      setDescription("");
       setVisibility("Public");
       setTheme("#3b82f6");
 
-      // Refetch boards after creation
       await fetchBoards();
 
-      // Show success message
       Swal.fire({
         icon: "success",
         title: "Board Created",
@@ -122,9 +113,7 @@ const Boards = () => {
       Swal.fire({
         icon: "error",
         title: "Creation Failed",
-        text: `Failed to create board: ${
-          error.response?.data?.error || error.message
-        }`,
+        text: error.response?.data?.error || "Failed to create board",
       });
     }
   };
@@ -139,7 +128,7 @@ const Boards = () => {
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes, delete it!",
     });
-  
+
     if (result.isConfirmed) {
       try {
         await axiosPublic.delete(`/boards/${boardId}`);
@@ -147,7 +136,11 @@ const Boards = () => {
         Swal.fire("Deleted!", "The board has been deleted.", "success");
       } catch (error) {
         console.error("Error deleting board:", error);
-        Swal.fire("Error!", "Failed to delete the board. Please try again.", "error");
+        Swal.fire(
+          "Error!",
+          "Failed to delete the board. Please try again.",
+          "error"
+        );
       }
     }
   };
