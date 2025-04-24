@@ -20,7 +20,7 @@ const GoogleButton = () => {
                     role: "user",
                     photoURL: user.photoURL || null,
                 };
-
+console.log("Google User:", newUser);
                 fetch("http://localhost:5000/users", {
                     method: "POST",
                     headers: {
