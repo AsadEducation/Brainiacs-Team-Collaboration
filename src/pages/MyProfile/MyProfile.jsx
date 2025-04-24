@@ -22,7 +22,6 @@ const MyProfile = () => {
       })
       .catch((err) => console.error("Profile fetch error:", err));
   }, [currentUser?.email, axiosPublic]);
-console.log(currentUser);
 
   if (!summary) return <p className="text-center">Loading...</p>;
 

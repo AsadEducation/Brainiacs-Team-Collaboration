@@ -75,12 +75,12 @@ const DashboardLayout = () => {
             <div className="flex items-center p-2 space-x-4">
               <img
                 src={currentUser?.photoURL}
-                alt={currentUser?.name}
+                alt={currentUser?.displayName}
                 className="w-12 h-12 rounded-full dark:bg-gray-500"
               />
               <div>
                 <h2 className="text-lg font-semibold">
-                  {currentUser?.displayName || "Unknown User"}
+                  {currentUser?.displayName }
                 </h2>
                 <span className="flex items-center space-x-1">
                   <Link
