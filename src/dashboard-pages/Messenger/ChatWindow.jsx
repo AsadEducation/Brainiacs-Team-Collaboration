@@ -51,6 +51,7 @@ const ChatWindow = ({
   removePoll, // Accept removePoll as a prop
   createPoll, // Add createPoll as a prop
   setPolls, // Add setPolls as a prop
+  getSeenByDetails, // Destructure getSeenByDetails from props
 }) => {
   const [reactionModal, setReactionModal] = useState({
     isOpen: false,
@@ -225,10 +226,12 @@ const ChatWindow = ({
           try {
             return {
               type: "video",
-              sources: [{
-                src: attachment,
-                type: `video/${attachment.split('.').pop().toLowerCase()}`
-              }]
+              sources: [
+                {
+                  src: attachment,
+                  type: `video/${attachment.split(".").pop().toLowerCase()}`,
+                },
+              ],
             };
           } catch (error) {
             console.error("Error creating video slide:", error);
@@ -250,7 +253,7 @@ const ChatWindow = ({
 
   const isVideo = (url) => {
     const videoExtensions = ["mp4", "webm", "ogg", "mov"];
-    const extension = url.split('.').pop().toLowerCase();
+    const extension = url.split(".").pop().toLowerCase();
     return videoExtensions.includes(extension);
   };
 
@@ -350,7 +353,7 @@ const ChatWindow = ({
                   </p>
                 )}
                 <div
-                  className={`mb-6 flex ${
+                  className={`flex ${
                     isSender ? "justify-end" : "justify-start"
                   }`}
                 >
@@ -463,7 +466,7 @@ const ChatWindow = ({
                                         muted
                                         controls
                                       />
-                                    ) :(
+                                    ) : (
                                       <div className="flex items-center gap-2 p-2 bg-gray-100 rounded-lg">
                                         <FaFile className="text-gray-500" />
                                         <span className="text-sm text-gray-700 truncate">
@@ -524,14 +527,12 @@ const ChatWindow = ({
                       <img
                         src={
                           isSender
-                            ? currentUser.photoURL || "/default-avatar.png"
+                            ? currentUser.photoURL
                             : getSenderName(msg.senderId)?.photoURL ||
                               "/default-avatar.png"
                         }
                         alt={
-                          isSender
-                            ? "You"
-                            : getSenderName(msg.senderId)?.name
+                          isSender ? "You" : getSenderName(msg.senderId)?.name
                         }
                         className={`w-8 h-8 rounded-full ${
                           isSender ? "hidden" : "relative -left-10 -top-8  z-10"
@@ -605,13 +606,21 @@ const ChatWindow = ({
                       {formatTime(msg.timestamp)}
                     </p>
                     {msg.seenBy?.length > 0 && (
-                      <p
-                        className={`text-xs sm:text-sm text-gray-400 mt-1 ${
-                          isSender ? "text-right" : "text-left"
+                      <div
+                        className={`flex items-center gap-2 mt-1 ${
+                          isSender ? "justify-end" : "justify-start"
                         }`}
                       >
-                        Seen by: {getSeenByNames(msg.seenBy)}
-                      </p>
+                        {getSeenByDetails(msg.seenBy).map((user, index) => (
+                          <div key={index} className="flex items-center gap-1">
+                            <img
+                              src={user.photoURL}
+                              alt={user.name}
+                              className="w-4 h-4 rounded-full"
+                            />
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </>
                 )}

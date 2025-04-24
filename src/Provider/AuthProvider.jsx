@@ -93,7 +93,7 @@ const AuthProvider = ({ children }) => {
           localStorage.setItem("authToken", token);
 
           const userData = await fetchUserDataWithRetry(user.email, token, 1); // Reduced retries
-          console.log(userData.email);
+          console.log(userData);
 
           setCurrentUser(userData);
         } catch (error) {

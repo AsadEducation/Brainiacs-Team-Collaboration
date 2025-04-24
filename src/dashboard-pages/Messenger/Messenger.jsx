@@ -194,21 +194,21 @@ const Messenger = () => {
   };
 
   const sendMessage = async (messageData) => {
-    // Check if there's no text AND no attachment
     if (!messageData.text?.trim() && !messageData.attachment) {
       console.warn("Cannot send an empty message without an attachment.");
       return;
     }
   
     const senderRole =
-      currentUser._id === selectedBoard.createdBy ? "admin" : "member";
+      selectedBoard.members.find((member) => member.userId === currentUser._id)
+        ?.role || "member"; // Determine the sender's role
   
     const fullMessageData = {
-      senderId: currentUser._id,
-      senderName: currentUser.name,
-      role: senderRole,
-      text: messageData.text?.trim() || null, // Use optional chaining and fallback to null
-      attachments: messageData.attachment ? [messageData.attachment] : [], // Include the attachment URL
+      senderId: currentUser._id, // Send senderId as a string
+      senderName: currentUser.displayName || currentUser.name, // Ensure senderName is populated
+      role: senderRole, // Include the role field
+      text: messageData.text?.trim() || null,
+      attachments: messageData.attachment ? [messageData.attachment] : [],
     };
   
     console.log("Sending message:", fullMessageData);
@@ -230,7 +230,8 @@ const Messenger = () => {
         setMessages((prevMessages) => [...prevMessages, result.message]);
         setNewMessage(""); // Clear the input field
       } else {
-        console.error("Failed to send message");
+        const errorData = await response.json();
+        console.error("Failed to send message:", errorData);
       }
     } catch (error) {
       console.error("Error sending message:", error);
@@ -303,6 +304,9 @@ const Messenger = () => {
   const markMessageAsSeen = async (messageId) => {
     if (!currentUser || !selectedBoard) return;
 
+    // Log the currentUser._id for debugging
+    console.log("Marking message as seen by user:", currentUser._id);
+
     try {
       const response = await fetch(
         `http://localhost:5000/boards/${selectedBoard._id}/messages/${messageId}/seen`,
@@ -311,7 +315,7 @@ const Messenger = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ seenBy: currentUser._id }), // Pass the correct user ID
+          body: JSON.stringify({ seenBy: currentUser._id }), // Ensure seenBy is sent as a string
         }
       );
 
@@ -323,7 +327,8 @@ const Messenger = () => {
           )
         );
       } else {
-        console.error("Failed to mark message as seen");
+        const errorData = await response.json();
+        console.error("Failed to mark message as seen:", errorData);
       }
     } catch (error) {
       console.error("Error marking message as seen:", error);
@@ -540,17 +545,16 @@ const Messenger = () => {
     }
   };
 
-  const getSeenByNames = (seenBy) => {
-    if (!seenBy || seenBy.length === 0) return "No one";
+  const getSeenByDetails = (seenBy) => {
+    if (!seenBy || seenBy.length === 0) return [];
 
-    const otherMembers = members.filter(
-      (member) =>
-        seenBy.includes(member.userId) && member.userId !== currentUser._id
-    );
-    const otherNames = otherMembers.map((member) => member.name).join(", ");
-    const seenByYou = seenBy.includes(currentUser._id) ? "You" : "";
-
-    return [seenByYou, otherNames].filter(Boolean).join(", ");
+    return seenBy.map((userId) => {
+      const member = members.find((member) => member.userId === userId);
+      return {
+        name: member ? member.name : "Unknown User",
+        photoURL: member ? member.photoURL || "/default-avatar.png" : "/default-avatar.png",
+      };
+    });
   };
 
   const onScrollToMessage = (messageId) => {
@@ -612,7 +616,7 @@ const Messenger = () => {
               getSenderName={getSenderName}
               formatDate={formatDate}
               formatTime={formatTime}
-              getSeenByNames={getSeenByNames}
+              getSeenByDetails={getSeenByDetails} // Pass getSeenByDetails as a prop
               handleScroll={handleScroll}
               setMessages={setMessages} // Pass setMessages as a prop
               messageRefs={messageRefs} // Pass messageRefs to ChatWindow
