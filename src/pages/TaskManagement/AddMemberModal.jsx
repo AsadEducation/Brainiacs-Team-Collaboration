@@ -1,5 +1,7 @@
 import React from "react";
 import Modal from "react-modal"; // Add this import
+import { toast } from "react-toastify"; // Import toast
+import Swal from "sweetalert2"; // Import SweetAlert2
 
 export default function AddMemberModal({
     isModalOpen,
@@ -13,13 +15,43 @@ export default function AddMemberModal({
     handleRemoveSelectedUser,
     handleAddSelectedUsers,
 }) {
+    const handleUserSelectWithCheck = (user) => {
+        if (selectedUsers.length >= 4) {
+            Swal.fire({
+                icon: "warning",
+                title: "Limit Reached",
+                text: "You cannot add more than 4 members.",
+            });
+            return;
+        }
+
+        if (selectedUsers.some((selected) => selected.id === user.id)) {
+            Swal.fire({
+                icon: "warning",
+                title: "Duplicate Member",
+                text: "This member is already added!",
+            });
+            return;
+        }
+
+        handleUserSelect(user);
+    };
+
+    const handleAddMemberClick = () => {
+        if (selectedUsers.length > 4) {
+            toast.error("You cannot add more than 4 members. Please upgrade your membership.");
+            return;
+        }
+        handleAddSelectedUsers();
+    };
+
     return (
         <Modal
             isOpen={isModalOpen}
             onRequestClose={() => setIsModalOpen(false)}
             contentLabel="Add Member Modal"
-            className="modal-content"
-            overlayClassName="modal-overlay"
+            className="modal-content max-w-lg w-full mx-auto p-4 bg-white rounded shadow-lg overflow-y-auto max-h-[90vh]" // Add responsive styles
+            overlayClassName="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
         >
             <h2 className="text-lg font-semibold mb-4">Add Member</h2>
             <input
@@ -29,15 +61,22 @@ export default function AddMemberModal({
                 placeholder="Search for users..."
                 className="w-full p-2 border rounded mb-4"
             />
-            <ul>
-                {suggestedUsers.map((user) => (
+            <ul className="max-h-40 overflow-y-auto border rounded">
+                {(Array.isArray(suggestedUsers) ? suggestedUsers : []).map((user) => (
                     <li
                         key={user.id || user.email}
-                        className="p-2 border-b cursor-pointer hover:bg-gray-100"
-                        onClick={() => handleUserSelect(user)}
+                        className="p-2 border-b cursor-pointer hover:bg-gray-100 flex items-center gap-2"
+                        onClick={() => handleUserSelectWithCheck(user)} // Use the new handler
                     >
-                        <h6 className="text-lg">{user.name}</h6>
-                        <p className="text-xs">({user.email})</p>
+                        <img
+                            src={user.photoURL || "/default-avatar.png"} // Fallback to default avatar
+                            alt={user.name}
+                            className="w-8 h-8 rounded-full object-cover border"
+                        />
+                        <div>
+                            <h6 className="text-lg">{user.name}</h6>
+                            <p className="text-xs text-gray-500">({user.email})</p>
+                        </div>
                     </li>
                 ))}
             </ul>
@@ -45,7 +84,7 @@ export default function AddMemberModal({
                 <h3 className="text-md font-semibold mt-4">Selected Users</h3>
                 <h3>({selectedUsers.length})</h3>
             </div>
-            <ul>
+            <ul className="max-h-40 overflow-y-auto border rounded">
                 {selectedUsers.map((user) => (
                     <li
                         key={user.id || user.email}
@@ -72,7 +111,7 @@ export default function AddMemberModal({
                     Close
                 </button>
                 <button
-                    onClick={handleAddSelectedUsers}
+                    onClick={handleAddMemberClick} // Use the new handler
                     className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                 >
                     Add

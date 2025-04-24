@@ -31,7 +31,6 @@ const ChatBox = () => {
 
     setInput("");
   };
-  console.log(messages,"message")
   const handleGemini = async (input) => {
     const response = await ai.models.generateContent({
       model: "gemini-2.0-flash",
