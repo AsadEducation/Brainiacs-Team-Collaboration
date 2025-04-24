@@ -14,6 +14,7 @@ import logActivity from "../../utils/activity/activityLogger";
 import moment from "moment/moment";
 import useAuth from "../../Hooks/useAuth";
 
+import Swal from "sweetalert2"; // Import SweetAlert2
 
 Modal.setAppElement("#root");
 
@@ -46,62 +47,87 @@ export default function NewTaskManagement() {
 
 
 
-    // siam vai's code starts here
-    useEffect(() => {
-        const fetchBoardData = async () => {
-            try {
-                const response = await axiosPublic.get(`/boards/${id}`);
-                setBoard(response.data);
-                setMembers(response.data.members || []);
-            } catch (error) {
-                console.error("Error fetching board data:", error);
-            }
-        };
-        fetchBoardData();
-    }, [id]);
-    // siam vai's code ends here
+  // siam vai's code starts here
+  useEffect(() => {
+    const fetchBoardData = async () => {
+      try {
+        const response = await axiosPublic.get(`/boards/${id}`); // Use axiosPublic for consistent base URL
+        setBoard(response.data);
+        setMembers(response.data.members || []);
+      } catch (error) {
+        console.error("Error fetching board data:", error);
 
-
-
-    // this state contains the column lists 
-    const { refetch: columnRefetch, data: columns = [], isLoading } = useQuery({
-        queryKey: ["columns"],
-        queryFn: async () => {
-            const result = await axiosPublic.get("/columns");
-            return result.data;
+        if (error.response?.status === 404) {
+          Swal.fire({
+            icon: "error",
+            title: "Board Not Found",
+            text: "The requested board does not exist or has been deleted.",
+          });
+          setBoard(null); // Clear the board state
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Failed to fetch board data. Please try again later.",
+          });
         }
-    })
-    useEffect(() => {
-        if (!isLoading) {
-            const boardColumns = columns.filter(column => column.boardId == id)
-            setCurrentColumns(boardColumns)
-        }
-    }, [columns]);
+      }
+    };
 
-    // this state contains task lists 
-    const { refetch: taskRefetch, data: dbTasks = [], isLoading: taskLoading } = useQuery({
-        queryKey: ["dbTasks"],
-        queryFn: async () => {
-            const result = await axiosPublic.get("/tasks");
-            return result.data;
-        }
-    })
+    fetchBoardData();
+  }, [id]); // Ensure this runs whenever the `id` changes
+  // siam vai's code ends here
 
-    useEffect(() => {
-        if (!taskLoading) {
-            const boardTasks = dbTasks.filter(task => task.boardId == id)
-            setTasks(boardTasks)
-        }
-    }, [dbTasks]);
-
-    // need to study about useMEMO 
-    const columnId = useMemo(() => currentColumns?.map(col => col.id), [currentColumns]);
-
-    // the below function is used to generate the id of new currentColumns 
-    const generateId = () => {
-        // generate a random number between 0 and 1000
-        return Math.floor(Math.random() * 10001);
+  // this state contains the column lists
+  const {
+    refetch: columnRefetch,
+    data: columns = [],
+    isLoading,
+  } = useQuery({
+    queryKey: ["columns"],
+    queryFn: async () => {
+      const result = await axiosPublic.get("/columns");
+      return result.data;
+    },
+  });
+  useEffect(() => {
+    if (!isLoading) {
+      const boardColumns = columns.filter((column) => column.boardId == id);
+      setCurrentColumns(boardColumns);
     }
+  }, [columns]);
+
+  // this state contains task lists
+  const {
+    refetch: taskRefetch,
+    data: dbTasks = [],
+    isLoading: taskLoading,
+  } = useQuery({
+    queryKey: ["dbTasks"],
+    queryFn: async () => {
+      const result = await axiosPublic.get("/tasks");
+      return result.data;
+    },
+  });
+
+  useEffect(() => {
+    if (!taskLoading) {
+      const boardTasks = dbTasks.filter((task) => task.boardId == id);
+      setTasks(boardTasks);
+    }
+  }, [dbTasks]);
+
+  // need to study about useMEMO
+  const columnId = useMemo(
+    () => currentColumns?.map((col) => col.id),
+    [currentColumns]
+  );
+
+  // the below function is used to generate the id of new currentColumns
+  const generateId = () => {
+    // generate a random number between 0 and 1000
+    return Math.floor(Math.random() * 10001);
+  };
 
     // the below function adds new column to the column list 
     const createNewColumn = (e) => {
@@ -166,95 +192,140 @@ export default function NewTaskManagement() {
         setIsAddingTask(false)
     }
 
-    //   siam vai's code starts here
-    const addMember = async (member) => {
-        if (!member.userId) {
-            console.error("Invalid member data:", member);
-            alert("Invalid member data. Please ensure the user has a valid ID.");
-            return;
-        }
+  //   siam vai's code starts here
+  const addMember = async (member) => {
+    if (!member.userId) {
+      console.error("Invalid member data:", member);
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Member",
+        text: "Invalid member data. Please ensure the user has a valid ID.",
+      });
+      return;
+    }
 
-        const updatedMembers = [...members, { userId: member.userId, role: "member" }];
-        setMembers(updatedMembers);
+    // Restrict normal users from adding more than 4 members
+    if (members.length >= 4) {
+      Swal.fire({
+        icon: "warning",
+        title: "Limit Reached",
+        text: "You cannot add more than 4 members to this board.",
+      });
+      return;
+    }
 
-        try {
-            const validMembers = updatedMembers.map((m) => ({
-                userId: m.userId.toString(), // Ensure userId is a string
-                role: m.role || "member",   // Default role
-            }));
+    // Prevent duplicate members
+    if (members.some((m) => m.userId === member.userId)) {
+      Swal.fire({
+        icon: "warning",
+        title: "Duplicate Member",
+        text: "This member is already added!",
+      });
+      return;
+    }
 
-            await axiosPublic.put(`/boards/${id}`, { members: validMembers });
-            console.log("Member added successfully");
+    const updatedMembers = [
+      ...members,
+      { userId: member.userId, role: "member" },
+    ];
+    setMembers(updatedMembers);
 
-            // Refetch the board data to update the UI
-            const response = await axiosPublic.get(`/boards/${id}`);
-            setBoard(response.data);
-            setMembers(response.data.members || []);
-        } catch (error) {
-            console.error("Error adding member to the board:", error);
-            alert("Failed to add member. Please check the data and try again.");
-        }
-    };
+    try {
+      const validMembers = updatedMembers.map((m) => ({
+        userId: m.userId.toString(), // Ensure userId is a string
+        role: m.role || "member", // Default role
+      }));
 
-    const fetchSuggestedUsers = async (query) => {
-        try {
-            const response = await axiosPublic.get(
-                `/users/search?query=${query}`
-            );
-            setSuggestedUsers(response.data);
-        } catch (error) {
-            console.error("Error fetching suggested users:", error);
-        }
-    };
+      await axiosPublic.put(`/boards/${id}`, { members: validMembers }); // Ensure `id` is correct
+      console.log("Member added successfully");
 
-    const handleSearchChange = (e) => {
-        const query = e.target.value;
-        setSearchQuery(query);
+      // Refetch the board data to update the UI
+      const response = await axiosPublic.get(`/boards/${id}`);
+      setBoard(response.data);
+      setMembers(response.data.members || []);
 
-        if (searchTimeout.current) {
-            clearTimeout(searchTimeout.current);
-        }
+      // Show success message
+      Swal.fire({
+        icon: "success",
+        title: "Member Added",
+        text: `${member.name} has been successfully added to the board!`,
+      });
+    } catch (error) {
+      console.error("Error adding member to the board:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to add member. Please check the data and try again.",
+      });
+    }
+  };
 
-        searchTimeout.current = setTimeout(() => {
-            if (query.trim()) {
-                fetchSuggestedUsers(query);
-            } else {
-                setSuggestedUsers([]);
-            }
-        }, 300); // Debounce for 300ms
-    };
+  const fetchSuggestedUsers = async (query) => {
+    try {
+      const response = await axiosPublic.get(`/members/search`, {
+        params: { query },
+      });
+      setSuggestedUsers(response.data);
+    } catch (error) {
+      console.error("Error fetching suggested users:", error);
+    }
+  };
 
-    const handleUserSelect = (user) => {
-        const normalizedUser = { ...user, id: user.id || user._id }; // Normalize id
-        if (!selectedUsers.some((selected) => selected.id === normalizedUser.id)) {
-            setSelectedUsers((prevSelectedUsers) => [...prevSelectedUsers, normalizedUser]);
-        }
-    };
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
 
-    const handleRemoveSelectedUser = (userId) => {
-        setSelectedUsers(selectedUsers.filter((user) => user.id !== userId));
-    };
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current);
+    }
 
-    const handleAddSelectedUsers = async () => {
-        for (const user of selectedUsers) {
-            if (!user.id) {
-                console.error("Invalid user object:", user);
-                alert("One or more selected users have invalid data. Please try again.");
-                continue;
-            }
+    searchTimeout.current = setTimeout(() => {
+      if (query.trim()) {
+        fetchSuggestedUsers(query);
+      } else {
+        setSuggestedUsers([]);
+      }
+    }, 300); // Debounce for 300ms
+  };
 
-            await addMember({
-                userId: user.id,
-                name: user.name,
-                email: user.email,
-                role: "member", // Default role
-            });
-        }
-        setSelectedUsers([]);
-        setIsModalOpen(false);
-    };
+  const handleUserSelect = (user) => {
+    const normalizedUser = { ...user, id: user.id || user._id }; // Normalize id
+    if (!selectedUsers.some((selected) => selected.id === normalizedUser.id)) {
+      setSelectedUsers((prevSelectedUsers) => [
+        ...prevSelectedUsers,
+        normalizedUser,
+      ]);
+    }
+  };
 
-    //   siam vai's code ends  here
+  const handleRemoveSelectedUser = (userId) => {
+    setSelectedUsers(selectedUsers.filter((user) => user.id !== userId));
+  };
+
+  const handleAddSelectedUsers = async () => {
+    for (const user of selectedUsers) {
+      if (!user.id) {
+        console.error("Invalid user object:", user);
+        alert(
+          "One or more selected users have invalid data. Please try again."
+        );
+        continue;
+      }
+
+      await addMember({
+        userId: user.id,
+        name: user.name,
+        email: user.email,
+        photoURL: user.photoURL,
+
+        role: "member", // Default role
+      });
+    }
+    setSelectedUsers([]);
+    setIsModalOpen(false);
+  };
+
+  //   siam vai's code ends  here
 
 
     const onDragStart = event => {

@@ -1,12 +1,46 @@
-import React, { useState } from 'react';
-import { LiaFileSolid } from 'react-icons/lia';
-import { MdOutlineMessage } from 'react-icons/md';
+import React, { useContext, useState } from 'react';
+import { MdDone, MdOutlineMessage } from 'react-icons/md';
 import { RiAttachmentFill } from 'react-icons/ri';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import TaskModal from './TaskModal';
+import useAxiosPublic from '../../Hooks/useAxiosPublic';
+import { ToastContainer, toast } from 'react-toastify';
+import useAuth from '../../Hooks/useAuth';
 
 const TaskCard = ({ task }) => {
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const axiosPublic = useAxiosPublic();
+  const { currentUser } = useAuth();
+
+
+  // completed done button clicking
+  const handleTaskDone = async (e) => {
+    e.stopPropagation();
+
+    const taskData = {
+      taskId: task.id,
+      taskTittle: task.taskTittle,
+      email: currentUser?.email,
+      completedAt: new Date(),
+    };
+
+    try {
+      const res = await axiosPublic.post('/completedTask', taskData);
+      if (res.data.success) {
+        toast.success("Task completed & point added!");
+        setIsCompleted(true);
+      }
+    } catch (err) {
+      console.error("Error completing task", err);
+      toast.error("Something went wrong!");
+    }
+  };
+
+
+
   const { setNodeRef, attributes, listeners, transform, transition, isDragging, active } = useSortable({
     id: task.id,
     data: task,
@@ -16,7 +50,7 @@ const TaskCard = ({ task }) => {
     transition,
     cursor: active ? "grabbing" : "grab"
   };
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
 
   if (isDragging) {
     return (
@@ -35,13 +69,26 @@ const TaskCard = ({ task }) => {
 
           <div className='flex justify-between items-center'>
             <h3 className="text-[12px] font-medium text-gray-900"> {taskTittle}</h3>
-            <div className="flex items-center text-cyan-600 space-x-1">
-              <span className="text-base"><LiaFileSolid /></span>
-              <p className="text-xs font-medium">4</p>
-            </div>
+            <button
+            disabled={isCompleted}
+            onClick={handleTaskDone}
+              className={
+             `flex items-center px-1 py-1 rounded-full 
+   ${isCompleted ? 'bg-green-500 text-white cursor-not-allowed' : 'bg-cyan-600 text-black'}`}
+        
+            >
+              <MdDone />
+            </button>
+
+
           </div>
 
-
+          {/* Date display */}
+          {task.startDate && task.dueDate && (
+            <div className="text-[10px] text-gray-500 mt-1">
+              📅 {task.startDate} → {task.dueDate}
+            </div>
+          )}
 
           {/* Member img */}
           <div className="flex items-center justify-between mt-3">
@@ -86,10 +133,10 @@ const TaskCard = ({ task }) => {
       </div>
 
       <TaskModal task={task} ></TaskModal>
-      
 
+      <ToastContainer />
     </>
   );
 };
 
-export default TaskCard;
+export default TaskCard;        

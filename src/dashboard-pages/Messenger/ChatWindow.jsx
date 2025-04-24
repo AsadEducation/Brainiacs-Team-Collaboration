@@ -1,5 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+import Lightbox from "yet-another-react-lightbox";
+import Video from "yet-another-react-lightbox/plugins/video"; // plugin
+import "yet-another-react-lightbox/styles.css";
+// import "yet-another-react-lightbox/plugins/video/styles.css";
 import {
   FaArrowLeft,
   FaArrowRight,
@@ -10,8 +14,11 @@ import { MdEmojiEmotions } from "react-icons/md";
 import { IoCloseCircleOutline } from "react-icons/io5";
 import PinMessageModal from "./PinMessageModal"; // Import PinMessageModal
 import EditMessageModal from "./EditMessageModal"; // Import EditMessageModal
-import { FaUser } from "react-icons/fa6";
-
+import { FaFile, FaUser } from "react-icons/fa6";
+import ActivePolls from "./ActivePolls"; // Import ActivePolls
+import ErrorBoundary from "../../components/ErrorBoundary"; // Import ErrorBoundary
+import "lightbox2/dist/css/lightbox.min.css"; // Import Lightbox2 CSS
+import lightbox from "lightbox2"; // Import Lightbox2 JS
 const ChatWindow = ({
   boardId, // Accept boardId as a prop
   pinnedMessages,
@@ -42,6 +49,8 @@ const ChatWindow = ({
   polls, // Accept polls as a prop
   votePoll, // Accept votePoll as a prop
   removePoll, // Accept removePoll as a prop
+  createPoll, // Add createPoll as a prop
+  setPolls, // Add setPolls as a prop
 }) => {
   const [reactionModal, setReactionModal] = useState({
     isOpen: false,
@@ -57,6 +66,8 @@ const ChatWindow = ({
   }); // State for edit modal
   const [pollModal, setPollModal] = useState({ isOpen: false, poll: null }); // State for poll modal
   const [previewAttachment, setPreviewAttachment] = useState(null); // State for attachment preview
+  const [lightboxSlides, setLightboxSlides] = useState([]); // State for Lightbox slides
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false); // State to control Lightbox visibility
 
   const dropdownRef = useRef(null);
 
@@ -205,7 +216,32 @@ const ChatWindow = ({
       imageExtensions.includes(extension) || videoExtensions.includes(extension)
     );
   };
+  const handleAttachmentPreview = (attachments, currentIndex) => {
+    const slides = attachments
+      .map((attachment) => {
+        if (isImage(attachment)) {
+          return { src: attachment }; // Image slide
+        } else if (isVideo(attachment)) {
+          try {
+            return {
+              type: "video",
+              sources: [{
+                src: attachment,
+                type: `video/${attachment.split('.').pop().toLowerCase()}`
+              }]
+            };
+          } catch (error) {
+            console.error("Error creating video slide:", error);
+            return null;
+          }
+        }
+        return null;
+      })
+      .filter(Boolean);
 
+    setLightboxSlides(slides);
+    setIsLightboxOpen(true);
+  };
   const isImage = (url) => {
     const imageExtensions = ["jpg", "jpeg", "png", "gif", "bmp", "webp"];
     const extension = url.split(".").pop().toLowerCase();
@@ -214,12 +250,24 @@ const ChatWindow = ({
 
   const isVideo = (url) => {
     const videoExtensions = ["mp4", "webm", "ogg", "mov"];
-    const extension = url.split(".").pop().toLowerCase();
+    const extension = url.split('.').pop().toLowerCase();
     return videoExtensions.includes(extension);
   };
 
   return (
     <>
+      {/* Lightbox Component */}
+      <Lightbox
+        open={isLightboxOpen}
+        close={() => setIsLightboxOpen(false)}
+        slides={lightboxSlides}
+        plugins={[Video]}
+        render={{
+          buttonPrev: lightboxSlides.length <= 1 ? () => null : undefined,
+          buttonNext: lightboxSlides.length <= 1 ? () => null : undefined,
+        }}
+      />
+
       <motion.div
         className="chat-window flex-1 rounded-lg overflow-y-scroll bg-gray-100 shadow-inner p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12"
         style={{ overflowX: "hidden" }} // Prevent horizontal scrolling
@@ -394,9 +442,13 @@ const ChatWindow = ({
                                   <div
                                     key={idx}
                                     className="cursor-pointer"
-                                    onClick={() =>
-                                      setPreviewAttachment(attachment)
-                                    } // Set preview attachment
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleAttachmentPreview(
+                                        msg.attachments,
+                                        idx
+                                      );
+                                    }}
                                   >
                                     {isImage(attachment) ? (
                                       <img
@@ -409,18 +461,15 @@ const ChatWindow = ({
                                         src={attachment}
                                         className="w-full h-32 object-cover rounded-lg"
                                         muted
-                                        loop
-                                        autoPlay
+                                        controls
                                       />
-                                    ) : (
-                                      <a
-                                        href={attachment}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="block text-blue-500 underline text-sm sm:text-base mt-1"
-                                      >
-                                        Open Attachment {idx + 1}
-                                      </a>
+                                    ) :(
+                                      <div className="flex items-center gap-2 p-2 bg-gray-100 rounded-lg">
+                                        <FaFile className="text-gray-500" />
+                                        <span className="text-sm text-gray-700 truncate">
+                                          {attachment.split("/").pop()}
+                                        </span>
+                                      </div>
                                     )}
                                   </div>
                                 ))}
@@ -482,7 +531,7 @@ const ChatWindow = ({
                         alt={
                           isSender
                             ? "You"
-                            : getSenderName(msg.senderId)?.name || "Unknown"
+                            : getSenderName(msg.senderId)?.name
                         }
                         className={`w-8 h-8 rounded-full ${
                           isSender ? "hidden" : "relative -left-10 -top-8  z-10"
@@ -575,29 +624,6 @@ const ChatWindow = ({
           </p>
         )}
       </motion.div>
-
-      {/* Polls Section */}
-      {polls.length > 0 && (
-        <div className="sticky flex justify-between items-center bottom-0 bg-white shadow-md rounded-lg p-4 z-30">
-          <h3 className="text-lg font-boldtext-primary">Active Polls</h3>
-          {polls.map((poll) => (
-            <div key={poll._id} className="poll-card">
-              <button
-                className="px-4 py-2 bg-primary text-white rounded hover:bg-accent transition"
-                onClick={() => setPollModal({ isOpen: true, poll })} // Open the poll modal
-              >
-                Vote Now
-              </button>
-              <button
-                className="ml-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700 transition"
-                onClick={() => removePoll(poll._id)} // Remove poll functionality
-              >
-                Remove Poll
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
 
       {/* Poll Voting Modal */}
       {pollModal.isOpen && (
@@ -751,12 +777,12 @@ const ChatWindow = ({
       {/* Attachment Preview Modal */}
       {previewAttachment && (
         <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-3xl">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full relative">
             <button
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
               onClick={() => setPreviewAttachment(null)} // Close preview
             >
-              <IoCloseCircleOutline className="text-2xl" />
+              <IoCloseCircleOutline className="cursor-pointer text-2xl" />
             </button>
             <div className="flex justify-center items-center">
               {isImage(previewAttachment) ? (
@@ -771,11 +797,58 @@ const ChatWindow = ({
                   controls
                   className="max-w-full max-h-[80vh] rounded-lg"
                 />
-              ) : null}
+              ) : (
+                <div className="text-center">
+                  <p className="text-gray-700 mb-4">
+                    This attachment type is not supported for preview.
+                  </p>
+                  <a
+                    href={previewAttachment}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 underline"
+                  >
+                    Open Attachment in a New Tab
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         </div>
       )}
+      <ErrorBoundary>
+        <ActivePolls
+          polls={polls}
+          votePoll={votePoll}
+          removePoll={removePoll}
+          removeVote={async (pollId, optionIndex) => {
+            try {
+              const response = await fetch(
+                `http://localhost:5000/boards/${boardId}/polls/${pollId}/remove-vote`,
+                {
+                  method: "PATCH",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    userId: currentUser._id,
+                    optionIndex,
+                  }),
+                }
+              );
+              if (response.ok) {
+                const updatedPoll = await response.json();
+                setPolls((prev) =>
+                  prev.map((poll) => (poll._id === pollId ? updatedPoll : poll))
+                );
+              } else {
+                console.error("Failed to remove vote");
+              }
+            } catch (error) {
+              console.error("Error removing vote:", error);
+            }
+          }}
+          currentUser={currentUser}
+        />
+      </ErrorBoundary>
     </>
   );
 };

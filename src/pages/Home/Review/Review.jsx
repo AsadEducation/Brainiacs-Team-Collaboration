@@ -27,7 +27,7 @@ const Review = () => {
 
 
     return (
-        <div className='py-20 mt-10'>
+        <div className='py-20 mt-10 bg-base-100'>
             <Swiper
                 // pagination={{
                 //     type: 'fraction',

@@ -10,10 +10,31 @@ const TaskModal = ({ task }) => {
     
 
     const [showActivity, setShowActivity] = useState(false);
+    
+    const [formData, setFormData] = useState({
+        startDate: "",
+        startTime: "",
+        dueDate: "",
+        dueTime: "",
+        reminder: "",
+        description: "",
+        activityComment: "",
+      });
+    
+      const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+          ...prev,
+          [name]: value,
+        }));
+      };
 
     const handleSubmit = (e) => {
         e.preventDefault()
     }
+
+
+    
 
     return (
         <dialog id={task?.id} className="modal modal-bottom sm:modal-middle">
@@ -40,17 +61,74 @@ const TaskModal = ({ task }) => {
 
                                 <form onSubmit={handleSubmit}>
 
-                                    <div className="w-full">
-                                        <label className="block text-sm font-medium text-gray-700 ">Due Date</label>
+                           {/* Dates Section */}
+<div className="grid grid-cols-2 gap-4 mt-2">
+  {/* Start Date */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700">Start Date</label>
+    <input
+     type="date"
+     name="startDate"
+     value={formData.startDate}
+     onChange={handleChange}
+     className="w-full p-2 mt-1 border rounded-md"
+    />
+  </div>
 
-                                        <input
-                                            type="date"
-                                            id="date"
-                                            className="w-full p-2 mt-2 border rounded-md"
-                                            placeholder="Due Date"
+  {/* Start Time */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700">Start Time</label>
+    <input
+      type="time"
+      name="startTime"
+      value={formData.startTime}
+      onChange={handleChange}
+      className="w-full p-2 mt-1 border rounded-md"
+    />
+  </div>
 
-                                        />
-                                    </div>
+  {/* Due Date */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700">Due Date</label>
+    <input
+      type="date"
+      name="dueDate"
+      value={formData.dueDate}
+      onChange={handleChange}
+      className="w-full p-2 mt-1 border rounded-md"
+    />
+  </div>
+
+  {/* Due Time */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700">Due Time</label>
+    <input
+       type="time"
+       name="dueTime"
+       value={formData.dueTime}
+       onChange={handleChange}
+       className="w-full p-2 mt-1 border rounded-md"
+    />
+  </div>
+</div>
+
+{/* Reminder */}
+<div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Reminder
+                    </label>
+                    <select
+                      name="reminder"
+                      value={formData.reminder}
+                      onChange={handleChange}
+                      className="w-full p-2 mt-1 border rounded-md"
+                    >
+                      <option value="">None</option>
+                      <option value="5min">5 minutes before</option>
+                      <option value="1hour">1 hour before</option>
+                      <option value="1day">1 day before</option>
+                    </select>
+                  </div>
 
                                     <label className="block text-sm font-medium text-gray-700 mt-4">Description</label>
                                     <textarea
@@ -146,4 +224,4 @@ const TaskModal = ({ task }) => {
     );
 };
 
-export default TaskModal;
+export default TaskModal;  

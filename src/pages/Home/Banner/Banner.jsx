@@ -38,8 +38,11 @@ const Banner = () => {
           <p className="text-sm md:text-base">
             Chat, manage tasks & share files seamlessly.
           </p>
-          <Link to="/signup" className="inline-block bg-secondary text-white px-6 py-2 rounded-lg font-semibold hover:bg-opacity-60 transition cursor-pointer">
-            Get Started
+          <Link
+            to="/signup"
+            className="inline-block bg-secondary text-white px-6 py-2 rounded-lg font-semibold hover:bg-opacity-60 transition cursor-pointer"
+          >
+            Learn More
           </Link>
         </motion.div>
 
