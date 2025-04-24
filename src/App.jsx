@@ -8,13 +8,14 @@ import DashboardLayout from "./Layouts/DashboardLayout";
 import Boards from "./pages/Boards/Boards.jsx";
 import NewTaskManagement from "./pages/TaskManagement/NewTaskManagement.jsx";
 import LeaderBoard from "./pages/LeaderBoardAndReview/LeaderBoard.jsx";
-import ActivityLog from './dashboard-pages/ActivityLog.jsx'
+
 import MyProfile from "./pages/MyProfile/MyProfile.jsx";
 import Messenger from "./dashboard-pages/Messenger/Messenger.jsx";
 import About from "./pages/About/About.jsx";
 import Services from "./pages/Services/Services.jsx";
 import Pricing from "./pages/Pricing/Pricing.jsx";
 import NotFound from "./pages/NotFound/NotFound.jsx";
+import ActivityLog from "./dashboard-pages/Activity Log/ActivityLog.jsx";
 
 function App() {
   return (

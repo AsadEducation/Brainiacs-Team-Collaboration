@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useRef } from "react";
+import React, { useMemo, useState, useEffect, useRef, act } from "react";
 import { useParams, useLocation } from "react-router";
 import axios from "axios";
 import useAxiosPublic from "../../Hooks/useAxiosPublic";
@@ -6,11 +6,14 @@ import TaskManagementHeader from "./TaskManagementHeader";
 import AddMemberModal from "./AddMemberModal";
 import ColumnsSection from "./ColumnsSection";
 import { useQuery } from "@tanstack/react-query";
-
 import Modal from "react-modal";
 import "./ModalStyles.css"; // Ensure this file exists and contains modal styles
 import { useSensors, useSensor, PointerSensor } from "@dnd-kit/core"; // Add this import
 import { arrayMove } from "@dnd-kit/sortable";
+import logActivity from "../../utils/activity/activityLogger";
+import moment from "moment/moment";
+import useAuth from "../../Hooks/useAuth";
+
 
 Modal.setAppElement("#root");
 
@@ -30,9 +33,17 @@ export default function NewTaskManagement() {
     const [activeColumn, setActiveColumn] = useState(null);
     const [activeTask, setActiveTask] = useState(null);
     const [isAddingList, setIsAddingList] = useState(false);
+    const { currentUser } = useAuth();
 
 
-    
+    //activity object which will capture activity [asad]
+
+    const activityObject = {
+        date: moment().format('ll'),
+        time: moment().format('LT'),
+        currentUser,
+    }
+
 
 
     // siam vai's code starts here
@@ -50,7 +61,7 @@ export default function NewTaskManagement() {
     }, [id]);
     // siam vai's code ends here
 
-    
+
 
     // this state contains the column lists 
     const { refetch: columnRefetch, data: columns = [], isLoading } = useQuery({
@@ -105,7 +116,7 @@ export default function NewTaskManagement() {
         // adding new column to local state 
         setCurrentColumns([...currentColumns, columnToAdd]);
         // adding new column to database
-        axiosPublic.post("/columns", {...columnToAdd,order:currentColumns.length+1})
+        axiosPublic.post("/columns", { ...columnToAdd, order: currentColumns.length + 1 })
             .then(res => {
                 console.log("column post response", res.data)
             })
@@ -258,7 +269,7 @@ export default function NewTaskManagement() {
         }, 10)
     }
     const onDragEnd = event => {
-        
+
         setActiveColumn(null)
         setActiveTask(null)
         const { active, over } = event;
@@ -282,59 +293,95 @@ export default function NewTaskManagement() {
                 return updatedColumns;
             })
         }
-        console.log("current task", currentTask)
+        // console.log("current task", currentTask)
     }
     const onDragOver = event => {
         const { active, over } = event;
-        console.log("active", active, "over", over)
         if (!over) return;
+
         const activeId = active.id;
         const overId = over.id;
-        if (activeId == overId) return;
+        if (activeId === overId) return;
+
         const isActiveTask = active.data.current?.type === "Task";
         const isOverTask = over.data.current?.type === "Task";
-        if (!isActiveTask) return;
-        // im dropping a task over another task
-        if (isActiveTask && isOverTask) {
-
-            const activeIndex = tasks.findIndex((t) => t.id === activeId)
-            const overIndex = tasks.findIndex((t) => t.id === overId)
-            tasks[activeIndex].columnId = tasks[overIndex].columnId;
-            tasks[activeIndex].columnTittle = tasks[overIndex].columnTittle;
-            const newTaskArray = arrayMove(tasks, activeIndex, overIndex)
-            setTasks(newTaskArray);
-            // currentTask = newTaskArray;
-            axiosPublic.put("/tasks", newTaskArray)
-                .then(res => {
-                    console.log("task is updated", res)
-                })
-                .catch(err => {
-                    console.log("task update error", err);
-                })
-
-        }
-
         const isOverAColumn = over.data.current?.type === "Column";
-        // im dropping a task over a column
-        if (isActiveTask && isOverAColumn) {
 
-            const activeIndex = tasks.findIndex((t) => t.id === activeId)
-            tasks[activeIndex].columnId = overId;
-            tasks[activeIndex].columnTittle = over.data.current?.tittle;
-            const newTaskArray = arrayMove(tasks, activeIndex, activeIndex)
+        if (!isActiveTask) return;
+
+        // Get the active task's original data BEFORE any modifications
+        const activeTask = tasks.find(t => t.id === activeId);
+        const activeTaskTitle = active?.data?.current?.taskTittle;
+
+        // Scenario 1: Dropping a Task over another Task
+        if (isActiveTask && isOverTask) {
+            const overTask = tasks.find(t => t.id === overId);
+
+            // Capture original and new columns BEFORE updating
+            const columnBeforeMove = activeTask.columnTittle || "Backlog";
+            const columnAfterMove = overTask.columnTittle || "Backlog";
+
+            // Update the task's position and column
+            const updatedTasks = tasks.map(task => {
+                if (task.id === activeId) {
+                    return {
+                        ...task,
+                        columnId: overTask.columnId,
+                        columnTittle: overTask.columnTittle
+                    };
+                }
+                return task;
+            });
+
+            // Reorder tasks
+            const activeIndex = tasks.findIndex(t => t.id === activeId);
+            const overIndex = tasks.findIndex(t => t.id === overId);
+            const newTaskArray = arrayMove(updatedTasks, activeIndex, overIndex);
+
             setTasks(newTaskArray);
-            // currentTask = newTaskArray;
-            axiosPublic.put("/tasks", newTaskArray)
-                .then(res => {
-                    console.log("task is updated", res)
-                })
-                .catch(err => {
-                    console.log("task update error", err);
-                })
-        }
-    }
 
-    
+            axiosPublic.put("/tasks", newTaskArray)
+                .then(() => {
+                    logActivity({
+                        ...activityObject,
+                        entity: active?.data?.current?.type,
+                        action : 'move',
+                        
+                        message: `${activeTaskTitle} moved from ${columnBeforeMove} to ${columnAfterMove}`,
+                        
+
+                    })
+                })
+                .catch(console.error);
+        }
+
+        // Scenario 2: Dropping a Task over a Column
+        if (isActiveTask && isOverAColumn) {
+            const columnBeforeMove = activeTask.columnTittle || "Backlog";
+            const columnAfterMove = over.data.current?.tittle || "New Column";
+
+            const updatedTasks = tasks.map(task => {
+                if (task.id === activeId) {
+                    return {
+                        ...task,
+                        columnId: overId,
+                        columnTittle: over.data.current?.tittle
+                    };
+                }
+                return task;
+            });
+
+            setTasks(updatedTasks);
+
+            axiosPublic.put("/tasks", updatedTasks)
+                .then(() => {
+                    activityObject.message = `"${activeTaskTitle}" moved from ${columnBeforeMove} to ${columnAfterMove}`,
+                        logActivity(activityObject);
+                })
+                .catch(console.error);
+        }
+    };
+
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: {
@@ -342,21 +389,22 @@ export default function NewTaskManagement() {
             },
         })
     );
-    
-    const handleColumnDelete=(column)=>{
-        console.log("column delete request for id :",column.id)
-        setCurrentColumns(()=>{
-            const newCurrentColumn=currentColumns.filter(col=>col.id!=column.id)
+
+    const handleColumnDelete = (column) => {
+        console.log("column delete request for id :", column.id)
+        setCurrentColumns(() => {
+            const newCurrentColumn = currentColumns.filter(col => col.id != column.id)
             return newCurrentColumn;
         })
         axiosPublic.delete(`/columns?id=${column.id}`)
-        .then(res=>{
-            console.log("Column Deleted",res)
-        })
-        .catch(err=>{
-            console.log("Column Delete Failed",err)
-        })
-        
+            .then(res => {
+                console.log("Column Deleted", res)
+                //write the logic for delete  activity [Asad]
+            })
+            .catch(err => {
+                console.log("Column Delete Failed", err)
+            })
+
 
     }
     return (
