@@ -23,44 +23,46 @@ const SignUp = () => {
   const [selectedFile, setSelectedFile] = useState(null); 
   const onSubmit = async (data) => {
     const { userName, email, password } = data;
-    const newUser = { name: userName, email, role: "user" };
+    const newUser = {
+        _id: null, // Will be updated after Firebase user creation
+        displayName: userName,
+        email,
+        role: "user",
+        photoURL: null,
+    };
 
     try {
-      let photoURL = null;
+        let photoURL = null;
 
-      // Upload the selected file if it exists
-      if (selectedFile) {
-        const uploadResponse = await uploadFile(
-          selectedFile,
-          `${userName}_profile`
-        );
-        photoURL = uploadResponse.url; // Get the uploaded photo URL
-        newUser.photo = photoURL; // Add photo URL to the user object
-      }
+        if (selectedFile) {
+            const uploadResponse = await uploadFile(selectedFile, `${userName}_profile`);
+            photoURL = uploadResponse.url;
+            newUser.photoURL = photoURL;
+        }
 
-      const res = await signUpUser(email, password);
-      console.log("Signup Success:", res.user);
+        const res = await signUpUser(email, password);
+        newUser._id = res.user.uid;
 
-      const response = await fetch("/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newUser),
-      });
+        const response = await fetch("http://localhost:5000/users", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newUser),
+        });
 
-      if (!response.ok) {
-        throw new Error("Failed to save user to the database");
-      }
+        if (!response.ok) {
+            throw new Error("Failed to save user to the database");
+        }
 
-      const result = await response.json();
-      console.log("User Added to DB:", result);
-      Swal.fire(`Welcome ${userName} to Brainiacs`).then(() => {
-        navigate("/dashboard");
-      });
+        const result = await response.json();
+        console.log("User Added to DB:", result);
+        Swal.fire(`Welcome ${userName} to Brainiacs`).then(() => {
+            navigate("/dashboard");
+        });
     } catch (err) {
-      console.error("Error:", err);
-      Swal.fire("Signup failed. Please check your details and try again.");
+        console.error("Error:", err);
+        Swal.fire("Signup failed. Please check your details and try again.");
     }
   };
 

@@ -13,12 +13,42 @@ const AuthProvider = ({ children }) => {
     const googleProvider = new GoogleAuthProvider();
     const [currentUser, setCurrentUser] = useState(null);
 
-    const signUpUser = (email, password) => {
-        return createUserWithEmailAndPassword(auth, email, password);
+    const signUpUser = async (email, password) => {
+        const result = await createUserWithEmailAndPassword(auth, email, password);
+        const user = result.user;
+
+        const newUser = {
+            _id: user.uid,
+            displayName: user.displayName || "Unknown",
+            email: user.email,
+            role: "user",
+            photoURL: user.photoURL || null,
+        };
+
+        await axios.post("http://localhost:5000/users", newUser, {
+            headers: { "Content-Type": "application/json" },
+        });
+
+        return result;
     };
 
-    const signUpGoogleUser = () => {
-        return signInWithPopup(auth, googleProvider);
+    const signUpGoogleUser = async () => {
+        const result = await signInWithPopup(auth, googleProvider);
+        const user = result.user;
+
+        const newUser = {
+            _id: user.uid,
+            displayName: user.displayName || "Unknown",
+            email: user.email,
+            role: "user",
+            photoURL: user.photoURL || null,
+        };
+
+        await axios.post("http://localhost:5000/users", newUser, {
+            headers: { "Content-Type": "application/json" },
+        });
+
+        return result;
     };
 
     const logInUser = (email, password) => {
