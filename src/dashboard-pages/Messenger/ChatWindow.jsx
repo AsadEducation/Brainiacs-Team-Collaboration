@@ -69,6 +69,8 @@ const ChatWindow = ({
   const [previewAttachment, setPreviewAttachment] = useState(null); // State for attachment preview
   const [lightboxSlides, setLightboxSlides] = useState([]); // State for Lightbox slides
   const [isLightboxOpen, setIsLightboxOpen] = useState(false); // State to control Lightbox visibility
+  const [unseenMessagesCount, setUnseenMessagesCount] = useState(0); // State for unseen messages count
+  const [showScrollToBottom, setShowScrollToBottom] = useState(false); // State for scroll-to-bottom arrow
 
   const dropdownRef = useRef(null);
 
@@ -92,7 +94,7 @@ const ChatWindow = ({
           console.error("boardId is not defined");
           return;
         }
-        const response = await fetch(`http://localhost:5000/boards/${boardId}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/boards/${boardId}`);
         if (!response.ok) {
           throw new Error(
             `Failed to fetch: ${response.status} ${response.statusText}`
@@ -107,6 +109,24 @@ const ChatWindow = ({
 
     fetchPinnedMessages();
   }, [boardId, setPinnedMessages]); // Fetch pinned messages on component mount or boardId change
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      const lastSeenIndex = messages.findIndex(
+        (msg) => !msg.seenBy?.includes(currentUser._id)
+      );
+      if (lastSeenIndex !== -1) {
+        messageRefs.current[messages[lastSeenIndex].messageId]?.scrollIntoView({
+          behavior: "smooth",
+        });
+        setUnseenMessagesCount(messages.length - lastSeenIndex);
+        setShowScrollToBottom(true);
+      } else {
+        setUnseenMessagesCount(0);
+        setShowScrollToBottom(false);
+      }
+    }
+  }, [messages, currentUser, messageRefs]);
 
   const handlePinMessage = (messageId) => {
     setPinModal({ isOpen: true, messageId }); // Open the pin modal
@@ -151,7 +171,7 @@ const ChatWindow = ({
 
       // Call the backend to persist the change
       await fetch(
-        `http://localhost:5000/boards/${boardId}/messages/${messageId}/reactions/${emoji}`,
+        `${import.meta.env.VITE_API_URL}/boards/${boardId}/messages/${messageId}/reactions/${emoji}`,
         {
           method: "DELETE",
           headers: {
@@ -171,7 +191,7 @@ const ChatWindow = ({
     try {
       // Call the backend API to unpin the message
       const response = await fetch(
-        `http://localhost:5000/boards/${boardId}/messages/${messageId}/unpin`,
+        `${import.meta.env.VITE_API_URL}/boards/${boardId}/messages/${messageId}/unpin`,
         {
           method: "PATCH",
           headers: {
@@ -255,6 +275,11 @@ const ChatWindow = ({
     const videoExtensions = ["mp4", "webm", "ogg", "mov"];
     const extension = url.split(".").pop().toLowerCase();
     return videoExtensions.includes(extension);
+  };
+
+  const scrollToBottom = () => {
+    lastMessageRef.current?.scrollIntoView({ behavior: "smooth" });
+    setShowScrollToBottom(false);
   };
 
   return (
@@ -528,8 +553,7 @@ const ChatWindow = ({
                         src={
                           isSender
                             ? currentUser.photoURL
-                            : getSenderName(msg.senderId)?.photoURL ||
-                              "/default-avatar.png"
+                            : getSenderName(msg.senderId)?.photoURL
                         }
                         alt={
                           isSender ? "You" : getSenderName(msg.senderId)?.name
@@ -633,6 +657,15 @@ const ChatWindow = ({
           </p>
         )}
       </motion.div>
+
+      {showScrollToBottom && unseenMessagesCount > 0 && (
+        <button
+          className="fixed bottom-4 right-4 bg-primary text-white p-3 rounded-full shadow-lg hover:bg-accent transition"
+          onClick={scrollToBottom}
+        >
+          {unseenMessagesCount} Unseen Messages
+        </button>
+      )}
 
       {/* Poll Voting Modal */}
       {pollModal.isOpen && (
@@ -833,7 +866,7 @@ const ChatWindow = ({
           removeVote={async (pollId, optionIndex) => {
             try {
               const response = await fetch(
-                `http://localhost:5000/boards/${boardId}/polls/${pollId}/remove-vote`,
+                `${import.meta.env.VITE_API_URL}/boards/${boardId}/polls/${pollId}/remove-vote`,
                 {
                   method: "PATCH",
                   headers: { "Content-Type": "application/json" },

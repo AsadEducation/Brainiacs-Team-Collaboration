@@ -21,7 +21,7 @@ const GoogleButton = () => {
                     photoURL: user.photoURL || null,
                 };
 console.log("Google User:", newUser);
-                fetch("http://localhost:5000/users", {
+                fetch(`${import.meta.env.VITE_API_URL}/users`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

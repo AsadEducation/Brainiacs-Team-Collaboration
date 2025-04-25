@@ -61,7 +61,7 @@ const Messenger = () => {
       if (!currentUser?._id) return; // Ensure currentUser is available
 
       try {
-        const response = await axios.get("http://localhost:5000/boards"); // Updated base URL
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/boards`); // Updated base URL
         const userBoards = response.data.filter((board) =>
           board.members?.some((member) => member.userId === currentUser._id)
         ); // Filter boards where the user is a member
@@ -119,7 +119,7 @@ const Messenger = () => {
 
       try {
         const response = await fetch(
-          `http://localhost:5000/boards/${selectedBoard._id}` // Updated base URL
+          `${import.meta.env.VITE_API_URL}/boards/${selectedBoard._id}` // Updated base URL
         );
         if (response.ok) {
           const boardData = await response.json();
@@ -212,10 +212,11 @@ const Messenger = () => {
     };
   
     console.log("Sending message:", fullMessageData);
+    console.log("Sender Image URL:", currentUser.photoURL || "/default-avatar.png"); // Log sender's image URL
   
     try {
       const response = await fetch(
-        `http://localhost:5000/boards/${selectedBoard._id}/messages`,
+        `${import.meta.env.VITE_API_URL}/boards/${selectedBoard._id}/messages`,
         {
           method: "PUT",
           headers: {
@@ -243,7 +244,7 @@ const Messenger = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/boards/${selectedBoard._id}/messages/${messageId}`, // Updated base URL
+        `${import.meta.env.VITE_API_URL}/boards/${selectedBoard._id}/messages/${messageId}`, // Updated base URL
         {
           method: "PATCH",
           headers: {
@@ -273,7 +274,7 @@ const Messenger = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/boards/${selectedBoard._id}/messages/${messageId}`, // Updated base URL
+        `${import.meta.env.VITE_API_URL}/boards/${selectedBoard._id}/messages/${messageId}`, // Updated base URL
         {
           method: "DELETE",
           headers: {
@@ -309,7 +310,7 @@ const Messenger = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/boards/${selectedBoard._id}/messages/${messageId}/seen`,
+        `${import.meta.env.VITE_API_URL}/boards/${selectedBoard._id}/messages/${messageId}/seen`,
         {
           method: "PATCH",
           headers: {
@@ -340,7 +341,7 @@ const Messenger = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/boards/${selectedBoard._id}/messages/${messageId}/pin`,
+        `${import.meta.env.VITE_API_URL}/boards/${selectedBoard._id}/messages/${messageId}/pin`,
         {
           method: "PATCH",
           headers: {
@@ -369,7 +370,7 @@ const Messenger = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/boards/${selectedBoard._id}/messages/${messageId}/unpin`,
+        `${import.meta.env.VITE_API_URL}/boards/${selectedBoard._id}/messages/${messageId}/unpin`,
         {
           method: "PATCH",
           headers: {
@@ -398,7 +399,7 @@ const Messenger = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/boards/${selectedBoard._id}/messages/${messageId}/react`, // Updated base URL
+        `${import.meta.env.VITE_API_URL}/boards/${selectedBoard._id}/messages/${messageId}/react`, // Updated base URL
         {
           method: "PATCH",
           headers: {
@@ -430,7 +431,7 @@ const Messenger = () => {
   const handleCreatePoll = async (pollData) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/boards/${selectedBoard._id}/polls`,
+        `${import.meta.env.VITE_API_URL}/boards/${selectedBoard._id}/polls`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -459,7 +460,7 @@ const Messenger = () => {
   
     try {
       const response = await fetch(
-        `http://localhost:5000/boards/${selectedBoard._id}/polls/${pollId}/vote`,
+        `${import.meta.env.VITE_API_URL}/boards/${selectedBoard._id}/polls/${pollId}/vote`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -488,7 +489,7 @@ const Messenger = () => {
   const removePoll = async (pollId) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/boards/${selectedBoard._id}/polls/${pollId}`,
+        `${import.meta.env.VITE_API_URL}/boards/${selectedBoard._id}/polls/${pollId}`,
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
@@ -676,6 +677,7 @@ const Messenger = () => {
         isOpen={showPollModal}
         onClose={() => setShowPollModal(false)}
         onCreate={handleCreatePoll}
+        currentUser={currentUser} // Pass currentUser as a prop
       />
     </motion.div>
   );
