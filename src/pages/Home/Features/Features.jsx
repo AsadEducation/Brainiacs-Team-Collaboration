@@ -1,6 +1,6 @@
 import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
-
+import "./Features.css";
 const featuresData = [
   {
     id: 1,

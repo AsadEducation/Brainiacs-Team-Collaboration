@@ -54,12 +54,27 @@ const Navbar = () => {
   }, [dropdownOpen]);
 
   const handleLogOut = () => {
-    signOutUser()
-      .then((res) => {
-        console.log("Success", res);
-        Swal.fire("Logged Out Successfully");
-      })
-      .catch((err) => console.log("error", err));
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You will be logged out!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, log me out!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        signOutUser()
+          .then((res) => {
+            console.log("Success", res);
+            Swal.fire("Logged Out!", "You have been logged out successfully.", "success");
+          })
+          .catch((err) => {
+            console.log("Error", err);
+            Swal.fire("Error!", "Something went wrong. Please try again.", "error");
+          });
+      }
+    });
   };
 
   return (
