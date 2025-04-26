@@ -14,14 +14,21 @@ const LeaderBoard = () => {
   useEffect(() => {
     axiosPublic.get('/leaderboard')
       .then((res) => {
-        setData(res.data);
-        const rank = res.data.findIndex(user => user.email === currentUserEmail);
-        if (rank !== -1) {
-          setYourRank(rank + 1);
+        console.log('Fetched Leaderboard Data:', res.data);
+       
+        if (Array.isArray(res.data)) {
+          setData(res.data);
+          const rank = res.data.findIndex(user => user.email === currentUserEmail);
+          if (rank !== -1) {
+            setYourRank(rank + 1);
+          }
+        } else {
+          console.error("Leaderboard data is not an array:", res.data);
         }
       })
       .catch((err) => console.error("Leaderboard fetch error:", err));
-  }, [axiosPublic]);
+  }, [axiosPublic, currentUserEmail]);
+  
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
