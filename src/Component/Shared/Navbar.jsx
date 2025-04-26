@@ -7,14 +7,14 @@ import useAuth from "../../Hooks/useAuth";
 import Swal from "sweetalert2";
 import userimage from "../../assets/icons/user.svg";
 import { MdOutlineLogout } from "react-icons/md";
+import { FaBars, FaChartBar } from "react-icons/fa";
 
 const Navbar = () => {
   const { currentUser, signOutUser } = useAuth(); // Use currentUser instead of user
-  const [isOpen, setIsOpen] = useState(false);  
+  const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   let lastScrollY = window.scrollY;
-
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -54,19 +54,34 @@ const Navbar = () => {
   }, [dropdownOpen]);
 
   const handleLogOut = () => {
-    signOutUser()
-      .then((res) => {
-        console.log("Success", res);
-        Swal.fire("Logged Out Successfully");
-      })
-      .catch((err) => console.log("error", err));
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You will be logged out!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, log me out!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        signOutUser()
+          .then((res) => {
+            console.log("Success", res);
+            Swal.fire("Logged Out!", "You have been logged out successfully.", "success");
+          })
+          .catch((err) => {
+            console.log("Error", err);
+            Swal.fire("Error!", "Something went wrong. Please try again.", "error");
+          });
+      }
+    });
   };
 
   return (
     <div>
       {/* Desktop and Tablet Navbar */}
       <motion.nav
-        className="min-w-[95%] fixed top-2 left-1/2 transform -translate-x-1/2 px-4 py-4 flex justify-between items-center rounded-full z-50 bg-white"
+        className="min-w-[90%] fixed top-2 left-1/2 transform -translate-x-1/2 p-1 md:p-4 flex justify-between items-center rounded-full z-50 bg-white"
         initial={{ y: 0 }}
         animate={{ y: isVisible ? 0 : -100 }}
         transition={{ duration: 0.3 }}
@@ -79,13 +94,7 @@ const Navbar = () => {
             className=" navbar-burger flex items-center p-3"
             onClick={toggleMenu}
           >
-            <svg
-              className="block h-6 w-6 fill-current"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z"></path>
-            </svg>
+            <FaBars className="text-xl" />
           </button>
         </div>
         <ul className="mx-auto hidden lg:flex lg:items-center lg:space-x-6">
@@ -198,7 +207,10 @@ const Navbar = () => {
             transition={{ duration: 0.3 }}
           >
             <div className="flex items-center mb-8">
-              <Link to="/" className="mr-auto text-3xl font-bold leading-none text-primary">
+              <Link
+                to="/"
+                className="mr-auto text-3xl font-bold leading-none text-primary"
+              >
                 <img className="w-32" src={logo} alt="Brainiacs" />
               </Link>
               <button
@@ -210,22 +222,34 @@ const Navbar = () => {
             </div>
             <ul>
               <li className="mb-1">
-                <Link to="/" className="block p-4 text-sm font-semibold text-primary hover:bg-blue-50 hover:text-secondary rounded">
+                <Link
+                  to="/"
+                  className="block p-4 text-sm font-semibold text-primary hover:bg-blue-50 hover:text-secondary rounded"
+                >
                   Home
                 </Link>
               </li>
               <li className="mb-1">
-                <Link to="/about" className="block p-4 text-sm font-semibold text-primary hover:bg-blue-50 hover:text-secondary rounded">
+                <Link
+                  to="/about"
+                  className="block p-4 text-sm font-semibold text-primary hover:bg-blue-50 hover:text-secondary rounded"
+                >
                   About Us
                 </Link>
               </li>
               <li className="mb-1">
-                <Link to="/services" className="block p-4 text-sm font-semibold text-primary hover:bg-blue-50 hover:text-secondary rounded">
+                <Link
+                  to="/services"
+                  className="block p-4 text-sm font-semibold text-primary hover:bg-blue-50 hover:text-secondary rounded"
+                >
                   Services
                 </Link>
               </li>
               <li className="mb-1">
-                <Link to="/pricing" className="block p-4 text-sm font-semibold text-primary hover:bg-blue-50 hover:text-secondary rounded">
+                <Link
+                  to="/pricing"
+                  className="block p-4 text-sm font-semibold text-primary hover:bg-blue-50 hover:text-secondary rounded"
+                >
                   Pricing
                 </Link>
               </li>
@@ -245,15 +269,18 @@ const Navbar = () => {
                       alt="User"
                     />
                     <div className="flex flex-col">
-                      <span className="text-sm font-semibold">{currentUser.displayName}</span>
-                      <span className="text-xs text-gray-500">{currentUser.email}</span>
+                      <span className="text-sm font-semibold">
+                        {currentUser.displayName}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {currentUser.email}
+                      </span>
                     </div>
                     <button
                       onClick={handleLogOut}
                       className="ml-auto text-sm font-semibold text-secondary hover:text-accent cursor-pointer"
                     >
                       <MdOutlineLogout className="text-4xl" />
-
                     </button>
                   </Link>
                 ) : (

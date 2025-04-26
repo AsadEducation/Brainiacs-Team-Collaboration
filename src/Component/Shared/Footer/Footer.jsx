@@ -1,72 +1,75 @@
 import React from 'react';
-import { FaFacebook, FaLinkedin } from 'react-icons/fa';
+import { FaFacebookF, FaLinkedinIn } from 'react-icons/fa';
 import { IoLogoTwitter } from 'react-icons/io';
+
 const Footer = () => {
-    return (
+  return (
+    <footer className="bg-[#2E5077] text-white pt-16 px-5">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-10 border-b border-white/20">
         <div>
-            <footer className="footer sm:footer-horizontal bg-[#2E5077] text-white p-10">
-  <aside>
-   
-    <div>
-    <p className='text-4xl '>
-      Follow Us On 
-    </p>
-
-    <div className="flex items-center  gap-4 mt-5">
-             <button className='bg-white text-2xl rounded-full text-[#1877F2] cursor-pointer'>
-              <FaFacebook></FaFacebook>
-             </button>
-                <button className=' text-2xl rounded-full text-[#1877F2] cursor-pointer'>
-                <IoLogoTwitter />
-                </button>
-                <div className='flex items-center justify-center bg-white h-4 w-4'>
-                <button className=' text-2xl    text-[#1877F2] cursor-pointer'>
-                <FaLinkedin />
-                </button>
-                </div>
-              </div>
-
-    </div>
-  </aside>
-  <nav>
-    <h6 className="footer-title">Categories</h6>
-    <a className="link link-hover">Branding</a>
-    <a className="link link-hover">Design</a>
-    <a className="link link-hover">Marketing</a>
-    <a className="link link-hover">Advertisement</a>
-  </nav>
-  <nav>
-    <h6 className="footer-title">Shopping</h6>
-    <a className="link link-hover">Payments</a>
-    <a className="link link-hover">Delivery options</a>
-    <a className="link link-hover">Buyer protection</a>
-    
-  </nav>
-  <nav>
-    <h6 className="footer-title">Customer care</h6>
-    <a className="link link-hover">Help center</a>
-    <a className="link link-hover">Terms & Conditions</a>
-    <a className="link link-hover">Privacy policy</a>
-    <a className="link link-hover">Returns & refund</a>
-    <a className="link link-hover">Survey & feedback</a>
-  </nav>
-  <nav>
-    <h6 className="footer-title">Pages</h6>
-    <a className="link link-hover">About Us</a>
-    <a className="link link-hover">Contact Us</a>
-    <a className="link link-hover">Services</a>
-    <a className="link link-hover">Blog</a>
-  </nav>
-</footer>
-
-<footer className="footer border-white border-t sm:footer-horizontal footer-center bg-[#2E5077] text-white p-4">
-  <aside>
-    <p>© 2025 Brainiacs Inc. All rights reserved </p>
-  </aside>
-</footer>
+          <h2 className="text-2xl font-semibold mb-6">Follow Us On</h2>
+          <div className="flex space-x-4">
+            {[
+              { icon: <FaFacebookF />, color: 'bg-white text-[#1877F2]' },
+              { icon: <IoLogoTwitter />, color: 'bg-white text-[#1DA1F2]' },
+              { icon: <FaLinkedinIn />, color: 'bg-white text-[#0077B5]' },
+            ].map((item, i) => (
+              <button
+                key={i}
+                className={`w-10 h-10 rounded-full flex items-center justify-center text-xl hover:scale-110 transition ${item.color}`}
+              >
+                {item.icon}
+              </button>
+            ))}
+          </div>
         </div>
 
-    );
+        <div>
+          <h6 className="uppercase font-bold mb-4 tracking-wide">Categories</h6>
+          <ul className="space-y-2">
+            <li><a className="hover:underline">Branding</a></li>
+            <li><a className="hover:underline">Design</a></li>
+            <li><a className="hover:underline">Marketing</a></li>
+            <li><a className="hover:underline">Advertisement</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h6 className="uppercase font-bold mb-4 tracking-wide">Shopping</h6>
+          <ul className="space-y-2">
+            <li><a className="hover:underline">Payments</a></li>
+            <li><a className="hover:underline">Delivery options</a></li>
+            <li><a className="hover:underline">Buyer protection</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h6 className="uppercase font-bold mb-4 tracking-wide">Customer Care</h6>
+          <ul className="space-y-2">
+            <li><a className="hover:underline">Help center</a></li>
+            <li><a className="hover:underline">Terms & Conditions</a></li>
+            <li><a className="hover:underline">Privacy policy</a></li>
+            <li><a className="hover:underline">Returns & refund</a></li>
+            <li><a className="hover:underline">Survey & feedback</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h6 className="uppercase font-bold mb-4 tracking-wide">Pages</h6>
+          <ul className="space-y-2">
+            <li><a className="hover:underline">About Us</a></li>
+            <li><a className="hover:underline">Contact Us</a></li>
+            <li><a className="hover:underline">Services</a></li>
+            <li><a className="hover:underline">Blog</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div className="text-center py-4 text-sm text-white/70">
+        © 2025 Brainiacs Inc. All rights reserved.
+      </div>
+    </footer>
+  );
 };
 
 export default Footer;

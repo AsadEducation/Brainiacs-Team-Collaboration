@@ -1,20 +1,20 @@
 import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
-import EditBoardModal from "./EditBoardModal"; // Import the EditBoardModal
+import EditBoardModal from "./EditBoardModal";
 import { BsThreeDots } from "react-icons/bs";
+import { LucideLayoutDashboard } from "lucide-react";
 
 const BoardCard = ({ board, onDelete, navigate, onEdit }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const menuRef = useRef(null); // Ref for the dropdown menu
-  const fallbackImage = "https://via.placeholder.com/150"; // Fallback image URL
+  const menuRef = useRef(null);
+  const fallbackImage = "https://via.placeholder.com/150";
 
   const toggleMenu = (e) => {
-    e.stopPropagation(); // Prevent event propagation
+    e.stopPropagation();
     setIsMenuOpen((prev) => !prev);
   };
 
-  // Close the menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -30,34 +30,47 @@ const BoardCard = ({ board, onDelete, navigate, onEdit }) => {
 
   return (
     <motion.div
-      className="p-4 shadow-inner shadow-slate-500/80 rounded cursor-pointer flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+      className="p-4 backdrop-blur-lg bg-white/30 shadow-lg border border-white/20 rounded-xl cursor-pointer hover:scale-105 transition-transform duration-300 h-36 w-full flex items-center "
       style={{ backgroundColor: board.theme }}
       onClick={() => navigate(`/dashboard/boards/${board._id}`)}
+      whileTap={{ scale: 0.98 }}
     >
       <div className="flex-1">
-        <h3 className="text-lg font-bold">
-          {board.name} <sup className="text-xs">({board.visibility})</sup>
+        <h3 className="text-base md:text-lg font-bold flex items-center gap-2">
+          <LucideLayoutDashboard size={18} /> {board.name}
         </h3>
-        <p className="text-sm mt-2">
+
+        <p className="text-sm md:text-base mt-2 line-clamp-2">
           {board.description || "No description provided."}
         </p>
       </div>
-      <div className="relative bottom-6 left-3" ref={menuRef}>
+
+      <div className=" flex flex-col items-end" ref={menuRef}>
         <button
           onClick={toggleMenu}
           className="hover:bg-gray-50 rounded-full p-2 text-gray-600 hover:text-gray-800 cursor-pointer"
         >
           <BsThreeDots />
         </button>
+        <div className="flex mt-3">
+          {board.members?.slice(0, 3).map((member, i) => (
+            <img
+              key={i}
+              src={member.photoURL || fallbackImage}
+              className="w-6 h-6 rounded-full border-2 border-white -ml-2"
+              alt="member"
+            />
+          ))}
+        </div>
         {isMenuOpen && (
           <div
-            className="absolute right-0 mt-2 w-32 bg-white shadow-lg rounded-md z-10"
-            onClick={(e) => e.stopPropagation()} // Prevent click propagation
+            className="absolute top-2 right-14 w-32 bg-white shadow-lg rounded-md z-10"
+            onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={() => {
                 setIsEditModalOpen(true);
-                setIsMenuOpen(false); // Close menu
+                setIsMenuOpen(false);
               }}
               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
@@ -66,7 +79,7 @@ const BoardCard = ({ board, onDelete, navigate, onEdit }) => {
             <button
               onClick={() => {
                 onDelete(board._id);
-                setIsMenuOpen(false); // Close menu
+                setIsMenuOpen(false);
               }}
               className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
             >
@@ -75,6 +88,7 @@ const BoardCard = ({ board, onDelete, navigate, onEdit }) => {
           </div>
         )}
       </div>
+
       {isEditModalOpen && (
         <EditBoardModal
           isOpen={isEditModalOpen}

@@ -1,12 +1,22 @@
 import { motion } from "framer-motion";
 import Countdown from "react-countdown";
 import confetti from "canvas-confetti";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import "./EidSection.css"; // CSS for stars
 import eid from "../../../assets/eid.json";
 import { Player } from "@lottiefiles/react-lottie-player";
+import moment from "moment";
+
 const EidSection = () => {
-  const eidDate = new Date("2025-04-10T00:00:00");
+  const eidDate = moment("2025-04-01T00:00:00");
+  const [isCompleted, setIsCompleted] = useState(false);
+
+  useEffect(() => {
+    const now = moment();
+    if (now.isSameOrAfter(eidDate.clone().add(3, "days"))) {
+      setIsCompleted(true);
+    }
+  }, [eidDate]);
 
   const handleClaim = () => {
     const duration = 2 * 1000;
@@ -57,7 +67,7 @@ const EidSection = () => {
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, type: "spring" }}
       viewport={{ once: true }}
-      className="relative overflow-hidden bg-green-50 dark:bg-gray-900 h-screen shadow-lg"
+      className="relative overflow-hidden bg-green-50 dark:bg-gray-900 h-[90vh] shadow-lg px-4 sm:px-6 lg:px-8"
     >
       {/* Floating Stars */}
       {[...Array(30)].map((_, index) => (
@@ -72,13 +82,13 @@ const EidSection = () => {
         />
       ))}
 
-      <div className="p-6 flex items-center justify-between">
-        <div className="flex flex-col items-center justify-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-green-700 dark:text-green-400 mb-4">
+      <div className="p-6 flex flex-col-reverse md:flex-row items-center justify-between">
+        <div className="flex flex-col items-center justify-center mt-10 md:mt-0 w-full md:w-1/2 text-center md:text-left">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-green-700 dark:text-green-400 mb-4">
             Eid-ul-Fitr Greetings
           </h2>
 
-          <p className="text-base sm:text-lg md:text-xl mb-6 text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base md:text-lg mb-6 text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
             On behalf of the Brainiacs team, we wish you an advance Eid Mubarak.
             <br />
             “This Eid, Brainiacs users will enjoy a{" "}
@@ -88,15 +98,15 @@ const EidSection = () => {
             ”
           </p>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 max-w-xl mx-auto relative z-10">
-            <h3 className="text-lg sm:text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-4 sm:p-6 max-w-full md:max-w-xl mx-auto relative z-10">
+            <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100">
               Expected Eid Date:{" "}
               <span className="text-green-600 dark:text-green-400">
-                April 10, 2025
+                April 29, 2025
               </span>
             </h3>
 
-            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-3">
+            <p className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-300 mb-3">
               Time remaining until Eid:
             </p>
 
@@ -104,25 +114,30 @@ const EidSection = () => {
               initial={{ scale: 0.95 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 300 }}
-              className="text-lg sm:text-2xl text-green-700 dark:text-green-300 font-bold"
+              className="text-base sm:text-lg md:text-2xl text-green-700 dark:text-green-300 font-bold"
             >
               <Countdown date={eidDate} renderer={renderer} />
             </motion.div>
 
             <button
               onClick={handleClaim}
-              className="mt-6 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition"
+              disabled={isCompleted}
+              className={`mt-4 sm:mt-6 px-4 sm:px-6 py-2 sm:py-3 ${
+                isCompleted
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-green-600 hover:bg-green-700"
+              } text-white font-medium rounded-lg transition w-full sm:w-auto`}
             >
               Claim Free Premium
             </button>
           </div>
         </div>
-        <div className="w-1/3 h-full flex items-center justify-center relative">
+        <div className="w-full md:w-1/2 h-full flex items-center justify-center relative mt-6 md:mt-0">
           <Player
             autoplay
             loop
             src={eid}
-            style={{ height: "100%", width: "100%" }}
+            style={{ height: "80%", width: "80%" }}
           />
         </div>
       </div>

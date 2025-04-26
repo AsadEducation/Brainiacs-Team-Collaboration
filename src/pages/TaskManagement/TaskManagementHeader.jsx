@@ -13,14 +13,7 @@ export default function TaskManagementHeader({
   const navigate = useNavigate(); // Initialize navigate
 
   const addMember = async (newMember) => {
-    console.log("New Member Data:", newMember); // Log the newMember object
-
-    if (
-      !newMember ||
-      !newMember.userId ||
-      !newMember.email ||
-      !newMember.displayName
-    ) {
+    if (!newMember || !newMember.userId || typeof newMember.userId !== "string") {
       console.error("Invalid member data:", newMember);
       Swal.fire({
         icon: "error",

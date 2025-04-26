@@ -200,7 +200,7 @@ export default function NewTaskManagement() {
 
   //   siam vai's code starts here
   const addMember = async (member) => {
-    if (!member.userId) {
+    if (!member.userId || typeof member.userId !== "string") {
       console.error("Invalid member data:", member);
       Swal.fire({
         icon: "error",

@@ -2,11 +2,10 @@ import React, { useState } from "react";
 import { FaHome, FaImage } from "react-icons/fa";
 import { LuFileUp } from "react-icons/lu";
 import { RiMenu2Line } from "react-icons/ri";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom"; // Import useLocation
 import ChatBox from "../Component/Shared/ChatBox/ChatBox";
 import { RxActivityLog } from "react-icons/rx";
 import { MdLeaderboard } from "react-icons/md";
-
 import { IoIosArrowBack, IoIosArrowForward, IoMdClose } from "react-icons/io";
 import useAuth from "../Hooks/useAuth"; // Import useAuth
 import {
@@ -18,10 +17,36 @@ import {
   FaCog,
   FaSignOutAlt,
 } from "react-icons/fa";
+import Swal from "sweetalert2"; // Import Swal
 
 const DashboardLayout = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
-  const { currentUser } = useAuth();
+  const { currentUser, signOutUser } = useAuth(); // Destructure signOutUser
+  const location = useLocation(); // Get current location
+
+  const handleLogOut = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You will be logged out!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, log me out!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        signOutUser()
+          .then((res) => {
+            console.log("Success", res);
+            Swal.fire("Logged Out!", "You have been logged out successfully.", "success");
+          })
+          .catch((err) => {
+            console.log("Error", err);
+            Swal.fire("Error!", "Something went wrong. Please try again.", "error");
+          });
+      }
+    });
+  };
 
   return (
     <div>
@@ -94,7 +119,11 @@ const DashboardLayout = () => {
             </div>
             <div className="divide-y dark:divide-gray-300">
               <ul className="pt-2 pb-4 space-y-1 text-sm">
-                <li className="dark:bg-gray-100 dark:text-gray-900">
+                <li
+                  className={`${
+                    location.pathname === "/" ? "bg-gray-900" : ""
+                  } dark:bg-gray-100 dark:text-gray-900`}
+                >
                   <Link
                     to="/"
                     className="flex items-center p-2 space-x-3 rounded-md"
@@ -103,7 +132,13 @@ const DashboardLayout = () => {
                     <span>Home</span>
                   </Link>
                 </li>
-                <li>
+                <li
+                  className={`${
+                    location.pathname === "/dashboard/boards"
+                      ? "bg-gray-200"
+                      : ""
+                  }`}
+                >
                   <Link
                     to="boards"
                     className="flex items-center p-2 space-x-3 rounded-md"
@@ -112,7 +147,13 @@ const DashboardLayout = () => {
                     <span>Boards</span>
                   </Link>
                 </li>
-                <li>
+                <li
+                  className={`${
+                    location.pathname === "/dashboard/messenger"
+                      ? "bg-gray-200"
+                      : ""
+                  }`}
+                >
                   <Link
                     to="messenger"
                     className="flex items-center p-2 space-x-3 rounded-md"
@@ -121,7 +162,13 @@ const DashboardLayout = () => {
                     <span>Messenger</span>
                   </Link>
                 </li>
-                <li>
+                <li
+                  className={`${
+                    location.pathname === "/dashboard/activity-log"
+                      ? "bg-gray-200"
+                      : ""
+                  }`}
+                >
                   <Link
                     to="activity-log"
                     className="flex items-center p-2 space-x-3 rounded-md"
@@ -130,7 +177,13 @@ const DashboardLayout = () => {
                     <span>Activity Log</span>
                   </Link>
                 </li>
-                <li>
+                <li
+                  className={`${
+                    location.pathname === "/dashboard/leaderBoard"
+                      ? "bg-gray-200"
+                      : ""
+                  }`}
+                >
                   <Link
                     to="leaderBoard"
                     className="flex items-center p-2 space-x-3 rounded-md"
@@ -141,23 +194,29 @@ const DashboardLayout = () => {
                 </li>
               </ul>
               <ul className="pt-4 pb-2 space-y-1 text-sm">
-                <li>
+                <li
+                  className={`${
+                    location.pathname === "/dashboard/settings"
+                      ? "bg-gray-200"
+                      : ""
+                  }`}
+                >
                   <Link
-                    to="/settings"
-                    className="flex items-center p-2 space-x-3 rounded-md"
+                    to="/dashboard/settings"
+                    className="flex items-center p-2 space-x-3 rounded-md cursor-pointer hover:bg-gray-200"
                   >
                     <FaCog className="w-5 h-5" />
                     <span>Settings</span>
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    to="/logout"
-                    className="flex items-center p-2 space-x-3 rounded-md"
+                  <button
+                    onClick={handleLogOut}
+                    className="flex items-center p-2 space-x-3 rounded-md w-full text-left cursor-pointer hover:bg-gray-200"
                   >
                     <FaSignOutAlt className="w-5 h-5" />
                     <span>Logout</span>
-                  </Link>
+                  </button>
                 </li>
               </ul>
             </div>
