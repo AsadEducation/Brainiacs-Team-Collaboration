@@ -47,7 +47,7 @@ const MyProfile = () => {
           <div className="flex gap-2 items-center">
           <img
                           className="w-10 h-10 rounded-full"
-                          src={currentUser.photoURL || userimage}
+                          src={currentUser.photoURL }
                           alt="User"
                         />
           <span className="text-lg font-semibold"> {currentUser?.name || "User"}</span>
