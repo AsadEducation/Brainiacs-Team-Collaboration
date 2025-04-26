@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 
-const PollCreationModal = ({ isOpen, onClose, onCreate }) => {
+const PollCreationModal = ({
+  isOpen,
+  onClose,
+  onCreate,
+  currentUser, // Accept currentUser as a prop
+}) => {
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState(["", ""]);
 
@@ -27,10 +32,19 @@ const PollCreationModal = ({ isOpen, onClose, onCreate }) => {
     const pollData = {
       question,
       options: options.map((text) => ({ text: text.trim(), votes: [] })),
-      createdBy: "currentUser._id", // Replace with actual user ID
+      createdBy: currentUser._id, // Use the actual user ID
     };
 
-    onCreate(pollData);
+    onCreate(pollData); // Call the onCreate function
+    setQuestion(""); // Reset question
+    setOptions(["", ""]); // Reset options
+    onClose(); // Close the modal
+  };
+
+  const handleCancel = () => {
+    setQuestion(""); // Reset question
+    setOptions(["", ""]); // Reset options
+    onClose(); // Close the modal
   };
 
   if (!isOpen) return null;
@@ -77,7 +91,7 @@ const PollCreationModal = ({ isOpen, onClose, onCreate }) => {
         </div>
         <div className="flex justify-end gap-2">
           <button
-            onClick={onClose}
+            onClick={handleCancel}
             className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
           >
             Cancel

@@ -6,61 +6,71 @@ import "slick-carousel/slick/slick-theme.css";
 import image1 from "../../../assets/image-1.jpg";
 import image2 from "../../../assets/image-2.jpg";
 import image3 from "../../../assets/image-3.jpg";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
+import { TypeAnimation } from "react-type-animation";
 
 const Banner = () => {
   const images = [image1, image2, image3];
 
   const settings = {
-    dots: false,
+    dots: true,
     infinite: true,
-    speed: 500,
+    speed: 700,
     fade: true,
-    cssEase: "",
+    cssEase: "ease-in-out",
     autoplay: true,
-    autoplaySpeed: 3000,
+    autoplaySpeed: 3500,
     arrows: false,
   };
 
   return (
-    <section className="relative bg-primary text-white py-16 md:py-24 lg:py-32 xl:py-40">
-      <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center pt-16 lg:pt-0 px-6">
+    <section className="relative h-[30vh] md:h-screen overflow-hidden">
+      <Slider {...settings} className="absolute inset-0 z-0">
+        {images.map((img, index) => (
+          <div key={index} className="h-full w-full">
+            <motion.img
+              src={img}
+              alt={`Slide ${index + 1}`}
+              className="h-full w-full object-cover"
+              initial={{ scale: 1.1 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 3 }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
+          </div>
+        ))}
+      </Slider>
+      <div className="absolute top-8 md:top-10 right-0 left-0 z-10 h-full flex items-center justify-center px-4">
         <motion.div
-          className="text-center md:text-left space-y-4 md:space-y-6"
-          initial={{ x: -100, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 1 }}
+          className="backdrop-blur-[calc(xs/2)] bg-black/5 rounded-2xl p-4 md:p-8 w-sm md:w-3xl text-center text-white shadow-xl"
         >
-          <h1 className="text-3xl md:text-5xl font-bold">Brainiacs</h1>
-          <h2 className="text-2xl md:text-4xl font-semibold leading-snug">
-            Smart & Fast Teamwork!
-          </h2>
-          <p className="text-sm md:text-base">
-            Chat, manage tasks & share files seamlessly.
+          <TypeAnimation
+            sequence={[
+              "Elevate Your Team’s Power",
+              4000,
+              "Collaborate Smarter, Faster",
+              4000,
+              "Achieve More Together",
+              4000,
+              "",
+              2000,
+            ]}
+            wrapper="h1"
+            className="text-lg md:text-4xl font-bold drop-shadow-xs whitespace-nowrap"
+            repeat={Infinity}
+          />
+          <p className="text-xs md:text-xl mt-2 md:mt-4 text-gray-200">
+            Brainiacs makes teamwork smarter, faster, and beautifully organized.
           </p>
-          <Link to="/signup" className="inline-block bg-secondary text-white px-6 py-2 rounded-lg font-semibold hover:bg-opacity-60 transition cursor-pointer">
-            Get Started
+          <Link
+            to="/signup"
+            className="mt-6 inline-block px-6 sm:px-8 py-2 sm:py-3 rounded-full bg-secondary hover:bg-secondary/80 transition shadow-lg shadow-secondary/40 font-semibold text-white text-base sm:text-lg"
+          >
+            Get Started Now
           </Link>
-        </motion.div>
-
-        {/* Slider */}
-        <motion.div
-          className="w-full mx-auto"
-          initial={{ x: 100, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 1 }}
-        >
-          <Slider {...settings}>
-            {images.map((img, index) => (
-              <div key={index} className="slide">
-                <img
-                  src={img}
-                  alt={`Slide ${index + 1}`}
-                  className="w-full h-48 sm:h-64 md:h-72 lg:h-80 xl:h-96 object-cover rounded-lg"
-                />
-              </div>
-            ))}
-          </Slider>
         </motion.div>
       </div>
     </section>

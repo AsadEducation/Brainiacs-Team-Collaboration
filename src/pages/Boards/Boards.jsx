@@ -5,8 +5,8 @@ import { AuthContext } from "../../Provider/AuthProvider";
 import BoardsHeader from "./BoardsHeader";
 import BoardCard from "./BoardCard"; // Import BoardCard
 import CreateBoardModal from "./CreateBoardModal"; // Import CreateBoardModal
-import EditBoardModal from "./EditBoardModal"; // Import EditBoardModal
 import useAxiosPublic from "../../Hooks/useAxiosPublic";
+import Swal from "sweetalert2"; // Import SweetAlert2
 
 const Boards = () => {
   const navigate = useNavigate();
@@ -16,11 +16,9 @@ const Boards = () => {
   const [description, setDescription] = useState("");
   const [visibility, setVisibility] = useState("Public");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editBoard, setEditBoard] = useState(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [theme, setTheme] = useState("#3b82f6");
+  const [theme, setTheme] = useState("#e0f2fe");
   const [searchQuery, setSearchQuery] = useState("");
-  const axiosPublic = useAxiosPublic(); // using baseURL from  axiosPublic hook [asad]
+  const axiosPublic = useAxiosPublic();
 
   const themeOptions = [
     { name: "Sky Blue", color: "#e0f2fe" },
@@ -30,124 +28,160 @@ const Boards = () => {
     { name: "Soft Gray", color: "#e5e7eb" },
   ];
 
+  const fetchBoards = async () => {
+    try {
+      const response = await axiosPublic.get(`/boards`);
+      setBoards(response.data);
+    } catch (error) {
+      console.error("Error fetching boards:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Fetch Failed",
+        text: "Failed to fetch boards. Please try again later.",
+      });
+    }
+  };
+
   useEffect(() => {
-    const fetchBoards = async () => {
-      try {
-        const response = await axiosPublic.get(`/boards`);
-        setBoards(response.data);
-      } catch (error) {
-        console.error("Error fetching boards:", error);
-        alert("Failed to fetch boards. Please try again later."); // User-friendly error message
-      }
-    };
-    fetchBoards();
+    fetchBoards(); // Fetch boards when the component mounts
   }, []);
 
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        if (!currentUser?.email) {
-          console.log("Current user is not available in AuthContext.");
-          return;
-        }
-
-        const response = await axiosPublic.get(`/user`, {
-          params: { email: currentUser.email },
-        });
-        console.log("Current User:", response.data);
-      } catch (error) {
-        console.error("Error fetching current user:", error);
+  const fetchCurrentUser = async () => {
+    try {
+      if (!currentUser?.email) {
+        console.log("Current user email is not available in AuthContext.");
+        return;
       }
-    };
 
-    fetchCurrentUser();
-    console.log("Current User:", currentUser); // Log currentUser for debugging
-  }, [currentUser]);
+      const response = await axiosPublic.get(`/user`, {
+        params: { email: currentUser.email.trim() },
+        headers: {
+          Authorization: `Bearer ${yourAuthTokenHere}`, // Add this line
+        },
+      });
+      console.log("Current User:", response.data);
+    } catch (error) {
+      console.error("Error fetching current user:", error);
+    }
+  };
 
   const createBoard = async () => {
-    if (!newBoard) return alert("Board name is required!");
-    if (!currentUser?._id) return alert("User is not authenticated!");
+    if (!newBoard.trim()) {
+      Swal.fire({
+        icon: "error",
+        title: "Validation Error",
+        text: "Board name is required!",
+      });
+      return;
+    }
+    if (!currentUser?._id || typeof currentUser._id !== "string") {
+      Swal.fire({
+        icon: "error",
+        title: "Authentication Error",
+        text: "User ID is invalid or not available!",
+      });
+      return;
+    }
 
     const newBoardData = {
-      name: newBoard,
-      description, // Include description
+      name: newBoard.trim(),
+      description: description.trim() || "",
       visibility,
       theme,
-      createdBy: currentUser._id,
-      members: [
-        {
-          userId: currentUser._id,
-          name: currentUser.name, // Pass user's name
-          email: currentUser.email, // Include user's email
-          role: "member",
-        },
-      ],
-      createdAt: new Date().toISOString(),
+      createdBy: currentUser._id, // Pass the user ID as a string
     };
 
     try {
       const response = await axiosPublic.post(`/boards`, newBoardData);
-      setBoards([...boards, response.data]);
+      console.log("Board Created:", response.data);
+
       setIsModalOpen(false);
       setNewBoard("");
-      setDescription(""); // Reset description
+      setDescription("");
       setVisibility("Public");
       setTheme("#3b82f6");
+
+      await fetchBoards();
+
+      Swal.fire({
+        icon: "success",
+        title: "Board Created",
+        text: "Your board has been created successfully!",
+      });
     } catch (error) {
       console.error("Error creating board:", error);
-      alert(
-        `Failed to create board: ${
-          error.response?.data?.error || error.message
-        }`
-      );
-    }
-  };
-
-  const updateBoard = async () => {
-    if (!editBoard?.name) return alert("Board name is required!");
-
-    try {
-      await axiosPublic.put(`/boards/${editBoard._id}`, {
-        name: editBoard.name,
-        description: editBoard.description, // Include description
-        visibility: editBoard.visibility,
-        theme: editBoard.theme,
+      Swal.fire({
+        icon: "error",
+        title: "Creation Failed",
+        text: error.response?.data?.error || "Failed to create board",
       });
-
-      setBoards(
-        boards.map((board) => (board._id === editBoard._id ? editBoard : board))
-      );
-      setIsEditModalOpen(false);
-    } catch (error) {
-      console.error("Error updating board:", error);
     }
   };
 
   const deleteBoard = async (boardId) => {
-    if (!window.confirm("Are you sure you want to delete this board?")) return;
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    });
 
+    if (result.isConfirmed) {
+      try {
+        await axiosPublic.delete(`/boards/${boardId}`);
+        setBoards(boards.filter((board) => board._id !== boardId));
+        Swal.fire("Deleted!", "The board has been deleted.", "success");
+      } catch (error) {
+        console.error("Error deleting board:", error);
+        Swal.fire(
+          "Error!",
+          "Failed to delete the board. Please try again.",
+          "error"
+        );
+      }
+    }
+  };
+
+  const editBoard = async (updatedBoard) => {
     try {
-      await axiosPublic.delete(`/boards/${boardId}`);
-      setBoards(boards.filter((board) => board._id !== boardId));
+      await axiosPublic.put(`/boards/${updatedBoard._id}`, updatedBoard);
+      setBoards((prevBoards) =>
+        prevBoards.map((board) =>
+          board._id === updatedBoard._id ? updatedBoard : board
+        )
+      );
+      Swal.fire({
+        icon: "success",
+        title: "Board Updated",
+        text: "The board has been updated successfully!",
+      });
     } catch (error) {
-      console.error("Error deleting board:", error);
+      console.error("Error updating board:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Update Failed",
+        text: "Failed to update the board. Please try again later.",
+      });
     }
   };
 
   const filteredBoards = boards
-  .filter((board) =>
-    currentUser &&
-    board.members?.some((member) => member.userId === currentUser._id)
-  )
-  .filter((board) => {
-    const lowerCaseQuery = searchQuery.toLowerCase();
-    const lowerCaseName = board.name.toLowerCase();
-    return (
-      lowerCaseName.startsWith(lowerCaseQuery.slice(0, 3)) && // Match first 3 letters
-      lowerCaseName.includes(lowerCaseQuery) // Further matches
-    );
-  });
-
+    .filter(
+      (board) =>
+        currentUser &&
+        board.members?.some((member) => member.userId === currentUser._id)
+    )
+    .filter((board) => {
+      const lowerCaseQuery = searchQuery?.toLowerCase() || ""; // Ensure searchQuery is a string
+      const lowerCaseName = board.name?.toLowerCase() || ""; // Ensure board.name is a string
+      return (
+        lowerCaseName.startsWith(lowerCaseQuery.slice(0, 3)) && // Match first 3 letters
+        lowerCaseName.includes(lowerCaseQuery) // Further matches
+      );
+    });
 
   return (
     <div className="p-6">
@@ -156,18 +190,15 @@ const Boards = () => {
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
       />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {filteredBoards.length > 0 ? (
           filteredBoards.map((board) => (
             <BoardCard
               key={board._id}
               board={board}
-              onEdit={(board) => {
-                setEditBoard(board);
-                setIsEditModalOpen(true);
-              }}
               onDelete={deleteBoard}
               navigate={navigate}
+              onEdit={editBoard} // Pass the edit function
             />
           ))
         ) : (
@@ -187,15 +218,6 @@ const Boards = () => {
         setVisibility={setVisibility}
         theme={theme}
         setTheme={setTheme}
-        themeOptions={themeOptions}
-      />
-
-      <EditBoardModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        onSave={updateBoard}
-        editBoard={editBoard}
-        setEditBoard={setEditBoard}
         themeOptions={themeOptions}
       />
     </div>

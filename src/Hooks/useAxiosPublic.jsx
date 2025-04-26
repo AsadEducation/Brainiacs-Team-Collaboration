@@ -3,7 +3,7 @@ import axios from "axios";
 const axiosPublic = axios.create({
 
     baseURL: window.location.hostname === 'localhost'
-        ? 'http://localhost:5000'
+        ? `${import.meta.env.VITE_API_URL}`
         : 'https://brainiacs-server.vercel.app',
 
 })

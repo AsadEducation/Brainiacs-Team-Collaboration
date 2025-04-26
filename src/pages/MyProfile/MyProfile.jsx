@@ -7,7 +7,6 @@ const MyProfile = () => {
   const { currentUser } = useAuth();
   const axiosPublic = useAxiosPublic();
 
-
   useEffect(() => {
     if (!currentUser?.email) return;
 
@@ -24,7 +23,6 @@ const MyProfile = () => {
       .catch((err) => console.error("Profile fetch error:", err));
   }, [currentUser?.email, axiosPublic]);
 
-  
   if (!summary) return <p className="text-center">Loading...</p>;
 
   const {
@@ -45,12 +43,15 @@ const MyProfile = () => {
       <div className="bg-white border rounded-xl p-6 max-w-md mx-auto shadow-lg mb-10">
         <div className="flex justify-between items-center mb-2">
           <div className="flex gap-2 items-center">
-          <img
-                          className="w-10 h-10 rounded-full"
-                          src={currentUser.photoURL }
-                          alt="User"
-                        />
-          <span className="text-lg font-semibold"> {currentUser?.name || "User"}</span>
+            <img
+              className="w-10 h-10 rounded-full"
+              src={currentUser.photoURL} // Use the imported default image
+              alt={currentUser.displayName || "User"}
+            />
+            <span className="text-lg font-semibold">
+              {" "}
+              {currentUser?.displayName || "User"}
+            </span>
           </div>
           <span className="text-lg font-semibold text-secondary">
             Points: {points}
@@ -61,7 +62,10 @@ const MyProfile = () => {
           <p className="text-gray-700 font-medium">
             Current Badge:
             {currentBadge ? (
-              <span className="text-yellow-600 text-lg"> 🏅 {currentBadge.title}</span>
+              <span className="text-yellow-600 text-lg">
+                {" "}
+                🏅 {currentBadge.title}
+              </span>
             ) : (
               <span className="text-gray-500"> None yet</span>
             )}
@@ -87,7 +91,8 @@ const MyProfile = () => {
 
         <div className="flex justify-between text-sm text-gray-600 mt-4">
           <p>
-            Tasks Completed: <span className="font-medium">{completedCount}</span>
+            Tasks Completed:{" "}
+            <span className="font-medium">{completedCount}</span>
           </p>
         </div>
       </div>
@@ -106,7 +111,9 @@ const MyProfile = () => {
               className="w-24 h-24 mx-auto mb-4"
             />
             <h4 className="text-xl font-semibold text-center">{badge.title}</h4>
-            <p className="text-sm text-gray-600 text-center">{badge.description}</p>
+            <p className="text-sm text-gray-600 text-center">
+              {badge.description}
+            </p>
             <p className="text-center text-sm mt-2">
               {points >= badge.pointsRequired ? (
                 <span className="text-green-600 font-medium">Unlocked</span>

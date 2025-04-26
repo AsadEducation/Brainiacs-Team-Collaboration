@@ -1,7 +1,7 @@
-/* @import "tailwindcss"; */
-/* @plugin "daisyui"{
+@import "tailwindcss";
+@plugin "daisyui"{
     themes: myCustomTheme;
-  } */
+  }
 
 
   .custom-gradient-task-board {

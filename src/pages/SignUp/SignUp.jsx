@@ -23,7 +23,6 @@ const SignUp = () => {
   const [selectedFile, setSelectedFile] = useState(null); 
   const onSubmit = async (data) => {
     const { userName, email, password } = data;
-    const newUser = { name: userName, email, role: "user" };
 
     try {
       let photoURL = null;
@@ -35,26 +34,11 @@ const SignUp = () => {
           `${userName}_profile`
         );
         photoURL = uploadResponse.url; // Get the uploaded photo URL
-        newUser.photo = photoURL; // Add photo URL to the user object
       }
 
-      const res = await signUpUser(email, password);
-      console.log("Signup Success:", res.user);
+      // Sign up the user and save to the database
+      await signUpUser(email, password, userName, photoURL);
 
-      const response = await fetch("/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newUser),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to save user to the database");
-      }
-
-      const result = await response.json();
-      console.log("User Added to DB:", result);
       Swal.fire(`Welcome ${userName} to Brainiacs`).then(() => {
         navigate("/dashboard");
       });

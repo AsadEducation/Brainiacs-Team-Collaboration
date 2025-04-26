@@ -8,18 +8,19 @@ import DashboardLayout from "./Layouts/DashboardLayout";
 import Boards from "./pages/Boards/Boards.jsx";
 import NewTaskManagement from "./pages/TaskManagement/NewTaskManagement.jsx";
 import LeaderBoard from "./pages/LeaderBoardAndReview/LeaderBoard.jsx";
-import ActivityLog from './dashboard-pages/ActivityLog.jsx'
+
 import MyProfile from "./pages/MyProfile/MyProfile.jsx";
 import Messenger from "./dashboard-pages/Messenger/Messenger.jsx";
 import About from "./pages/About/About.jsx";
 import Services from "./pages/Services/Services.jsx";
 import Pricing from "./pages/Pricing/Pricing.jsx";
 import NotFound from "./pages/NotFound/NotFound.jsx";
+import ActivityLog from "./dashboard-pages/Activity Log/ActivityLog.jsx";
+import Settings from "./dashboard-pages/Settings/Settings.jsx";
 
 function App() {
   return (
     <Routes>
-
       <Route path="/" element={<MainLayout />}>
         <Route index element={<Home />} />
         <Route path="/about" element={<About />} />
@@ -36,15 +37,15 @@ function App() {
         <Route path="boards" element={<Boards />} />
         <Route path="leaderBoard" element={<LeaderBoard />} />
         <Route path="myProfile" element={<MyProfile />} />
-        <Route path="boards/:id" element={<NewTaskManagement />} />  
-        <Route path="activity-log" element={<ActivityLog/>} />
+        <Route path="boards/:id" element={<NewTaskManagement />} />
+        <Route path="activity-log" element={<ActivityLog />} />
         <Route path="messenger/:boardId" element={<Messenger />} />
         <Route path="messenger" element={<Messenger />} /> {/* Default route */}
+        <Route path="settings" element={<Settings />} /> {/* Default route */}
       </Route>
 
       {/* Catch-all route for 404 Not Found */}
       <Route path="*" element={<NotFound />} />
-
     </Routes>
   );
 }

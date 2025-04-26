@@ -1,68 +1,92 @@
+import React from "react";
 import CountUp from "react-countup";
 import { useInView } from "react-intersection-observer";
+import { motion } from "framer-motion";
+import { FaChartLine, FaRocket, FaComments, FaGlobeAsia } from "react-icons/fa";
+import Tilt from "react-parallax-tilt";
 
-import 'animate.css';
-import { useEffect, useState } from 'react';
+const statsData = [
+  {
+    id: 1,
+    icon: <FaChartLine className="text-4xl text-cyan-400" />,
+    value: 75,
+    suffix: "%",
+    text: "Faster project completion and better team coordination",
+  },
+  {
+    id: 2,
+    icon: <FaRocket className="text-4xl text-indigo-400" />,
+    value: 67,
+    suffix: "%",
+    text: "More productivity through Brainiacs vs email",
+  },
+  {
+    id: 3,
+    icon: <FaComments className="text-4xl text-pink-400" />,
+    value: 85,
+    suffix: "%",
+    text: "Teams experience better communication",
+  },
+  {
+    id: 4,
+    icon: <FaGlobeAsia className="text-4xl text-yellow-300" />,
+    value: 3,
+    suffix: "M+",
+    text: "Teams worldwide rely on Brainiacs",
+  },
+];
 
 const Statistics = () => {
+  const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
 
-    const boxStyle = "flex flex-col items-center bg-accent/20 border-2 rounded-lg  border-[#003C43] p-10 space-y-3 "
-
-    const [isVisible, setIsVisible] = useState(false);  // State to track visibility
-
-    useEffect(() => {
-        // Create an Intersection Observer to watch for when the element is visible on screen
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) {  // If the element is visible on the screen
-                    setIsVisible(true);        // Trigger the animation
-                }
-            });
-        });
-
-        return () => observer.disconnect();  
-    }, []);
-    const { ref, inView } = useInView({
-        threshold: 0.5,
-        triggerOnce: true,
-    })
-    return (
-        <div className={`bg-gradient-to-br from-secondary/20 via-white to-secondary/20 pb-10 bg-cover bg-right text-white px-5 py-10`}>
-            <div className="py-10 flex flex-col md:flex-row gap-5 md:gap-28">
-                <h1 className="text-xl md:text-3xl font-bold  text-primary ">Why Teams Trust Brainiacs for Seamless Collaboration & Productivity?</h1>
-                <div className="space-y-3">
-                    <h2 className="text-secondary text-sm md:text-base">Boost efficiency, enhance teamwork, and streamline projects with Brainiacs—your ultimate team collaboration solution.</h2>
-                    <button className="inline-block bg-secondary text-white px-6 py-2 rounded-lg font-semibold hover:bg-opacity-60 transition cursor-pointer">
-                        Get Started
-                    </button>
+  return (
+    <section className="px-4 sm:px-6 py-12 sm:py-20 text-white">
+      <div className="max-w-7xl mx-auto text-center space-y-4 mb-12 sm:mb-16">
+        <h2 className="text-3xl sm:text-4xl font-bold">
+          Why <span className="text-secondary">Teams Trust Brainiacs</span>
+        </h2>
+        <p className="text-base sm:text-lg max-w-md sm:max-w-xl mx-auto">
+          Empower your team with faster workflows, better communication, and
+          global collaboration.
+        </p>
+        <button className="mt-4 bg-secondary text-white font-semibold px-4 sm:px-6 py-2 rounded-lg transition">
+          Get Started
+        </button>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+        {statsData.map((item, index) => (
+          <motion.div
+            key={item.id}
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: index * 0.2 }}
+            viewport={{ once: true }}
+          >
+            <Tilt
+              glareEnable={true}
+              glareMaxOpacity={0.2}
+              scale={1.05}
+              className="w-full"
+            >
+              <div
+                ref={ref}
+                className="bg-white/10 backdrop-blur-lg border border-white/20 p-6 sm:p-8 rounded-2xl shadow-xl text-center space-y-4 hover:shadow-2xl transition duration-300"
+              >
+                <div className="flex items-center justify-center">
+                  {item.icon}
                 </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 text-primary gap-5 ">
-                <div className={boxStyle}>
-                    <h3 ref={ref} className="md:text-5xl text-4xl font-medium">{inView && (<CountUp end={75}></CountUp>)}%</h3>
-                    <h5 className="md:text-sm text-xs ">Businesses using Brainiacs experience faster project completion and improved team coordination</h5>
-                </div>
-
-                <div className={boxStyle}>
-                    <h3 ref={ref} className="md:text-5xl text-4xl font-medium">{inView && (<CountUp end={67}></CountUp>)}%</h3>
-                    <h5 className="md:text-sm text-xs ">Employees say collaborating on Brainiacs helps them be more productive than relying on emails alone.</h5>
-                </div>
-
-                <div className={boxStyle}>
-                    <h3 ref={ref} className="md:text-5xl text-4xl font-medium">{inView && (<CountUp end={85}></CountUp>)}%</h3>
-                    <h5 className="md:text-sm text-xs ">Teams that use Brainiacs' real-time messaging and task tracking experience better communication and reduced misalignment.</h5>
-                </div>
-
-                <div className={boxStyle}>
-                    <h3 ref={ref} className="md:text-5xl text-4xl font-medium">{inView && (<CountUp end={3}></CountUp>)}M+</h3>
-                    <h5 className="md:text-sm text-xs ">Teams worldwide rely on collaboration tools like Brainiacs to streamline workflows and enhance productivity.</h5>
-                </div>
-
-
-
-            </div>
-        </div>
-    );
+                <h3 className="text-3xl sm:text-4xl font-bold text-white">
+                  {inView && <CountUp end={item.value} duration={2} />}
+                  {item.suffix}
+                </h3>
+                <p className="text-xs sm:text-sm">{item.text}</p>
+              </div>
+            </Tilt>
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  );
 };
 
 export default Statistics;
