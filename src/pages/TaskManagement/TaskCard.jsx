@@ -19,25 +19,29 @@ const TaskCard = ({ task }) => {
   // completed done button clicking
   const handleTaskDone = async (e) => {
     e.stopPropagation();
-
+  
     const taskData = {
       taskId: task.id,
       taskTittle: task.taskTittle,
       email: currentUser?.email,
       completedAt: new Date(),
     };
-
+  
     try {
       const res = await axiosPublic.post('/completedTask', taskData);
       if (res.data.success) {
         toast.success("Task completed & point added!");
         setIsCompleted(true);
+  
+        // 🔥 REGENERATE Leaderboard
+        await axiosPublic.post('/leaderboard');
       }
     } catch (err) {
       console.error("Error completing task", err);
       toast.error("Something went wrong!");
     }
   };
+  
 
 
 
@@ -70,7 +74,7 @@ const TaskCard = ({ task }) => {
           <div className='flex justify-between items-center'>
             <h3 className="text-[12px] font-medium text-gray-900"> {taskTittle}</h3>
             <button
-            disabled={isCompleted}
+            // disabled={isCompleted}
             onClick={handleTaskDone}
               className={
              `flex items-center px-1 py-1 rounded-full 
