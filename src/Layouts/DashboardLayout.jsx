@@ -35,8 +35,12 @@ const DashboardLayout = () => {
 
   useEffect(() => {
     // Ensure the client connects to the correct server URL
-    socket.current = io("http://localhost:5000"); // Replace with your server's URL if deployed
-
+    socket.current = io("https://brainiacs-server.onrender.com", {
+      transports: ["websocket"],
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+    });
     // Identify the user to the server
     if (currentUser?.email) {
       socket.current.emit("identify", currentUser.email);
@@ -308,7 +312,10 @@ const DashboardLayout = () => {
                   </button>
                 </li>
               </ul>
-              <JoinRequests joinRequests={joinRequests} setJoinRequests={setJoinRequests} />
+              <JoinRequests
+                joinRequests={joinRequests}
+                setJoinRequests={setJoinRequests}
+              />
             </div>
           </div>
         </div>

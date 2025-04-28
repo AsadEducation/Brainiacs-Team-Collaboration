@@ -13,7 +13,8 @@ const JoinRequests = ({ joinRequests, setJoinRequests }) => {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    socketRef.current = io("http://localhost:5000", {
+    socketRef.current = io("https://brainiacs-server.onrender.com", {
+      transports: ["websocket"],
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
