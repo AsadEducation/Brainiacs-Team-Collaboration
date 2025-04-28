@@ -17,6 +17,8 @@ import Pricing from "./pages/Pricing/Pricing.jsx";
 import NotFound from "./pages/NotFound/NotFound.jsx";
 import ActivityLog from "./dashboard-pages/Activity Log/ActivityLog.jsx";
 import Settings from "./dashboard-pages/Settings/Settings.jsx";
+import PrivateRoute from "./Routes/PrivateRoute"; // Import PrivateRoute
+import PublicRoute from "./Routes/PublicRoute"; // Import PublicRoute
 
 function App() {
   return (
@@ -26,13 +28,34 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/services" element={<Services />} />
         <Route path="/pricing" element={<Pricing />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/login" element={<Login />} />
+        <Route
+          path="/signup"
+          element={
+            <PublicRoute>
+              <SignUp />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
       </Route>
 
       {/* dashboard routes  */}
 
-      <Route path="/dashboard" element={<DashboardLayout />}>
+      <Route
+        path="/dashboard"
+        element={
+          <PrivateRoute>
+            <DashboardLayout />
+          </PrivateRoute>
+        }
+      >
         <Route index element={<Navigate to="boards" replace />} />
         <Route path="boards" element={<Boards />} />
         <Route path="leaderBoard" element={<LeaderBoard />} />

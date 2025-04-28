@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FaHome, FaImage } from "react-icons/fa";
 import { LuFileUp } from "react-icons/lu";
 import { RiMenu2Line } from "react-icons/ri";
@@ -18,11 +18,92 @@ import {
   FaSignOutAlt,
 } from "react-icons/fa";
 import Swal from "sweetalert2"; // Import Swal
+import useAxiosPublic from "../Hooks/useAxiosPublic"; // Import useAxiosPublic
+import { io } from "socket.io-client";
+import { toast } from "react-toastify"; // Keep toast for notifications
+import "react-toastify/dist/ReactToastify.css"; // Import Toastify styles
+import JoinRequests from "../components/JoinRequests"; // Import JoinRequests
 
 const DashboardLayout = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
   const { currentUser, signOutUser } = useAuth(); // Destructure signOutUser
   const location = useLocation(); // Get current location
+  const axiosPublic = useAxiosPublic();
+  const [joinRequests, setJoinRequests] = useState([]); // State to store join requests
+
+  const socket = useRef(null);
+
+  useEffect(() => {
+    // Ensure the client connects to the correct server URL
+    socket.current = io("http://localhost:5000"); // Replace with your server's URL if deployed
+
+    // Identify the user to the server
+    if (currentUser?.email) {
+      socket.current.emit("identify", currentUser.email);
+    }
+
+    // Fetch join requests initially
+    const fetchJoinRequests = async () => {
+      try {
+        const response = await axiosPublic.get("/join-requests", {
+          params: { email: currentUser.email },
+        });
+        setJoinRequests(response.data);
+      } catch (error) {
+        console.error("Error fetching join requests:", error);
+      }
+    };
+
+    fetchJoinRequests();
+
+    // Listen for real-time join request updates
+    socket.current.on("join-requests-updated", fetchJoinRequests);
+
+    // Listen for real-time join request events
+    socket.current.on("join-request-sent", ({ receiverEmail, joinRequest }) => {
+      if (currentUser?.email === receiverEmail) {
+        setJoinRequests((prev) => [...prev, joinRequest]); // Update join requests in real-time
+
+        // Show a toast notification for the new join request
+        toast.info(
+          `New join request from ${joinRequest.senderName} for board: ${joinRequest.boardName}`
+        );
+      }
+    });
+
+    // Listen for join request status updates
+    socket.current.on("join-request-status", ({ status, boardName }) => {
+      if (status === "accepted") {
+        toast.success(
+          `Your join request for board "${boardName}" has been accepted.`
+        );
+      } else if (status === "rejected") {
+        toast.error(
+          `Your join request for board "${boardName}" has been rejected.`
+        );
+      }
+    });
+
+    // Listen for receiver's action on the join request
+    socket.current.on(
+      "join-request-action",
+      ({ action, senderName, boardName }) => {
+        if (action === "accepted") {
+          toast.info(
+            `You accepted ${senderName}'s join request for board: ${boardName}`
+          );
+        } else if (action === "rejected") {
+          toast.info(
+            `You rejected ${senderName}'s join request for board: ${boardName}`
+          );
+        }
+      }
+    );
+
+    return () => {
+      socket.current.disconnect();
+    };
+  }, [currentUser, axiosPublic]);
 
   const handleLogOut = () => {
     Swal.fire({
@@ -38,11 +119,19 @@ const DashboardLayout = () => {
         signOutUser()
           .then((res) => {
             console.log("Success", res);
-            Swal.fire("Logged Out!", "You have been logged out successfully.", "success");
+            Swal.fire(
+              "Logged Out!",
+              "You have been logged out successfully.",
+              "success"
+            );
           })
           .catch((err) => {
             console.log("Error", err);
-            Swal.fire("Error!", "Something went wrong. Please try again.", "error");
+            Swal.fire(
+              "Error!",
+              "Something went wrong. Please try again.",
+              "error"
+            );
           });
       }
     });
@@ -96,7 +185,7 @@ const DashboardLayout = () => {
             aria-label="close sidebar"
             className="drawer-overlay"
           ></label>
-          <div className="h-full p-3 space-y-2 w-60 dark:bg-gray-50 dark:text-gray-800">
+          <div className="h-full p-3 space-y-2 w-60 dark:bg-gray-50 dark:text-gray-800 relative">
             <div className="flex items-center p-2 space-x-4">
               <img
                 src={currentUser?.photoURL}
@@ -219,6 +308,7 @@ const DashboardLayout = () => {
                   </button>
                 </li>
               </ul>
+              <JoinRequests joinRequests={joinRequests} setJoinRequests={setJoinRequests} />
             </div>
           </div>
         </div>

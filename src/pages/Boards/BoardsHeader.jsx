@@ -23,7 +23,7 @@ const BoardsHeader = ({ onCreateBoard, searchQuery, setSearchQuery, setBoards })
           placeholder="Search boards..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="px-4 py-2 w-full focus:outline-none"
+          className="px-4 py-2 w-full border-none focus:outline-none"
         />
         <button
           onClick={handleSearch}

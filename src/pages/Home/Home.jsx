@@ -13,7 +13,7 @@ const Home = () => {
     return (
         <div >
             <Banner />
-            <EidSection/>
+            {/* <EidSection/> */}
             <Features />
             <Statistics></Statistics>
             <Review></Review>

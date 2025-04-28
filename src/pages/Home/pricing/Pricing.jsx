@@ -79,14 +79,14 @@ const Pricing = () => {
           <h2 className="text-4xl font-extrabold text-secondary">
             Value That Scales With You
           </h2>
-          <p className="mt-2 text-white text-sm">
+          <p className="mt-2  text-sm">
             Change your plan according to your needs
           </p>
         </div>
 
         <div className="flex justify-center mb-10 space-x-3 items-center">
           <span
-            className="text-sm text-white font-medium cursor-pointer"
+            className="text-sm  font-medium cursor-pointer"
             onClick={() => setIsYearly(false)}
           >
             Monthly
@@ -94,7 +94,7 @@ const Pricing = () => {
           <button
             onClick={() => setIsYearly(!isYearly)}
             className={`w-12 h-6 rounded-full p-1 flex items-center transition duration-300 cursor-pointer ${
-              isYearly ? "bg-primary" : "bg-primary-300"
+              isYearly ? "bg-primary" : "bg-black"
             }`}
           >
             <span
@@ -104,7 +104,7 @@ const Pricing = () => {
             ></span>
           </button>
           <span
-            className="text-sm text-white font-medium cursor-pointer"
+            className="text-sm font-medium cursor-pointer"
             onClick={() => setIsYearly(true)}
           >
             Yearly
@@ -117,7 +117,7 @@ const Pricing = () => {
           animate="visible"
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10"
         >
-          <AnimatePresence mode="wait">
+          <AnimatePresence>
             {pricingPlans.map((plan, index) => (
               <motion.div
                 key={index + (isYearly ? "Y" : "M")}
