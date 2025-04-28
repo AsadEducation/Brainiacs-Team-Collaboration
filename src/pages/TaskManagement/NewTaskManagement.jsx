@@ -86,11 +86,14 @@ export default function NewTaskManagement() {
 
   useEffect(() => {
     // Connect to WebSocket server
-    socket.current = io("http://localhost:5000", {
+    socket.current = io("https://brainiacs-server.onrender.com", {
+      transports: ["websocket"],
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
     });
+
+
 
     // Connection status logging
     socket.current.on("connect", () => {
