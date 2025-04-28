@@ -40,8 +40,10 @@ const AuthProvider = ({ children }) => {
     };
 
     // Save user to the database
-    // await axios.post("${import.meta.env.VITE_API_URL}/users", newUser);
     await axios.post(`${import.meta.env.VITE_API_URL}/users`, newUser);
+
+    // Manually update currentUser state
+    setCurrentUser(newUser);
 
     return user;
   };

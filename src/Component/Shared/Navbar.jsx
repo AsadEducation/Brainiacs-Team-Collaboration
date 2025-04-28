@@ -67,11 +67,19 @@ const Navbar = () => {
         signOutUser()
           .then((res) => {
             console.log("Success", res);
-            Swal.fire("Logged Out!", "You have been logged out successfully.", "success");
+            Swal.fire(
+              "Logged Out!",
+              "You have been logged out successfully.",
+              "success"
+            );
           })
           .catch((err) => {
             console.log("Error", err);
-            Swal.fire("Error!", "Something went wrong. Please try again.", "error");
+            Swal.fire(
+              "Error!",
+              "Something went wrong. Please try again.",
+              "error"
+            );
           });
       }
     });
@@ -159,12 +167,13 @@ const Navbar = () => {
               />
             </button>
             {dropdownOpen && (
-              <div className="absolute right-0 top-14 w-48 bg-white border rounded-lg shadow-lg dropdown">
+              <div className="absolute right-0 top-14 w-48 bg-white rounded-lg shadow-lg dropdown">
                 <div className="flex flex-col justify-center px-4 py-2 text-sm text-gray-700">
-                  <p>{currentUser.displayName}</p>
-                  <p className="text-xs">{currentUser.email}</p>
+                  <Link to="/dashboard/myProfile">
+                    <p>{currentUser.displayName}</p>
+                    <p className="text-xs">{currentUser.email}</p>
+                  </Link>
                 </div>
-                <hr />
                 <Link
                   to="/dashboard/boards"
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -172,10 +181,10 @@ const Navbar = () => {
                   Dashboard
                 </Link>
                 <Link
-                  to="/dashboard/myProfile"
+                  to="/dashboard/settings"
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 >
-                  Profile
+                  Settings
                 </Link>
                 <button
                   onClick={handleLogOut}
