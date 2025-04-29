@@ -1,6 +1,8 @@
+// axiosPublic.js
 import axios from "axios";
 
 const axiosPublic = axios.create({
+  baseURL: "http://localhost:5000", 
   baseURL:
     window.location.hostname === "localhost"
       ? `${import.meta.env.VITE_API_URL}`

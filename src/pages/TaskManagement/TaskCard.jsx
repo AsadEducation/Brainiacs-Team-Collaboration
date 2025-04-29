@@ -16,7 +16,7 @@ const TaskCard = ({ task }) => {
   const { currentUser } = useAuth();
 
 
-  // completed done button clicking
+  
   const handleTaskDone = async (e) => {
     e.stopPropagation();
   
@@ -33,7 +33,6 @@ const TaskCard = ({ task }) => {
         toast.success("Task completed & point added!");
         setIsCompleted(true);
   
-        // 🔥 REGENERATE Leaderboard
         await axiosPublic.post('/leaderboard');
       }
     } catch (err) {
