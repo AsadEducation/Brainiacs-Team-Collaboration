@@ -167,7 +167,9 @@ const Boards = () => {
       });
     }
   };
-
+  console.log('Boards type:', Array.isArray(boards)); // true/false
+  console.log('Boards data:', boards);
+  
   const filteredBoards = boards
     .filter(
       (board) =>

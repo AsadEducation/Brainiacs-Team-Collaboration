@@ -4,3 +4,51 @@
     { "id": 3, "title": "Workshop Attendance", "status": "completed" }
   ]
   
+
+   {/* right side */}
+                            {/* <div className="flex flex-col space-y-2">
+                                <button
+                                    className="px-16 py-2 rounded-lg text-black bg-gray-200 hover:bg-gray-300 flex items-center justify-start gap-3">
+                                    <GoPersonAdd />
+                                    Join
+                                </button>
+                                <button
+                                    className="px-16 py-2 rounded-lg text-black bg-gray-200 hover:bg-gray-300 flex items-center justify-start gap-3">
+                                    <BsPerson />
+                                    Members
+                                </button>
+
+                                <button
+                                    className="px-16 py-2 rounded-lg text-black bg-gray-200 hover:bg-gray-300 flex items-center justify-start gap-3">
+                                    <IoMdPricetag />
+                                    Labels
+                                </button>
+
+                                <button
+                                    className="px-16 py-2 rounded-lg text-black bg-gray-200 hover:bg-gray-300 flex items-center justify-start gap-3">
+                                    <TbChecklist />
+                                    Checklist
+                                </button>
+
+                                <button
+                                    className="px-16 py-2 rounded-lg text-black bg-gray-200 hover:bg-gray-300 flex items-center justify-start gap-3">
+                                    <RiAttachment2 />
+                                    Attachment
+                                </button>
+
+                                <button
+                                    className="px-16 py-2 rounded-lg text-black bg-gray-200 hover:bg-gray-300 flex items-center justify-start gap-3">
+                                    <IoLocationOutline />
+                                    Location
+                                </button>
+
+                            </div> */}
+
+                             {/* Button */}
+
+                             {/* <div className="mt-4 flex justify-start space-x-2">
+
+                            <button className="px-4 py-2 text-white bg-[#2E5077] rounded-lg">
+                                Save
+                            </button>
+                        </div> */}

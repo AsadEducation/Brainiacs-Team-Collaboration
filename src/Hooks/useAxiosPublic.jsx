@@ -1,15 +1,12 @@
+// axiosPublic.js
 import axios from "axios";
 
 const axiosPublic = axios.create({
-
-    baseURL: window.location.hostname === 'localhost'
-        ? `${import.meta.env.VITE_API_URL}`
-        : 'https://brainiacs-server.vercel.app',
-
-})
+  baseURL: "http://localhost:5000", // Always use localhost:5000
+});
 
 const useAxiosPublic = () => {
-    return axiosPublic;
+  return axiosPublic;
 };
 
 export default useAxiosPublic;
