@@ -4,7 +4,7 @@ import Footer from "../Component/Shared/Footer/Footer";
 
 const MainLayout = () => {
   return (
-    <div className="bg-primary">
+    <div>
       <Navbar />
       <div className="min-h-[calc(100vh-68px)]">
         <Outlet />

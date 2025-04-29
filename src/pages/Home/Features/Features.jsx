@@ -42,7 +42,7 @@ export default function Features() {
       {featuresData.map((feature) => (
         <motion.div
           key={feature.id}
-          className="snap-start grid grid-cols-1 md:grid-cols-2 gap-10 items-center h-screen px-4"
+          className="snap-start grid grid-cols-1 md:grid-cols-2 items-center h-screen px-4"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -52,7 +52,7 @@ export default function Features() {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ duration: 0.6 }}
-            className="h-[300px] md:h-[400px] w-full"
+            className="mx-auto h-[50%] w-[50%] flex items-center justify-center"
           >
             <img
               src={feature.image}
@@ -60,12 +60,10 @@ export default function Features() {
               className="w-full h-full object-cover rounded-2xl shadow-lg"
             />
           </motion.div>
-          <div className="text-white space-y-4 text-center md:text-left">
+          <div className=" space-y-4 text-center md:text-left">
             <h3 className="text-2xl md:text-3xl font-bold">{feature.title}</h3>
-            <p className="text-gray-300 text-base md:text-lg">
-              {feature.description}
-            </p>
-            <button className="mt-4 text-blue-400 hover:text-blue-300 transition">
+            <p className=" text-base md:text-lg">{feature.description}</p>
+            <button className="mt-4 text-blue-800 hover:text-blue-300 transition">
               Learn more →
             </button>
           </div>

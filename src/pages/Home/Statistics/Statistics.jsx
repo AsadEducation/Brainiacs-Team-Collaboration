@@ -40,7 +40,7 @@ const Statistics = () => {
   const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
 
   return (
-    <section className="px-4 sm:px-6 py-12 sm:py-20 text-white">
+    <section className="px-4 sm:px-6 py-12 sm:py-20 ">
       <div className="max-w-7xl mx-auto text-center space-y-4 mb-12 sm:mb-16">
         <h2 className="text-3xl sm:text-4xl font-bold">
           Why <span className="text-secondary">Teams Trust Brainiacs</span>
@@ -49,7 +49,7 @@ const Statistics = () => {
           Empower your team with faster workflows, better communication, and
           global collaboration.
         </p>
-        <button className="mt-4 bg-secondary text-white font-semibold px-4 sm:px-6 py-2 rounded-lg transition">
+        <button className="mt-4 bg-secondary  font-semibold px-4 sm:px-6 py-2 rounded-lg transition">
           Get Started
         </button>
       </div>
@@ -75,7 +75,7 @@ const Statistics = () => {
                 <div className="flex items-center justify-center">
                   {item.icon}
                 </div>
-                <h3 className="text-3xl sm:text-4xl font-bold text-white">
+                <h3 className="text-3xl sm:text-4xl font-bold ">
                   {inView && <CountUp end={item.value} duration={2} />}
                   {item.suffix}
                 </h3>
