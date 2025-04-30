@@ -87,7 +87,6 @@ const Footer = () => {
   <img className='w-4 h-4 bg-' src="https://i.ibb.co.com/QjHv0n95/twitter.png" alt="" />
 </div>
 
- 
   <nav className="grid-flow-col gap-4 md:place-self-center md:justify-self-end font-bold ">
    <Link  to="/about" className='hover:text-accent cursor-pointer'>About Us</Link>
    <Link  to="/services"  className='hover:text-accent cursor-pointer'>Services</Link>
