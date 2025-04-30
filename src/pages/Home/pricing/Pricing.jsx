@@ -79,7 +79,7 @@ const Pricing = () => {
           <h2 className="text-4xl font-extrabold text-secondary">
             Value That Scales With You
           </h2>
-          <p className="mt-2  text-sm">
+          <p className="mt-4  text-md ">
             Change your plan according to your needs
           </p>
         </div>
@@ -127,7 +127,7 @@ const Pricing = () => {
                 className={`relative rounded-2xl p-8 shadow-xl transition-all duration-300 
                   ${
                     plan.isBestDeal
-                      ? "border-2 border-blue-500"
+                      ? "border-2 border-[#4da1a9]"
                       : "border border-slate-200"
                   } 
                   ${
@@ -138,7 +138,7 @@ const Pricing = () => {
                 `}
               >
                 {plan.isBestDeal && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-600 to-purple-500 text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg z-10">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#2e5077] to-[#5a79a1] text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg z-10">
                     Most Popular
                   </div>
                 )}
@@ -182,8 +182,8 @@ const Pricing = () => {
                   className={`relative group w-full px-5 py-2.5 text-sm font-semibold text-white
                     ${
                       isYearly
-                        ? "bg-gradient-to-r from-indigo-600 to-purple-600"
-                        : "bg-gradient-to-r from-primary to-secondary"
+                        ? "bg-gradient-to-r from-[#2e5077] to-[#5a79a1]"
+                        : "bg-gradient-to-r from-[#4da1a9] to-[#7fc6cc]"
                     } rounded-md shadow-md overflow-hidden`}
                 >
                   <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300 blur-sm"></span>

@@ -86,10 +86,19 @@ const TaskCard = ({ task }) => {
 
           </div>
 
-          {/* Date display */}
-          {task.startDate && task.dueDate && (
-            <div className="text-[10px] text-gray-500 mt-1">
-              📅 {task.startDate} → {task.dueDate}
+         {/* Display dates if they exist */}
+         {(task.startDate || task.dueDate) && (
+            <div className="mt-2 text-xs text-gray-600">
+              {task.startDate && task.startTime && (
+                <div>
+                  <span className="font-medium">Start:</span> {task.startDate} {task.startTime}
+                </div>
+              )}
+              {task.dueDate && task.dueTime && (
+                <div>
+                  <span className="font-medium">Due:</span> {task.dueDate} {task.dueTime}
+                </div>
+              )}
             </div>
           )}
 
@@ -136,7 +145,8 @@ const TaskCard = ({ task }) => {
       </div>
 
       <TaskModal task={task} ></TaskModal>
-
+      
+     
       <ToastContainer />
     </>
   );
