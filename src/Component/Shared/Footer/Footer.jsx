@@ -87,24 +87,11 @@ const Footer = () => {
   <img className='w-4 h-4 bg-' src="https://i.ibb.co.com/QjHv0n95/twitter.png" alt="" />
 </div>
 
-  {/* <div className="flex space-x-4">
-             {[
-              { icon: <FaFacebookF />, color: 'bg-white text-[#1877F2]' },
-              { icon: <IoLogoTwitter />, color: 'bg-white text-[#1DA1F2]' },
-              { icon: <FaLinkedinIn />, color: 'bg-white text-[#0077B5]' },
-            ].map((item, i) => (
-              <button
-                key={i}
-                className={`w-10 h-10 rounded-full flex items-center justify-center text-xl hover:scale-110 transition ${item.color}`}
-              >
-                {item.icon}
-              </button>
-            ))}
-          </div> */}
+ 
   <nav className="grid-flow-col gap-4 md:place-self-center md:justify-self-end font-bold ">
    <Link  to="/about" className='hover:text-accent cursor-pointer'>About Us</Link>
    <Link  to="/services"  className='hover:text-accent cursor-pointer'>Services</Link>
-   <Link   to="/pricing"  className='hover:text-accent cursor-pointer'>Pricing</Link>
+   <Link  to="/pricing"  className='hover:text-accent cursor-pointer'>Pricing</Link>
   </nav>
   </div>
 </footer>
