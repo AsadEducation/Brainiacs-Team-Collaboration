@@ -86,14 +86,12 @@ export default function NewTaskManagement() {
 
   useEffect(() => {
     // Connect to WebSocket server
-    socket.current = io("https://brainiacs-server.onrender.com", {
+    socket.current = io(`${import.meta.env.VITE_API_URL}`, {
       transports: ["websocket"],
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
     });
-
-
 
     // Connection status logging
     socket.current.on("connect", () => {
@@ -237,35 +235,17 @@ export default function NewTaskManagement() {
 
   //   siam vai's code starts here
   const addMember = async (member) => {
-    // Log the payload for debugging
     console.log("Sending join request with payload:", {
       boardId: id,
-      boardName: name,
+      boardName: board?.name,
       senderId: currentUser?._id,
       senderName: currentUser?.displayName,
-      senderPhotoURL: member.photoURL,
+      senderPhotoURL: currentUser?.photoURL,
+      receiverName: member.displayName || member.name, // Correctly using receiverName
+      receiverPhotoURL: member.photoURL, // Correctly using receiverPhotoURL
       receiverId: member.userId,
       receiverEmail: member.email,
     });
-
-    // Validate the payload before sending
-    if (
-      !id ||
-      !board?.name ||
-      !currentUser?._id ||
-      !currentUser?.displayName ||
-      !member.photoURL ||
-      !member.userId ||
-      !member.email
-    ) {
-      console.error("Invalid payload for join request");
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Failed to send join request. Missing required fields.",
-      });
-      return;
-    }
 
     try {
       const response = await axiosPublic.post("/join-requests", {
@@ -274,6 +254,8 @@ export default function NewTaskManagement() {
         senderId: currentUser?._id,
         senderName: currentUser?.displayName,
         senderPhotoURL: currentUser?.photoURL,
+        receiverName: member.displayName || member.name, // Correctly using receiverName
+        receiverPhotoURL: member.photoURL, // Correctly using receiverPhotoURL
         receiverId: member.userId,
         receiverEmail: member.email,
       });
@@ -286,12 +268,9 @@ export default function NewTaskManagement() {
         joinRequest: savedRequest,
       });
 
-      // Show success toast notification
       toast.success(`Join request sent to ${member.name}.`);
     } catch (error) {
       console.error("Error sending join request:", error);
-
-      // Show error toast notification
       toast.error("Failed to send join request. Please try again.");
     }
   };

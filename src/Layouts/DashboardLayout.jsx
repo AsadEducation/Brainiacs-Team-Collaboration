@@ -35,7 +35,7 @@ const DashboardLayout = () => {
 
   useEffect(() => {
     // Ensure the client connects to the correct server URL
-    socket.current = io("https://brainiacs-server.onrender.com", {
+    socket.current = io(`${import.meta.env.VITE_API_URL}`, {
       transports: ["websocket"],
       reconnection: true,
       reconnectionAttempts: 5,
