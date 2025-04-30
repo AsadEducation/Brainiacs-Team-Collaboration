@@ -20,7 +20,7 @@ const Review = () => {
         {reviewData.map((review, index) => (
           <div
             key={index}
-            className="bg-gradient-to-r from-[#2e5077] to-[#5a79a1] hover:from-[#2e5077] hover:to-[#5a79a1] text-white shadow-lg rounded-xl px-4 md:px-8 py-6 mx-2 md:mx-4  max-w-[300px] md:max-w-[500px] h-[320px] md:h-[300px] border border-primary/20 hover:scale-105 hover:shadow-2xl transition-all duration-500 ease-in-out transform"
+            className="bg-gradient-to-r from-[#2e5077] to-[#5a79a1] hover:from-[#2e5077] hover:to-[#5a79a1] text-white shadow-lg rounded-xl px-4 md:px-8 py-6 mx-2 md:mx-4  max-w-[300px] md:max-w-[500px] h-[320px] md:h-[300px] border border-primary/20  hover:shadow-2xl transition-all duration-500 ease-in-out transform"
           >
             <p className="text-xs sm:text-sm md:text-base text-gray-200 mb-4 leading-relaxed">
               "{review.reviewText}"

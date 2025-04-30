@@ -182,6 +182,9 @@ const DashboardLayout = () => {
           </div>
         </div>
 
+        {/* Ai bot chatbox */}
+        <ChatBox></ChatBox>
+
         {/* Sidebar */}
         <div className="drawer-side ">
           <label
