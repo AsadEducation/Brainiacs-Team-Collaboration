@@ -80,8 +80,7 @@ export default function ColumnsSection({
                     )}
                 </div>
                 
-                {/* Ai bot chatbox */}
-                <ChatBox></ChatBox>
+                
             </div>
             {createPortal(
                 <DragOverlay dropAnimation={{ duration: 200 }}>
