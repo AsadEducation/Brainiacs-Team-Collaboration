@@ -49,9 +49,9 @@ const Faq = () => {
   const column2 = faqData.slice(Math.ceil(faqData.length / 2));
 
   return (
-    <div className="bg-[#2E5077] p-8">
+    <div className=" p-8">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-4xl font-bold text-center text-white mb-12 mt-10">
+        <h2 className="text-4xl font-bold text-center text-secondary  mb-12 mt-10">
           Frequently Asked Questions
         </h2>
 

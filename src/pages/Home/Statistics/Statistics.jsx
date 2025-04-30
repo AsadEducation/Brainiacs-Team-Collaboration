@@ -41,7 +41,7 @@ const Statistics = () => {
 
   return (
     <section className="px-4 sm:px-6 py-12 sm:py-20 ">
-      <div className="max-w-7xl mx-auto text-center space-y-4 mb-12 sm:mb-16">
+      <div className="max-w-7xl mx-auto text-center space-y-4 mb-20 sm:mb-16">
         <h2 className="text-3xl sm:text-4xl font-bold">
           Why <span className="text-secondary">Teams Trust Brainiacs</span>
         </h2>
@@ -49,9 +49,7 @@ const Statistics = () => {
           Empower your team with faster workflows, better communication, and
           global collaboration.
         </p>
-        <button className="mt-4 bg-secondary  font-semibold px-4 sm:px-6 py-2 rounded-lg transition">
-          Get Started
-        </button>
+        
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
         {statsData.map((item, index) => (
