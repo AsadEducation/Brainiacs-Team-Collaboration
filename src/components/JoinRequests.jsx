@@ -13,7 +13,7 @@ const JoinRequests = ({ joinRequests, setJoinRequests }) => {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    socketRef.current = io("https://brainiacs-server.onrender.com", {
+    socketRef.current = io(`${import.meta.env.VITE_API_URL}`, {
       transports: ["websocket"],
       reconnection: true,
       reconnectionAttempts: 5,
@@ -101,7 +101,9 @@ const JoinRequests = ({ joinRequests, setJoinRequests }) => {
         try {
           await axiosPublic.patch(`/join-requests/${requestId}`, { status });
 
-          setJoinRequests((prev) => prev.filter((req) => req._id !== requestId));
+          setJoinRequests((prev) =>
+            prev.filter((req) => req._id !== requestId)
+          );
 
           Swal.fire({
             icon: "success",
@@ -138,7 +140,8 @@ const JoinRequests = ({ joinRequests, setJoinRequests }) => {
               <div className="flex flex-col">
                 <div>
                   <p className="text-sm font-medium">
-                    {request.senderName} invited you to join: {request.boardName}
+                    {request.senderName} invited you to join:{" "}
+                    {request.boardName}
                   </p>
                   <p className="text-xs text-gray-500">
                     {new Date(request.createdAt).toLocaleString()}
