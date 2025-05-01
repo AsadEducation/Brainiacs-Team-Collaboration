@@ -49,7 +49,7 @@ const Faq = () => {
   const column2 = faqData.slice(Math.ceil(faqData.length / 2));
 
   return (
-    <div className=" p-8">
+    <div className=" p-8 mb-10">
       <div className="max-w-6xl mx-auto">
         <h2 className="text-4xl font-bold text-center text-secondary  mb-12 mt-10">
           Frequently Asked Questions
