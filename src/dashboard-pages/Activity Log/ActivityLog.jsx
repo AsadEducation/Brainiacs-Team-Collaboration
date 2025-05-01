@@ -53,7 +53,7 @@ import useActivity from "../../Hooks/useActivity";
 
 const ActivityLog = () => {
 
-  const { activities } = useActivity(); console.log(activities);
+  const { activities } = useActivity(); //console.log(activities);
 
 
 
@@ -62,20 +62,14 @@ const ActivityLog = () => {
 
       {activities.map((activity, index) => (
         <div key={activity._id} className="mb-8">
-          <h3 className="text-gray-500 font-semibold my-4">{activity.time}</h3>
-          <div className="border-l-2 border-gray-300 pl-4">
-            <div className="mb-4 p-3 bg-white shadow rounded-lg">
-              <p className="text-gray-700 font-medium">
-                {activity.currentUser.name} {activity.message}
-              </p>
-              {/* <p className="text-xs text-gray-400">{activity.time}</p> */}
-              {activity.currentUser.role && (
-                <p className="text-xs text-gray-400 mt-1">
-                  Role: <span className="font-medium">{activity.currentUser.role}</span>
-                </p>
-              )}
-            </div>
+          
+          <div className="mb-4 p-3 bg-white shadow rounded-lg">
+            <p className="text-gray-700 font-medium">
+              {activity.message}
+            </p>
+
           </div>
+          {/* </div> */}
         </div>
       ))}
     </div>
