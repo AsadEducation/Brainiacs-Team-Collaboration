@@ -30,8 +30,16 @@ const Login = () => {
         navigate("/dashboard"); // Redirect to dashboard page after alert
       });
     } catch (err) {
-      console.error("error", err);
-      Swal.fire("Login failed. Please check your credentials and try again.");
+      console.error("Login error:", err);
+      let errorMessage = "Login failed. Please check your credentials and try again.";
+      if (err.code === "auth/invalid-email") {
+        errorMessage = "Invalid email format. Please enter a valid email.";
+      } else if (err.code === "auth/user-not-found") {
+        errorMessage = "No user found with this email. Please sign up first.";
+      } else if (err.code === "auth/wrong-password") {
+        errorMessage = "Incorrect password. Please try again.";
+      }
+      Swal.fire(errorMessage);
     }
   };
 

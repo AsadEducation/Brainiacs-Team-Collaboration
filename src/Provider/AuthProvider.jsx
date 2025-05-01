@@ -53,7 +53,10 @@ const AuthProvider = ({ children }) => {
   };
 
   const logInUser = (email, password) => {
-    return signInWithEmailAndPassword(auth, email, password);
+    return signInWithEmailAndPassword(auth, email, password).catch((error) => {
+      console.error("Error during login:", error);
+      throw error; // Propagate the error for handling in the calling function
+    });
   };
 
   const updateUser = (name, photo) => {
