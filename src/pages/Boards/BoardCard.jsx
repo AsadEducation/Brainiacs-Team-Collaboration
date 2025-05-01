@@ -8,7 +8,6 @@ const BoardCard = ({ board, onDelete, navigate, onEdit }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
-  const fallbackImage = "https://via.placeholder.com/150";
 
   const toggleMenu = (e) => {
     e.stopPropagation();
@@ -56,7 +55,7 @@ const BoardCard = ({ board, onDelete, navigate, onEdit }) => {
           {board.members?.slice(0, 3).map((member, i) => (
             <img
               key={i}
-              src={member.photoURL || fallbackImage}
+              src={member.photoURL}
               className="w-6 h-6 rounded-full border-2 border-white -ml-2"
               alt="member"
             />
