@@ -71,8 +71,7 @@ const Footer = () => {
     //   </div>
     // </footer>
 
-
-    <footer className="border-gray-300 border-t mt-10 mb-5 pt-5">
+    <footer className="border-gray-300 border-t  mb-5 pt-5">
   <div className='footer sm:footer-horizontal max-w-7xl mx-auto   text-black items-center p-4'>
   <aside className="grid-flow-col items-center ">
      <Link to="/" className="text-3xl font-bold leading-none">
