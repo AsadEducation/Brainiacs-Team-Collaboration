@@ -1,30 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import {
-  FaEllipsisV,
-  FaFileUpload,
-  FaImage,
-  FaPhoneAlt,
-  FaPoll,
-  FaVideo,
-  FaArrowLeft, // Import icons
-  FaArrowRight, // Import icons
-} from "react-icons/fa";
-import { FaCirclePlus } from "react-icons/fa6";
-import { AiOutlineSend } from "react-icons/ai";
-import useAuth from "../../Hooks/useAuth"; // Import useAuth
-import { MdEmojiEmotions } from "react-icons/md";
-import axios from "axios"; // Import axios
+import useAuth from "../../Hooks/useAuth";
+import axios from "axios";
 import MessengerHeader from "./MessengerHeader";
 import BoardList from "./BoardList";
 import ChatWindow from "./ChatWindow";
 import MessageInput from "./MessageInput";
-import SearchMessage from "./SearchMessage"; // Import SearchMessage
-import PollCreationModal from "./PollCreationModal"; // Import the new modal
+import PollCreationModal from "./PollCreationModal";
+import { IoClipboardSharp, IoCloseCircleSharp } from "react-icons/io5";
 
 const Messenger = () => {
-  const { currentUser } = useAuth(); // Access currentUser from AuthContext
+  const { currentUser } = useAuth();
   const { boardId } = useParams();
   const navigate = useNavigate();
   const [boards, setBoards] = useState([]);
@@ -32,24 +19,34 @@ const Messenger = () => {
   const [showOptions, setShowOptions] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
-  const optionsRef = useRef(null); // Add this line
+  const optionsRef = useRef(null);
   const [messages, setMessages] = useState([]);
   const [clickedMessageId, setClickedMessageId] = useState(null);
   const [members, setMembers] = useState([]);
   const [newMessage, setNewMessage] = useState("");
-  const [showAttachDropdown, setShowAttachDropdown] = useState(false); // State for dropdown visibility
-  const attachDropdownRef = useRef(null); // Ref for dropdown
-  const lastMessageRef = useRef(null); // Ref for the last message
-  const [showMessageOptions, setShowMessageOptions] = useState(null); // State to track which message's options are visible
-  const [isUserScrolling, setIsUserScrolling] = useState(false); // Track if the user is scrolling
+  const [showAttachDropdown, setShowAttachDropdown] = useState(false);
+  const attachDropdownRef = useRef(null);
+  const lastMessageRef = useRef(null);
+  const [showMessageOptions, setShowMessageOptions] = useState(null);
+  const [isUserScrolling, setIsUserScrolling] = useState(false);
   const [pinnedMessages, setPinnedMessages] = useState([]);
   const [currentPinnedIndex, setCurrentPinnedIndex] = useState(0);
-  const [showReactionDropdown, setShowReactionDropdown] = useState(null); // Track which message's reaction dropdown is visible
-  const [polls, setPolls] = useState([]); // State to store polls
-  const [selectedPollOption, setSelectedPollOption] = useState(null); // Track selected poll option
-  const messageRefs = useRef({}); // Store refs for each message
-  const [showPollModal, setShowPollModal] = useState(false); // State for poll modal
-  const [selectedFile, setSelectedFile] = useState(null); // Add state for selected file
+  const [showReactionDropdown, setShowReactionDropdown] = useState(null);
+  const [polls, setPolls] = useState([]);
+  const [selectedPollOption, setSelectedPollOption] = useState(null);
+  const messageRefs = useRef({});
+  const [showPollModal, setShowPollModal] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [showBoardList, setShowBoardList] = useState(false); // State to toggle board list
+  const [showBoardDropdown, setShowBoardDropdown] = useState(false); // State for dropdown visibility
+
+  const toggleBoardList = () => {
+    setShowBoardList((prev) => !prev);
+  };
+
+  const toggleBoardDropdown = () => {
+    setShowBoardDropdown((prev) => !prev);
+  };
 
   useEffect(() => {
     if (currentUser) {
@@ -58,13 +55,15 @@ const Messenger = () => {
 
   useEffect(() => {
     const fetchBoards = async () => {
-      if (!currentUser?._id) return; // Ensure currentUser is available
+      if (!currentUser?._id) return;
 
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/boards`); // Updated base URL
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/boards`
+        );
         const userBoards = response.data.filter((board) =>
           board.members?.some((member) => member.userId === currentUser._id)
-        ); // Filter boards where the user is a member
+        );
         setBoards(userBoards);
 
         if (userBoards.length > 0) {
@@ -77,7 +76,7 @@ const Messenger = () => {
         }
       } catch (error) {
         console.error("Error fetching boards:", error);
-        alert("Failed to fetch boards. Please try again later."); // User-friendly error message
+        alert("Failed to fetch boards. Please try again later.");
       }
     };
 
@@ -86,11 +85,11 @@ const Messenger = () => {
 
   const handleBoardSelect = (board) => {
     setSelectedBoard(board);
-    navigate(`/dashboard/messenger/${board._id}`); // Navigate to the selected board
+    setShowBoardDropdown(false); // Close dropdown on board selection
+    navigate(`/dashboard/messenger/${board._id}`);
   };
 
   useEffect(() => {
-    // Close dropdowns when clicking outside
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowDropdown(false);
@@ -103,6 +102,9 @@ const Messenger = () => {
         !attachDropdownRef.current.contains(event.target)
       ) {
         setShowAttachDropdown(false);
+      }
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowBoardDropdown(false); // Close dropdown if clicked outside
       }
     };
 
@@ -119,15 +121,14 @@ const Messenger = () => {
 
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/boards/${selectedBoard._id}` // Updated base URL
+          `${import.meta.env.VITE_API_URL}/boards/${selectedBoard._id}`
         );
         if (response.ok) {
           const boardData = await response.json();
-          setMessages(boardData.messages || []); // Set messages from the board
-          setMembers(boardData.members || []); // Set members from the board
-          setPolls((boardData.polls || []).filter((poll) => poll.isActive)); // Filter active polls
+          setMessages(boardData.messages || []);
+          setMembers(boardData.members || []);
+          setPolls((boardData.polls || []).filter((poll) => poll.isActive));
 
-          // Update selectedBoard to include members
           setSelectedBoard((prevBoard) => ({
             ...prevBoard,
             members: boardData.members || [],
@@ -141,7 +142,7 @@ const Messenger = () => {
     };
 
     fetchBoardData();
-  }, [selectedBoard]); // Fetch data when selectedBoard changes
+  }, [selectedBoard]);
 
   const getUnseenMessageCount = (messages) => {
     return messages.filter((msg) => !msg.seenBy?.includes(currentUser._id))
@@ -149,7 +150,6 @@ const Messenger = () => {
   };
 
   useEffect(() => {
-    // Scroll to the last message only if the user is not scrolling up
     if (!isUserScrolling && lastMessageRef.current) {
       lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
     }
@@ -198,22 +198,25 @@ const Messenger = () => {
       console.warn("Cannot send an empty message without an attachment.");
       return;
     }
-  
+
     const senderRole =
       selectedBoard.members.find((member) => member.userId === currentUser._id)
-        ?.role || "member"; // Determine the sender's role
-  
+        ?.role || "member";
+
     const fullMessageData = {
-      senderId: currentUser._id, // Send senderId as a string
-      senderName: currentUser.displayName || currentUser.name, // Ensure senderName is populated
-      role: senderRole, // Include the role field
+      senderId: currentUser._id,
+      senderName: currentUser.displayName || currentUser.name,
+      role: senderRole,
       text: messageData.text?.trim() || null,
       attachments: messageData.attachment ? [messageData.attachment] : [],
     };
-  
+
     console.log("Sending message:", fullMessageData);
-    console.log("Sender Image URL:", currentUser.photoURL || "/default-avatar.png"); // Log sender's image URL
-  
+    console.log(
+      "Sender Image URL:",
+      currentUser.photoURL || "/default-avatar.png"
+    );
+
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/boards/${selectedBoard._id}/messages`,
@@ -225,11 +228,11 @@ const Messenger = () => {
           body: JSON.stringify(fullMessageData),
         }
       );
-  
+
       if (response.ok) {
         const result = await response.json();
         setMessages((prevMessages) => [...prevMessages, result.message]);
-        setNewMessage(""); // Clear the input field
+        setNewMessage("");
       } else {
         const errorData = await response.json();
         console.error("Failed to send message:", errorData);
@@ -244,7 +247,9 @@ const Messenger = () => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/boards/${selectedBoard._id}/messages/${messageId}`, // Updated base URL
+        `${import.meta.env.VITE_API_URL}/boards/${
+          selectedBoard._id
+        }/messages/${messageId}`,
         {
           method: "PATCH",
           headers: {
@@ -274,7 +279,9 @@ const Messenger = () => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/boards/${selectedBoard._id}/messages/${messageId}`, // Updated base URL
+        `${import.meta.env.VITE_API_URL}/boards/${
+          selectedBoard._id
+        }/messages/${messageId}`,
         {
           method: "DELETE",
           headers: {
@@ -310,7 +317,9 @@ const Messenger = () => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/boards/${selectedBoard._id}/messages/${messageId}/seen`,
+        `${import.meta.env.VITE_API_URL}/boards/${
+          selectedBoard._id
+        }/messages/${messageId}/seen`,
         {
           method: "PATCH",
           headers: {
@@ -341,7 +350,9 @@ const Messenger = () => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/boards/${selectedBoard._id}/messages/${messageId}/pin`,
+        `${import.meta.env.VITE_API_URL}/boards/${
+          selectedBoard._id
+        }/messages/${messageId}/pin`,
         {
           method: "PATCH",
           headers: {
@@ -370,7 +381,9 @@ const Messenger = () => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/boards/${selectedBoard._id}/messages/${messageId}/unpin`,
+        `${import.meta.env.VITE_API_URL}/boards/${
+          selectedBoard._id
+        }/messages/${messageId}/unpin`,
         {
           method: "PATCH",
           headers: {
@@ -399,7 +412,9 @@ const Messenger = () => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/boards/${selectedBoard._id}/messages/${messageId}/react`, // Updated base URL
+        `${import.meta.env.VITE_API_URL}/boards/${
+          selectedBoard._id
+        }/messages/${messageId}/react`, // Updated base URL
         {
           method: "PATCH",
           headers: {
@@ -457,20 +472,22 @@ const Messenger = () => {
       alert("You must be logged in to vote!");
       return;
     }
-  
+
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/boards/${selectedBoard._id}/polls/${pollId}/vote`,
+        `${import.meta.env.VITE_API_URL}/boards/${
+          selectedBoard._id
+        }/polls/${pollId}/vote`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ 
-            userId: currentUser._id, 
-            optionIndex 
+          body: JSON.stringify({
+            userId: currentUser._id,
+            optionIndex,
           }),
         }
       );
-  
+
       if (response.ok) {
         const updatedPoll = await response.json();
         setPolls((prev) =>
@@ -489,7 +506,9 @@ const Messenger = () => {
   const removePoll = async (pollId) => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/boards/${selectedBoard._id}/polls/${pollId}`,
+        `${import.meta.env.VITE_API_URL}/boards/${
+          selectedBoard._id
+        }/polls/${pollId}`,
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
@@ -553,7 +572,9 @@ const Messenger = () => {
       const member = members.find((member) => member.userId === userId);
       return {
         name: member ? member.name : "Unknown User",
-        photoURL: member ? member.photoURL || "/default-avatar.png" : "/default-avatar.png",
+        photoURL: member
+          ? member.photoURL || "/default-avatar.png"
+          : "/default-avatar.png",
       };
     });
   };
@@ -573,10 +594,9 @@ const Messenger = () => {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-
       {/* Chat interface */}
       <motion.div
-        className="chat-interface w-full md:w-3/4 p-4 sm:p-6 flex flex-col bg-white shadow-lg rounded-lg"
+        className="chat-interface w-full p-4 sm:p-6 flex flex-col bg-white shadow-lg rounded-lg"
         initial={{ x: -200 }}
         animate={{ x: 0 }}
         exit={{ x: -200 }}
@@ -584,20 +604,20 @@ const Messenger = () => {
       >
         {selectedBoard ? (
           <>
-            {/* Header */}
             <MessengerHeader
               selectedBoard={selectedBoard}
               showOptions={showOptions}
               setShowOptions={setShowOptions}
               createPoll={createPoll}
-              messages={messages} // Pass messages
-              onScrollToMessage={onScrollToMessage} // Pass onScrollToMessage
+              messages={messages}
+              onScrollToMessage={onScrollToMessage}
+              toggleBoardDropdown={toggleBoardDropdown} // Pass toggleBoardDropdown
+              showBoardDropdown={showBoardDropdown} // Pass showBoardDropdown
             />
-            {/* Chat Window */}
             <ChatWindow
-              boardId={selectedBoard._id} // Pass boardId as a prop
+              boardId={selectedBoard._id}
               pinnedMessages={pinnedMessages}
-              setPinnedMessages={setPinnedMessages} // Pass setPinnedMessages as a prop
+              setPinnedMessages={setPinnedMessages}
               currentPinnedIndex={currentPinnedIndex}
               handlePreviousPinned={handlePreviousPinned}
               handleNextPinned={handleNextPinned}
@@ -609,7 +629,7 @@ const Messenger = () => {
               showMessageOptions={showMessageOptions}
               setShowMessageOptions={setShowMessageOptions}
               pinMessage={pinMessage}
-              editMessage={editMessage} // Pass editMessage as a prop
+              editMessage={editMessage}
               deleteMessage={deleteMessage}
               reactToMessage={reactToMessage}
               showReactionDropdown={showReactionDropdown}
@@ -617,16 +637,16 @@ const Messenger = () => {
               getSenderName={getSenderName}
               formatDate={formatDate}
               formatTime={formatTime}
-              getSeenByDetails={getSeenByDetails} // Pass getSeenByDetails as a prop
+              getSeenByDetails={getSeenByDetails}
               handleScroll={handleScroll}
-              setMessages={setMessages} // Pass setMessages as a prop
-              messageRefs={messageRefs} // Pass messageRefs to ChatWindow
-              polls={polls} // Pass polls as a prop
-              votePoll={votePoll} // Pass votePoll as a prop
-              removePoll={removePoll} // Pass removePoll as a prop
-              setPolls={setPolls} // Pass setPolls as a prop
+              setMessages={setMessages}
+              messageRefs={messageRefs}
+              polls={polls}
+              votePoll={votePoll}
+              removePoll={removePoll}
+              setPolls={setPolls}
+              members={members} // Pass members as a prop
             />
-            {/* Message Input */}
             <MessageInput
               newMessage={newMessage}
               setNewMessage={setNewMessage}
@@ -634,7 +654,8 @@ const Messenger = () => {
               showAttachDropdown={showAttachDropdown}
               setShowAttachDropdown={setShowAttachDropdown}
               attachDropdownRef={attachDropdownRef}
-              setSelectedFile={setSelectedFile} // Pass setSelectedFile as a prop
+              setSelectedFile={setSelectedFile}
+              createPoll={createPoll} // Pass createPoll to MessageInput
             />
           </>
         ) : (
@@ -649,38 +670,45 @@ const Messenger = () => {
         )}
       </motion.div>
 
-      {/* Sidebar with board list */}
-      <motion.div
-        className="board-list w-full md:w-1/4 bg-white p-4 sm:p-6 overflow-y-auto shadow-lg rounded-lg"
-        initial={{ x: 200 }}
-        animate={{ x: 0 }}
-        exit={{ x: 200 }}
-        transition={{ duration: 0.5 }}
-      >
-        <motion.h2
-          className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 text-primary"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
+      {/* Board list dropdown */}
+      <div className="relative">
+        <motion.div
+          ref={dropdownRef}
+          className={`fixed top-16 left-1/2 transform -translate-x-1/2 bg-white shadow-lg rounded-lg p-4 w-11/12 sm:w-96 z-40 ${
+            showBoardDropdown ? "block" : "hidden"
+          }`}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{
+            opacity: showBoardDropdown ? 1 : 0,
+            y: showBoardDropdown ? 0 : -20,
+          }}
+          transition={{ duration: 0.3 }}
         >
-          Your Boards
-        </motion.h2>
-        <BoardList
-          boards={boards}
-          selectedBoard={selectedBoard}
-          handleBoardSelect={handleBoardSelect}
-          getUnseenMessageCount={getUnseenMessageCount}
-          messages={messages}
-        />
-      </motion.div>
+          <motion.h2
+            className="text-lg font-bold mb-4 text-primary"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            Your Boards
+          </motion.h2>
+          <BoardList
+            boards={boards}
+            selectedBoard={selectedBoard}
+            handleBoardSelect={handleBoardSelect}
+            getUnseenMessageCount={getUnseenMessageCount}
+            messages={messages}
+          />
+        </motion.div>
+      </div>
+
       <PollCreationModal
         isOpen={showPollModal}
         onClose={() => setShowPollModal(false)}
         onCreate={handleCreatePoll}
-        currentUser={currentUser} // Pass currentUser as a prop
+        currentUser={currentUser}
       />
     </motion.div>
   );
 };
-
 export default Messenger;

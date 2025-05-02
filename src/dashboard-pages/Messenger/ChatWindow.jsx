@@ -17,8 +17,7 @@ import EditMessageModal from "./EditMessageModal"; // Import EditMessageModal
 import { FaFile, FaUser } from "react-icons/fa6";
 import ActivePolls from "./ActivePolls"; // Import ActivePolls
 import ErrorBoundary from "../../components/ErrorBoundary"; // Import ErrorBoundary
-import "lightbox2/dist/css/lightbox.min.css"; // Import Lightbox2 CSS
-import lightbox from "lightbox2"; // Import Lightbox2 JS
+import "lightbox2/dist/css/lightbox.min.css";
 const ChatWindow = ({
   boardId, // Accept boardId as a prop
   pinnedMessages,
@@ -52,6 +51,7 @@ const ChatWindow = ({
   createPoll, // Add createPoll as a prop
   setPolls, // Add setPolls as a prop
   getSeenByDetails, // Destructure getSeenByDetails from props
+  members, // Add members as a prop
 }) => {
   const [reactionModal, setReactionModal] = useState({
     isOpen: false,
@@ -94,7 +94,9 @@ const ChatWindow = ({
           console.error("boardId is not defined");
           return;
         }
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/boards/${boardId}`);
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/boards/${boardId}`
+        );
         if (!response.ok) {
           throw new Error(
             `Failed to fetch: ${response.status} ${response.statusText}`
@@ -171,7 +173,9 @@ const ChatWindow = ({
 
       // Call the backend to persist the change
       await fetch(
-        `${import.meta.env.VITE_API_URL}/boards/${boardId}/messages/${messageId}/reactions/${emoji}`,
+        `${
+          import.meta.env.VITE_API_URL
+        }/boards/${boardId}/messages/${messageId}/reactions/${emoji}`,
         {
           method: "DELETE",
           headers: {
@@ -191,7 +195,9 @@ const ChatWindow = ({
     try {
       // Call the backend API to unpin the message
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/boards/${boardId}/messages/${messageId}/unpin`,
+        `${
+          import.meta.env.VITE_API_URL
+        }/boards/${boardId}/messages/${messageId}/unpin`,
         {
           method: "PATCH",
           headers: {
@@ -258,7 +264,7 @@ const ChatWindow = ({
             return null;
           }
         }
-        return null;
+        return null; // Non-image/video files are not added to the Lightbox
       })
       .filter(Boolean);
 
@@ -297,7 +303,7 @@ const ChatWindow = ({
       />
 
       <motion.div
-        className="chat-window flex-1 rounded-lg overflow-y-scroll bg-gray-100 shadow-inner p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12"
+        className="chat-window flex-1 rounded-lg overflow-y-scroll bg-gray-100 shadow-inner p-12 sm:p-6 md:p-8 lg:p-10 xl:p-12"
         style={{ overflowX: "hidden" }} // Prevent horizontal scrolling
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -446,7 +452,7 @@ const ChatWindow = ({
                       <div
                         className={`relative max-w-full sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg p-4 rounded-2xl shadow-lg ${
                           isSender
-                            ? "bg-primary text-white rounded-br-none"
+                            ? "bg-primary text-white rounded-br-none mb-2"
                             : "bg-gray-200 text-gray-800 rounded-bl-none"
                         }`}
                       >
@@ -472,10 +478,11 @@ const ChatWindow = ({
                                     className="cursor-pointer"
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      handleAttachmentPreview(
-                                        msg.attachments,
-                                        idx
-                                      );
+                                      if (isImage(attachment) || isVideo(attachment)) {
+                                        handleAttachmentPreview(msg.attachments, idx);
+                                      } else {
+                                        window.open(attachment, "_blank"); // Open non-image/video files in a new tab
+                                      }
                                     }}
                                   >
                                     {isImage(attachment) ? (
@@ -507,7 +514,7 @@ const ChatWindow = ({
                               msg.reactions &&
                               Object.keys(msg.reactions).length > 0 && (
                                 <div
-                                  className={`absolute -bottom-4 ${
+                                  className={`w-10 absolute -bottom-4 ${
                                     isSender
                                       ? "px-2 py-1 left-1 bg-white"
                                       : "px-2 py-1 right-1 bg-gray-200"
@@ -553,13 +560,19 @@ const ChatWindow = ({
                         src={
                           isSender
                             ? currentUser.photoURL
-                            : getSenderName(msg.senderId)?.photoURL
+                            : members.find(
+                                (member) => member.userId === msg.senderId
+                              )?.photoURL || "/default-avatar.png"
                         }
                         alt={
-                          isSender ? "You" : getSenderName(msg.senderId)?.name
+                          isSender
+                            ? "You"
+                            : members.find(
+                                (member) => member.userId === msg.senderId
+                              )?.name || "Unknown User"
                         }
                         className={`w-8 h-8 rounded-full ${
-                          isSender ? "hidden" : "relative -left-10 -top-8  z-10"
+                          isSender ? "hidden" : "relative -left-10 -top-8 z-10"
                         }`}
                       />
                     </div>
@@ -866,7 +879,9 @@ const ChatWindow = ({
           removeVote={async (pollId, optionIndex) => {
             try {
               const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/boards/${boardId}/polls/${pollId}/remove-vote`,
+                `${
+                  import.meta.env.VITE_API_URL
+                }/boards/${boardId}/polls/${pollId}/remove-vote`,
                 {
                   method: "PATCH",
                   headers: { "Content-Type": "application/json" },

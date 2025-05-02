@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { FaCirclePlus } from "react-icons/fa6";
+import { FaCirclePlus, FaSquarePollVertical } from "react-icons/fa6";
 import { AiOutlineSend, AiOutlineClose } from "react-icons/ai"; // Import close icon
 import { uploadFile } from "../../utils/Upload"; // Import the upload function
 
@@ -12,6 +12,7 @@ const MessageInput = ({
   setShowAttachDropdown,
   attachDropdownRef,
   setSelectedFile, // Removed default no-op function
+  createPoll, // Add createPoll as a prop
 }) => {
   const [fileName, setFileName] = useState(""); // State to store selected file name
   const [selectedFile, setLocalSelectedFile] = useState(null); // Local state for selected file
@@ -93,7 +94,7 @@ const MessageInput = ({
 
   return (
     <motion.div
-      className="mt-4 sm:mt-6 flex flex-col sm:flex-row items-center relative shadow-md p-4 rounded-lg bg-gray-100"
+      className="mt-4 sm:mt-6 flex sm:flex-row items-center relative shadow-md p-4 rounded-lg bg-gray-100 gap-6 md:gap-0"
       initial={{ y: 50, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
@@ -109,10 +110,14 @@ const MessageInput = ({
           </button>
         </div>
       )}
-      <div
-        className="relative mr-0 sm:mr-4 mb-4 sm:mb-0"
-        ref={attachDropdownRef}
-      >
+      <div className="relative mr-0 sm:mr-4" ref={attachDropdownRef}>
+        {/* Create Poll Button */}
+        <button
+          className="text-primary hover:text-accent transition duration-200 mr-4"
+          onClick={createPoll}
+        >
+          <FaSquarePollVertical className="text-2xl sm:text-3xl" />
+        </button>
         <button
           className="text-primary hover:text-accent transition duration-200"
           onClick={() => setShowAttachDropdown(!showAttachDropdown)}
@@ -168,7 +173,7 @@ const MessageInput = ({
             <motion.span
               className="inline-block text-xl sm:text-2xl"
               animate={{
-                x: [0, 50, 100, 200], 
+                x: [0, 50, 100, 200],
               }}
               transition={{
                 duration: 1, // Duration of the animation

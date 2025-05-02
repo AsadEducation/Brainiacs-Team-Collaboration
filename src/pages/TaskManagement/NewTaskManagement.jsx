@@ -473,10 +473,6 @@ export default function NewTaskManagement() {
     if (isActiveTask && isOverAColumn) {
       const columnBeforeMove = activeTask.columnTittle || "Backlog";
       const columnAfterMove = over.data.current?.tittle || "New Column";
-    // Scenario 2: Dropping a Task over a Column
-    if (isActiveTask && isOverAColumn) {
-      const columnBeforeMove = activeTask.columnTittle || "Backlog";
-      const columnAfterMove = over.data.current?.tittle || "New Column";
 
       const updatedTasks = tasks.map(task => {
         if (task.id === activeId) {
@@ -490,11 +486,9 @@ export default function NewTaskManagement() {
       });
 
       setTasks(updatedTasks);
-      setTasks(updatedTasks);
 
       axiosPublic.put("/tasks", updatedTasks)
         .then((res) => {
-          // console.log("successfully sent tasks to db", res);
           logActivity({
             entity: "Task",
             action: 'Move',
@@ -503,7 +497,7 @@ export default function NewTaskManagement() {
             columnBeforeMove,
             columnAfterMove,
             ...activityObject
-          })
+          });
         })
         .catch(console.error);
     }
