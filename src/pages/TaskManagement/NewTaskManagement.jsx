@@ -473,118 +473,119 @@ export default function NewTaskManagement() {
     if (isActiveTask && isOverAColumn) {
       const columnBeforeMove = activeTask.columnTittle || "Backlog";
       const columnAfterMove = over.data.current?.tittle || "New Column";
-    // Scenario 2: Dropping a Task over a Column
-    if (isActiveTask && isOverAColumn) {
-      const columnBeforeMove = activeTask.columnTittle || "Backlog";
-      const columnAfterMove = over.data.current?.tittle || "New Column";
+      // Scenario 2: Dropping a Task over a Column
+      if (isActiveTask && isOverAColumn) {
+        const columnBeforeMove = activeTask.columnTittle || "Backlog";
+        const columnAfterMove = over.data.current?.tittle || "New Column";
 
-      const updatedTasks = tasks.map(task => {
-        if (task.id === activeId) {
-          return {
-            ...task,
-            columnId: overId,
-            columnTittle: over.data.current?.tittle
-          };
-        }
-        return task;
-      });
+        const updatedTasks = tasks.map(task => {
+          if (task.id === activeId) {
+            return {
+              ...task,
+              columnId: overId,
+              columnTittle: over.data.current?.tittle
+            };
+          }
+          return task;
+        });
 
-      setTasks(updatedTasks);
-      setTasks(updatedTasks);
+        setTasks(updatedTasks);
+        setTasks(updatedTasks);
 
-      axiosPublic.put("/tasks", updatedTasks)
-        .then((res) => {
-          // console.log("successfully sent tasks to db", res);
+        axiosPublic.put("/tasks", updatedTasks)
+          .then((res) => {
+            // console.log("successfully sent tasks to db", res);
+            logActivity({
+              entity: "Task",
+              action: 'Move',
+              taskId: active?.data?.current?.id,
+              taskTittle: active?.data?.current?.taskTittle,
+              columnBeforeMove,
+              columnAfterMove,
+              ...activityObject
+            })
+          })
+          .catch(console.error);
+      }
+    };
+
+    const sensors = useSensors(
+      useSensor(PointerSensor, {
+        activationConstraint: {
+          distance: 3,
+        },
+      })
+    );
+
+    const handleColumnDelete = (column) => {
+      console.log("column delete request for id :", column.id)
+      console.log("checking column name before delete", column);
+      setCurrentColumns(() => {
+        const newCurrentColumn = currentColumns.filter(col => col.id != column.id)
+        return newCurrentColumn;
+      })
+      axiosPublic.delete(`/columns?id=${column.id}`)
+        .then(res => {
+          console.log("Column Deleted", res)
+          //logging the activity of column delete 
           logActivity({
-            entity: "Task",
-            action: 'Move',
-            taskId: active?.data?.current?.id,
-            taskTittle: active?.data?.current?.taskTittle,
-            columnBeforeMove,
-            columnAfterMove,
+            entity: "Column",
+            action: 'Delete',
+            columnId: column?.id,
+            columnTittle: column?.tittle,
             ...activityObject
           })
+
         })
-        .catch(console.error);
+        .catch(err => {
+          console.log("Column Delete Failed", err)
+        })
+
+
     }
-  };
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 3,
-      },
-    })
-  );
-
-  const handleColumnDelete = (column) => {
-    console.log("column delete request for id :", column.id)
-    console.log("checking column name before delete", column);
-    setCurrentColumns(() => {
-      const newCurrentColumn = currentColumns.filter(col => col.id != column.id)
-      return newCurrentColumn;
-    })
-    axiosPublic.delete(`/columns?id=${column.id}`)
-      .then(res => {
-        console.log("Column Deleted", res)
-        //logging the activity of column delete 
-        logActivity({
-          entity: "Column",
-          action: 'Delete',
-          columnId: column?.id,
-          columnTittle: column?.tittle,
-          ...activityObject
-        })
-
-      })
-      .catch(err => {
-        console.log("Column Delete Failed", err)
-      })
-
-
+    return (
+      <div
+        style={{
+          backgroundColor: board?.theme || location.state?.theme || "#f4f5f7",
+          minHeight: "100vh",
+        }}
+        className="flex flex-col"
+      >
+        <TaskManagementHeader board={board} members={members} setIsModalOpen={setIsModalOpen} />
+        <main className="flex-grow p-6 pb-2">
+          <div className="container mx-auto">
+            <ColumnsSection
+              sensors={sensors}
+              onDragStart={onDragStart}
+              onDragEnd={onDragEnd}
+              onDragOver={onDragOver}
+              columnId={columnId}
+              currentColumns={currentColumns}
+              updateColumn={updateColumn}
+              createTask={createTask}
+              tasks={tasks}
+              isAddingList={isAddingList}
+              setIsAddingList={setIsAddingList}
+              createNewColumn={createNewColumn}
+              activeColumn={activeColumn}
+              activeTask={activeTask}
+              handleColumnDelete={handleColumnDelete}
+            />
+          </div>
+        </main>
+        <AddMemberModal
+          isModalOpen={isModalOpen}
+          setIsModalOpen={setIsModalOpen}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          suggestedUsers={suggestedUsers}
+          handleSearchChange={handleSearchChange}
+          handleUserSelect={handleUserSelect}
+          selectedUsers={selectedUsers}
+          handleRemoveSelectedUser={handleRemoveSelectedUser}
+          handleAddSelectedUsers={handleAddSelectedUsers}
+        />
+      </div>
+    );
   }
-  return (
-    <div
-      style={{
-        backgroundColor: board?.theme || location.state?.theme || "#f4f5f7",
-        minHeight: "100vh",
-      }}
-      className="flex flex-col"
-    >
-      <TaskManagementHeader board={board} members={members} setIsModalOpen={setIsModalOpen} />
-      <main className="flex-grow p-6 pb-2">
-        <div className="container mx-auto">
-          <ColumnsSection
-            sensors={sensors}
-            onDragStart={onDragStart}
-            onDragEnd={onDragEnd}
-            onDragOver={onDragOver}
-            columnId={columnId}
-            currentColumns={currentColumns}
-            updateColumn={updateColumn}
-            createTask={createTask}
-            tasks={tasks}
-            isAddingList={isAddingList}
-            setIsAddingList={setIsAddingList}
-            createNewColumn={createNewColumn}
-            activeColumn={activeColumn}
-            activeTask={activeTask}
-            handleColumnDelete={handleColumnDelete}
-          />
-        </div>
-      </main>
-      <AddMemberModal
-        isModalOpen={isModalOpen}
-        setIsModalOpen={setIsModalOpen}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        suggestedUsers={suggestedUsers}
-        handleSearchChange={handleSearchChange}
-        handleUserSelect={handleUserSelect}
-        selectedUsers={selectedUsers}
-        handleRemoveSelectedUser={handleRemoveSelectedUser}
-        handleAddSelectedUsers={handleAddSelectedUsers}
-      />
-    </div>
-  );
 }
