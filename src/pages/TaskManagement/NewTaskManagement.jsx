@@ -432,9 +432,6 @@ export default function NewTaskManagement() {
       // Capture original and new columns BEFORE updating
       const columnBeforeMove = activeTask.columnTittle || "Backlog";
       const columnAfterMove = overTask.columnTittle || "Backlog";
-      // Capture original and new columns BEFORE updating
-      const columnBeforeMove = activeTask.columnTittle || "Backlog";
-      const columnAfterMove = overTask.columnTittle || "Backlog";
 
       // Update the task's position and column
       const updatedTasks = tasks.map(task => {
@@ -512,13 +509,6 @@ export default function NewTaskManagement() {
     }
   };
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 3,
-      },
-    })
-  );
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
