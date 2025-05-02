@@ -7,6 +7,7 @@ import BoardCard from "./BoardCard"; // Import BoardCard
 import CreateBoardModal from "./CreateBoardModal"; // Import CreateBoardModal
 import useAxiosPublic from "../../Hooks/useAxiosPublic";
 import Swal from "sweetalert2"; // Import SweetAlert2
+import logActivity from "../../utils/activity/activityLogger";
 
 const Boards = () => {
   const navigate = useNavigate();
@@ -19,6 +20,12 @@ const Boards = () => {
   const [theme, setTheme] = useState("#e0f2fe");
   const [searchQuery, setSearchQuery] = useState("");
   const axiosPublic = useAxiosPublic();
+
+  //activity object [asad]
+
+  const activityObject = {
+    currentUser,
+  }
 
   const themeOptions = [
     { name: "Sky Blue", color: "#e0f2fe" },
@@ -92,9 +99,18 @@ const Boards = () => {
     };
 
     try {
-      const response = await axiosPublic.post(`/boards`, newBoardData);
-      console.log("Board Created:", response.data);
-
+      const res = await axiosPublic.post(`/boards`, newBoardData); 
+      // console.log('response new board creation ', res.data);
+      if(res?.data?.insertedId){
+        //logging activity of new board creation
+        logActivity({
+          entity: "Board",
+          action: 'Add',
+          boardId:res.data.insertedId,
+          boardTitle:newBoard,
+          ...activityObject
+        })
+      }
       setIsModalOpen(false);
       setNewBoard("");
       setDescription("");
@@ -129,9 +145,24 @@ const Boards = () => {
       confirmButtonText: "Yes, delete it!",
     });
 
+
     if (result.isConfirmed) {
       try {
-        await axiosPublic.delete(`/boards/${boardId}`);
+        const res = await axiosPublic.delete(`/boards/${boardId}`);
+        //console.log('board deletion response ', res.data);
+
+        if (res?.data?.deletedCount) {
+          //logging activity of deleted board
+          logActivity({
+            entity: "Board",
+            action: 'Delete',
+            boardId,
+            // boardTitle:
+            ...activityObject
+          })
+
+        }
+
         setBoards(boards.filter((board) => board._id !== boardId));
         Swal.fire("Deleted!", "The board has been deleted.", "success");
       } catch (error) {

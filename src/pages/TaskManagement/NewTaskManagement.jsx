@@ -11,12 +11,11 @@ import "./ModalStyles.css"; // Ensure this file exists and contains modal styles
 import { useSensors, useSensor, PointerSensor } from "@dnd-kit/core"; // Add this import
 import { arrayMove } from "@dnd-kit/sortable";
 import logActivity from "../../utils/activity/activityLogger";
-import moment from "moment/moment";
-import useAuth from "../../Hooks/useAuth";
 
 import Swal from "sweetalert2"; // Import SweetAlert2
 import { toast } from "react-toastify"; // Import react-toastify
 import { io } from "socket.io-client"; // Import socket.io-client
+import useAuth from "../../Hooks/useAuth";
 
 Modal.setAppElement("#root");
 
@@ -39,13 +38,13 @@ export default function NewTaskManagement() {
   const [isAddingList, setIsAddingList] = useState(false);
   const { currentUser } = useAuth();
 
-  //activity object which will capture activity [asad]
+  //activity object [asad]
 
   const activityObject = {
-    date: moment().format("ll"),
-    time: moment().format("LT"),
     currentUser,
-  };
+    boardId: id,
+  }
+
 
   // siam vai's code starts here
   useEffect(() => {
@@ -165,73 +164,100 @@ export default function NewTaskManagement() {
   // the below function is used to generate the id of new currentColumns
   const generateId = () => {
     // generate a random number between 0 and 1000
-    return Math.floor(Math.random() * 10001);
+    return crypto.randomUUID()
   };
 
-  // the below function adds new column to the column list
+  // the below function adds new column to the column list 
   const createNewColumn = (e) => {
     e.preventDefault();
     const columnTittle = e.target.columnName.value;
+    const columnId = generateId()
     const columnToAdd = {
-      id: columnTittle + generateId(),
+      id: columnId,
       type: "Column",
       boardId: id,
       tittle: columnTittle || `Column ${currentColumns.length + 1}`,
     };
-    // adding new column to local state
+    // adding new column to local state 
     setCurrentColumns([...currentColumns, columnToAdd]);
     // adding new column to database
-    axiosPublic
-      .post("/columns", { ...columnToAdd, order: currentColumns.length + 1 })
-      .then((res) => {
-        console.log("column post response", res.data);
+    axiosPublic.post("/columns", { ...columnToAdd, order: currentColumns.length + 1 })
+      .then(res => {
+        console.log("column post response", res.data)
+        // logging activity after creating a new column
+        logActivity({
+          entity: "Column",
+          action: 'Add',
+          columnId,
+          columnTittle,
+          ...activityObject
+        })
       })
-      .catch((err) => {
-        console.log("Column post error", err);
-      });
-    setIsAddingList(false);
-  };
+      .catch(err => {
+        console.log("Column post error", err)
+      })
+    setIsAddingList(false)
+
+  }
   const updateColumn = (id, tittle) => {
-    const columnInfo = { id, tittle };
-    const newColumn = currentColumns.map((col) => {
+    const columnInfo = { id, tittle }
+
+    const newColumn = currentColumns.map(col => {
       if (col.id !== id) return col;
-      return { ...col, tittle };
-    });
-    setCurrentColumns(newColumn);
-    axiosPublic
-      .put("/columnName", columnInfo)
-      .then((res) => {
-        console.log("Column Name is updated", res);
+      return { ...col, tittle }
+    })
+    setCurrentColumns(newColumn)
+    axiosPublic.put('/columnName', columnInfo)
+      .then(res => {
+        console.log("Column Name is updated", res)
+        // logging the update of column
+        logActivity({
+          entity: "ColumnName",
+          action: 'Update',
+          columnId: id,
+          columnTittle: tittle,
+          ...activityObject
+        })
       })
-      .catch((err) => {
+      .catch(err => {
         console.log("Column Name update Failed", err);
-      });
-  };
+      })
+  }
   const createTask = (e, columnId, columnTittle, setIsAddingTask) => {
     e.preventDefault();
     const tittle = e.target.taskTittle.value;
-    console.log(tittle, "tittle");
+    const taskId = generateId();
+    console.log(tittle, "tittle")
     const newTask = {
-      id: tittle + generateId(),
+      id: taskId,
       type: "Task",
       boardId: id,
       columnId,
       columnTittle,
-      taskTittle: tittle || `Task ${tasks.length + 1}`,
-    };
+      taskTittle: tittle || `Task ${tasks.length + 1}`
+    }
     // adding new task to local state
-    setTasks([...tasks, newTask]);
+    setTasks([...tasks, newTask])
     // adding new task to database
-    axiosPublic
-      .post("tasks", { ...newTask, order: tasks.length + 1 })
-      .then((res) => {
-        console.log("task post response", res.data);
+    axiosPublic.post("tasks", { ...newTask, order: tasks.length + 1 })
+      .then(res => {
+        console.log("task post response", res.data)
+        //logging the creation of new task
+        logActivity({
+          ...activityObject,
+          entity: "Task",
+          action: 'Add',
+          taskId,
+          taskTittle: tittle,
+          columnId,
+          columnTittle
+        })
       })
-      .catch((err) => {
-        console.log("task post error", err);
-      });
-    setIsAddingTask(false);
-  };
+      .catch(err => {
+        console.log("task post error", err)
+      })
+    setIsAddingTask(false)
+  }
 
   //   siam vai's code starts here
   const addMember = async (member) => {
@@ -342,65 +368,47 @@ export default function NewTaskManagement() {
 
   //   siam vai's code ends  here
 
-  const onDragStart = (event) => {
-    console.log(event, "event");
+
+  const onDragStart = event => {
+    console.log("event", event)
     setTimeout(() => {
       if (event.active.data.current?.type === "Column") {
-        setActiveColumn({
-          id: event.active.data.current?.id,
-          tittle: event.active.data.current?.tittle,
-          type: "Column",
-        });
+        setActiveColumn({ id: event.active.data.current?.id, tittle: event.active.data.current?.tittle, type: "Column" })
       }
       if (event.active.data.current?.type === "Task") {
-        setActiveTask({
-          id: event.active.data.current?.id,
-          taskTittle: event.active.data.current?.taskTittle,
-          type: "Task",
-        });
+        setActiveTask({ id: event.active.data.current?.id, taskTittle: event.active.data.current?.taskTittle, type: "Task" })
       }
-    }, 10);
-  };
-  const onDragEnd = (event) => {
-    setActiveColumn(null);
-    setActiveTask(null);
-    const { active, over } = event;
+    }, 10)
+  }
+  const onDragEnd = event => {
+
+    setActiveColumn(null)
+    setActiveTask(null)
+    const { active, over } = event; console.log('active task', active);
     if (!over) return;
     const activeId = active.id;
     const overId = over.id;
     if (activeId == overId) return;
-    if (
-      active.data.current?.type === "Column" &&
-      over.data.current?.type === "Column"
-    ) {
-      setCurrentColumns((currentColumns) => {
-        const activeColumnIndex = currentColumns.findIndex(
-          (col) => col.id == activeId
-        );
-        const overColumnIndex = currentColumns.findIndex(
-          (col) => col.id == overId
-        );
-        const updatedColumns = arrayMove(
-          currentColumns,
-          activeColumnIndex,
-          overColumnIndex
-        );
-        axiosPublic
-          .put("/columns", updatedColumns)
-          .then((res) => {
-            console.log("column set update", res);
+    if (active.data.current?.type === "Column" && over.data.current?.type === "Column") {
+      setCurrentColumns(currentColumns => {
+        const activeColumnIndex = currentColumns.findIndex(col => col.id == activeId)
+        const overColumnIndex = currentColumns.findIndex(col => col.id == overId)
+        const updatedColumns = arrayMove(currentColumns, activeColumnIndex, overColumnIndex)
+        axiosPublic.put("/columns", updatedColumns)
+          .then(res => {
+            console.log("column set update", res)
             columnRefetch();
           })
-          .catch((err) => {
-            console.log("column swap error", err);
-          });
+          .catch(err => {
+            console.log("column swap error", err)
+          })
         return updatedColumns;
-      });
+      })
     }
     // console.log("current task", currentTask)
-  };
-  const onDragOver = (event) => {
-    const { active, over } = event;
+  }
+  const onDragOver = event => {
+    const { active, over } = event; //console.log('active task',active)
     if (!over) return;
 
     const activeId = active.id;
@@ -414,46 +422,49 @@ export default function NewTaskManagement() {
     if (!isActiveTask) return;
 
     // Get the active task's original data BEFORE any modifications
-    const activeTask = tasks.find((t) => t.id === activeId);
+    const activeTask = tasks.find(t => t.id === activeId);
     const activeTaskTitle = active?.data?.current?.taskTittle;
 
     // Scenario 1: Dropping a Task over another Task
     if (isActiveTask && isOverTask) {
-      const overTask = tasks.find((t) => t.id === overId);
+      const overTask = tasks.find(t => t.id === overId);
 
       // Capture original and new columns BEFORE updating
       const columnBeforeMove = activeTask.columnTittle || "Backlog";
       const columnAfterMove = overTask.columnTittle || "Backlog";
 
       // Update the task's position and column
-      const updatedTasks = tasks.map((task) => {
+      const updatedTasks = tasks.map(task => {
         if (task.id === activeId) {
           return {
             ...task,
             columnId: overTask.columnId,
-            columnTittle: overTask.columnTittle,
+            columnTittle: overTask.columnTittle
           };
         }
         return task;
       });
 
       // Reorder tasks
-      const activeIndex = tasks.findIndex((t) => t.id === activeId);
-      const overIndex = tasks.findIndex((t) => t.id === overId);
+      const activeIndex = tasks.findIndex(t => t.id === activeId);
+      const overIndex = tasks.findIndex(t => t.id === overId);
       const newTaskArray = arrayMove(updatedTasks, activeIndex, overIndex);
 
       setTasks(newTaskArray);
+      setTasks(newTaskArray);
 
-      axiosPublic
-        .put("/tasks", newTaskArray)
-        .then(() => {
+      axiosPublic.put("/tasks", newTaskArray)
+        .then((res) => {
+          // console.log("successfully sent tasks to db", res);
           logActivity({
-            ...activityObject,
-            entity: active?.data?.current?.type,
-            action: "move",
-
-            message: `${activeTaskTitle} moved from ${columnBeforeMove} to ${columnAfterMove}`,
-          });
+            entity: "Task",
+            action: 'Move',
+            taskId: active?.data?.current?.id,
+            taskTittle: active?.data?.current?.taskTittle,
+            columnBeforeMove,
+            columnAfterMove,
+            ...activityObject
+          })
         })
         .catch(console.error);
     }
@@ -462,25 +473,37 @@ export default function NewTaskManagement() {
     if (isActiveTask && isOverAColumn) {
       const columnBeforeMove = activeTask.columnTittle || "Backlog";
       const columnAfterMove = over.data.current?.tittle || "New Column";
+    // Scenario 2: Dropping a Task over a Column
+    if (isActiveTask && isOverAColumn) {
+      const columnBeforeMove = activeTask.columnTittle || "Backlog";
+      const columnAfterMove = over.data.current?.tittle || "New Column";
 
-      const updatedTasks = tasks.map((task) => {
+      const updatedTasks = tasks.map(task => {
         if (task.id === activeId) {
           return {
             ...task,
             columnId: overId,
-            columnTittle: over.data.current?.tittle,
+            columnTittle: over.data.current?.tittle
           };
         }
         return task;
       });
 
       setTasks(updatedTasks);
+      setTasks(updatedTasks);
 
-      axiosPublic
-        .put("/tasks", updatedTasks)
-        .then(() => {
-          (activityObject.message = `"${activeTaskTitle}" moved from ${columnBeforeMove} to ${columnAfterMove}`),
-            logActivity(activityObject);
+      axiosPublic.put("/tasks", updatedTasks)
+        .then((res) => {
+          // console.log("successfully sent tasks to db", res);
+          logActivity({
+            entity: "Task",
+            action: 'Move',
+            taskId: active?.data?.current?.id,
+            taskTittle: active?.data?.current?.taskTittle,
+            columnBeforeMove,
+            columnAfterMove,
+            ...activityObject
+          })
         })
         .catch(console.error);
     }
@@ -495,23 +518,31 @@ export default function NewTaskManagement() {
   );
 
   const handleColumnDelete = (column) => {
-    console.log("column delete request for id :", column.id);
+    console.log("column delete request for id :", column.id)
+    console.log("checking column name before delete", column);
     setCurrentColumns(() => {
-      const newCurrentColumn = currentColumns.filter(
-        (col) => col.id != column.id
-      );
+      const newCurrentColumn = currentColumns.filter(col => col.id != column.id)
       return newCurrentColumn;
-    });
-    axiosPublic
-      .delete(`/columns?id=${column.id}`)
-      .then((res) => {
-        console.log("Column Deleted", res);
-        //write the logic for delete  activity [Asad]
+    })
+    axiosPublic.delete(`/columns?id=${column.id}`)
+      .then(res => {
+        console.log("Column Deleted", res)
+        //logging the activity of column delete 
+        logActivity({
+          entity: "Column",
+          action: 'Delete',
+          columnId: column?.id,
+          columnTittle: column?.tittle,
+          ...activityObject
+        })
+
       })
-      .catch((err) => {
-        console.log("Column Delete Failed", err);
-      });
-  };
+      .catch(err => {
+        console.log("Column Delete Failed", err)
+      })
+
+
+  }
   return (
     <div
       style={{
@@ -520,11 +551,7 @@ export default function NewTaskManagement() {
       }}
       className="flex flex-col"
     >
-      <TaskManagementHeader
-        board={board}
-        members={members}
-        setIsModalOpen={setIsModalOpen}
-      />
+      <TaskManagementHeader board={board} members={members} setIsModalOpen={setIsModalOpen} />
       <main className="flex-grow p-6 pb-2">
         <div className="container mx-auto">
           <ColumnsSection
