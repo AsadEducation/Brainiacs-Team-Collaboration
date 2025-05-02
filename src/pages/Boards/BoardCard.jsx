@@ -56,7 +56,7 @@ const BoardCard = ({ board, onDelete, navigate, onEdit }) => {
             <img
               key={i}
               src={member.photoURL}
-              className="w-6 h-6 rounded-full border-2 border-white -ml-2"
+              className="w-6 h-6 rounded-full border-2 border-white"
               alt="member"
             />
           ))}
