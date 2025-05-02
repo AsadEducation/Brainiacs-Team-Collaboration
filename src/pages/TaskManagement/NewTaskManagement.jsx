@@ -33,15 +33,14 @@ export default function NewTaskManagement() {
   const [activeColumn, setActiveColumn] = useState(null);
   const [activeTask, setActiveTask] = useState(null);
   const [isAddingList, setIsAddingList] = useState(false);
-  const {currentUser} = useAuth();
-
+  const { currentUser } = useAuth();
 
 
   //activity object [asad]
 
   const activityObject = {
     currentUser,
-    boardId:id,
+    boardId: id,
   }
 
 
@@ -148,8 +147,9 @@ export default function NewTaskManagement() {
         logActivity({
           entity: "Column",
           action: 'Add',
-          columnId ,
+          columnId,
           columnTittle,
+          ...activityObject
         })
       })
       .catch(err => {
@@ -160,6 +160,7 @@ export default function NewTaskManagement() {
   }
   const updateColumn = (id, tittle) => {
     const columnInfo = { id, tittle }
+
     const newColumn = currentColumns.map(col => {
       if (col.id !== id) return col;
       return { ...col, tittle }
@@ -170,12 +171,11 @@ export default function NewTaskManagement() {
         console.log("Column Name is updated", res)
         // logging the update of column
         logActivity({
-          entity: "Column",
+          entity: "ColumnName",
           action: 'Update',
-          columnId : id,
-          columnTittle:tittle,
-          boardId:id,
-          currentUser,
+          columnId: id,
+          columnTittle: tittle,
+          ...activityObject
         })
       })
       .catch(err => {
@@ -185,9 +185,10 @@ export default function NewTaskManagement() {
   const createTask = (e, columnId, columnTittle, setIsAddingTask) => {
     e.preventDefault();
     const tittle = e.target.taskTittle.value;
+    const taskId = generateId();
     console.log(tittle, "tittle")
     const newTask = {
-      id: tittle + generateId(),
+      id: taskId,
       type: "Task",
       boardId: id,
       columnId,
@@ -200,6 +201,16 @@ export default function NewTaskManagement() {
     axiosPublic.post("tasks", { ...newTask, order: tasks.length + 1 })
       .then(res => {
         console.log("task post response", res.data)
+        //logging the creation of new task
+        logActivity({
+          ...activityObject,
+          entity: "Task",
+          action: 'Add',
+          taskId,
+          taskTittle: tittle,
+          columnId,
+          columnTittle
+        })
       })
       .catch(err => {
         console.log("task post error", err)
@@ -344,7 +355,7 @@ export default function NewTaskManagement() {
 
 
   const onDragStart = event => {
-    console.log("event",event)
+    console.log("event", event)
     setTimeout(() => {
       if (event.active.data.current?.type === "Column") {
         setActiveColumn({ id: event.active.data.current?.id, tittle: event.active.data.current?.tittle, type: "Column" })
@@ -358,7 +369,7 @@ export default function NewTaskManagement() {
 
     setActiveColumn(null)
     setActiveTask(null)
-    const { active, over } = event; console.log('active task',active);
+    const { active, over } = event; console.log('active task', active);
     if (!over) return;
     const activeId = active.id;
     const overId = over.id;
@@ -432,12 +443,11 @@ export default function NewTaskManagement() {
           logActivity({
             entity: "Task",
             action: 'Move',
-            taskId: active?.data?.current?._id,
-            taskTittle:active?.data?.current?.taskTittle,
-            boardId:active?.data?.current?.boardId,
-            currentUser,
+            taskId: active?.data?.current?.id,
+            taskTittle: active?.data?.current?.taskTittle,
             columnBeforeMove,
-            columnAfterMove
+            columnAfterMove,
+            ...activityObject
           })
         })
         .catch(console.error);
@@ -467,12 +477,11 @@ export default function NewTaskManagement() {
           logActivity({
             entity: "Task",
             action: 'Move',
-            taskId: active?.data?.current?._id,
-            taskTittle:active?.data?.current?.taskTittle,
-            boardId:active?.data?.current?.boardId,
-            currentUser,
+            taskId: active?.data?.current?.id,
+            taskTittle: active?.data?.current?.taskTittle,
             columnBeforeMove,
-            columnAfterMove
+            columnAfterMove,
+            ...activityObject
           })
         })
         .catch(console.error);
@@ -489,6 +498,7 @@ export default function NewTaskManagement() {
 
   const handleColumnDelete = (column) => {
     console.log("column delete request for id :", column.id)
+    console.log("checking column name before delete", column);
     setCurrentColumns(() => {
       const newCurrentColumn = currentColumns.filter(col => col.id != column.id)
       return newCurrentColumn;
@@ -496,7 +506,15 @@ export default function NewTaskManagement() {
     axiosPublic.delete(`/columns?id=${column.id}`)
       .then(res => {
         console.log("Column Deleted", res)
-        //write the logic for delete  activity [Asad]
+        //logging the activity of column delete 
+        logActivity({
+          entity: "Column",
+          action: 'Delete',
+          columnId: column?.id,
+          columnTittle: column?.tittle,
+          ...activityObject
+        })
+
       })
       .catch(err => {
         console.log("Column Delete Failed", err)
