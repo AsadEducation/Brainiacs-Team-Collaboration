@@ -4,6 +4,7 @@ const PollCreationModal = ({
   isOpen,
   onClose,
   onCreate,
+  currentUser, // Accept currentUser as a prop
 }) => {
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState(["", ""]);
@@ -31,7 +32,7 @@ const PollCreationModal = ({
     const pollData = {
       question,
       options: options.map((text) => ({ text: text.trim(), votes: [] })),
-      createdBy: "currentUser._id", // Replace with actual user ID
+      createdBy: currentUser._id, // Use the actual user ID
     };
 
     onCreate(pollData); // Call the onCreate function

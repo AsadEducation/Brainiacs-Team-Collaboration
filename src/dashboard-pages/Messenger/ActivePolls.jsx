@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Swal from "sweetalert2"; // Import SweetAlert2
-import PollCreationModal from "./PollCreationModal";
 import { IoTrashBin } from "react-icons/io5";
 import { FaArrowUpRightDots, FaMinus } from "react-icons/fa6";
 
@@ -15,6 +14,36 @@ const ActivePolls = ({
 }) => {
   const [isPollModalOpen, setPollModalOpen] = useState(false);
   const [activePollId, setActivePollId] = useState(null);
+  const [remainingTimes, setRemainingTimes] = useState({}); // State to track remaining times
+
+  useEffect(() => {
+    const updateRemainingTimes = () => {
+      const now = new Date();
+      const updatedTimes = polls.reduce((acc, poll) => {
+        const expiresAt = new Date(poll.expiresAt);
+        const remainingTime = Math.max(0, expiresAt - now); // Ensure non-negative time
+        acc[poll._id] = remainingTime;
+        return acc;
+      }, {});
+      setRemainingTimes(updatedTimes);
+    };
+
+    updateRemainingTimes(); // Initial calculation
+    const interval = setInterval(updateRemainingTimes, 1000); // Update every second
+
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, [polls]);
+
+  const formatTime = (milliseconds) => {
+    const seconds = Math.floor((milliseconds / 1000) % 60);
+    const minutes = Math.floor((milliseconds / (1000 * 60)) % 60);
+    const hours = Math.floor((milliseconds / (1000 * 60 * 60)) % 24);
+    const days = Math.floor(milliseconds / (1000 * 60 * 60 * 24));
+
+    return `${days > 0 ? `${days}d ` : ""}${hours > 0 ? `${hours}h ` : ""}${
+      minutes > 0 ? `${minutes}m ` : ""
+    }${seconds}s`;
+  };
 
   const handleVoteToggle = async (pollId, optionIndex, hasVoted) => {
     if (!currentUser?._id) {
@@ -59,10 +88,10 @@ const ActivePolls = ({
     <div className="pt-2">
       {polls.map((poll) => (
         <div key={poll._id} className="poll-card mb-4">
-          <div className="flex items-center justify-between ">
-            <h3 className="text-sm font-bold">Active Polls </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-bold">Active Polls</h3>
             <button
-              className=" underline transition p-2 rounded-lg hover:bg-gray-200 cursor-pointer"
+              className="underline transition p-2 rounded-lg hover:bg-gray-200 cursor-pointer"
               onClick={() =>
                 setActivePollId(activePollId === poll._id ? null : poll._id)
               }
@@ -78,6 +107,12 @@ const ActivePolls = ({
             <ul className="mt-2 space-y-2">
               <div className="flex justify-between items-center">
                 <p className="font-medium">{poll.question}</p>
+                <p className="text-xs text-gray-500">
+                  Time remaining:{" "}
+                  {remainingTimes[poll._id]
+                    ? formatTime(remainingTimes[poll._id])
+                    : "Expired"}
+                </p>
                 {currentUser?._id === poll.createdBy && (
                   <button
                     className="text-red-500 hover:text-red-700 text-xl transition"
@@ -87,6 +122,7 @@ const ActivePolls = ({
                   </button>
                 )}
               </div>
+
               {poll.options.map((option, index) => {
                 const hasVoted = option.votes.some(
                   (vote) => vote.userId === currentUser?._id

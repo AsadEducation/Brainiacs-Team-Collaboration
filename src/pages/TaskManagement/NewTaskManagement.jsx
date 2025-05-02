@@ -13,6 +13,8 @@ import { arrayMove } from "@dnd-kit/sortable";
 import logActivity from "../../utils/activity/activityLogger";
 
 import Swal from "sweetalert2"; // Import SweetAlert2
+import { toast } from "react-toastify"; // Import react-toastify
+import { io } from "socket.io-client"; // Import socket.io-client
 import useAuth from "../../Hooks/useAuth";
 
 Modal.setAppElement("#root");
@@ -21,6 +23,7 @@ export default function NewTaskManagement() {
   const { id } = useParams();
   const location = useLocation();
   const [board, setBoard] = useState(null);
+  const socket = useRef(null); // Initialize socket reference
   const [members, setMembers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -34,7 +37,6 @@ export default function NewTaskManagement() {
   const [activeTask, setActiveTask] = useState(null);
   const [isAddingList, setIsAddingList] = useState(false);
   const { currentUser } = useAuth();
-
 
   //activity object [asad]
 
@@ -61,6 +63,12 @@ export default function NewTaskManagement() {
             text: "The requested board does not exist or has been deleted.",
           });
           setBoard(null); // Clear the board state
+        } else if (error.response?.status === 400) {
+          Swal.fire({
+            icon: "error",
+            title: "Invalid Board ID",
+            text: "The provided board ID is invalid. Please check and try again.",
+          });
         } else {
           Swal.fire({
             icon: "error",
@@ -74,6 +82,39 @@ export default function NewTaskManagement() {
     fetchBoardData();
   }, [id]); // Ensure this runs whenever the `id` changes
   // siam vai's code ends here
+
+  useEffect(() => {
+    // Connect to WebSocket server
+    socket.current = io(`${import.meta.env.VITE_API_URL}`, {
+      transports: ["websocket"],
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+    });
+
+    // Connection status logging
+    socket.current.on("connect", () => {
+      console.log("Socket connected");
+    });
+
+    socket.current.on("disconnect", () => {
+      console.log("Socket disconnected");
+    });
+
+    // Identify the user to the server when connected
+    socket.current.on("connect", () => {
+      if (currentUser?.email) {
+        socket.current.emit("identify", currentUser.email);
+        console.log(`Identified as ${currentUser.email}`);
+      }
+    });
+
+    return () => {
+      if (socket.current) {
+        socket.current.disconnect();
+      }
+    };
+  }, [currentUser]);
 
   // this state contains the column lists
   const {
@@ -220,69 +261,43 @@ export default function NewTaskManagement() {
 
   //   siam vai's code starts here
   const addMember = async (member) => {
-    if (!member.userId) {
-      console.error("Invalid member data:", member);
-      Swal.fire({
-        icon: "error",
-        title: "Invalid Member",
-        text: "Invalid member data. Please ensure the user has a valid ID.",
-      });
-      return;
-    }
-
-    // Restrict normal users from adding more than 4 members
-    if (members.length >= 4) {
-      Swal.fire({
-        icon: "warning",
-        title: "Limit Reached",
-        text: "You cannot add more than 4 members to this board.",
-      });
-      return;
-    }
-
-    // Prevent duplicate members
-    if (members.some((m) => m.userId === member.userId)) {
-      Swal.fire({
-        icon: "warning",
-        title: "Duplicate Member",
-        text: "This member is already added!",
-      });
-      return;
-    }
-
-    const updatedMembers = [
-      ...members,
-      { userId: member.userId, role: "member" },
-    ];
-    setMembers(updatedMembers);
+    console.log("Sending join request with payload:", {
+      boardId: id,
+      boardName: board?.name,
+      senderId: currentUser?._id,
+      senderName: currentUser?.displayName,
+      senderPhotoURL: currentUser?.photoURL,
+      receiverName: member.displayName || member.name, // Correctly using receiverName
+      receiverPhotoURL: member.photoURL, // Correctly using receiverPhotoURL
+      receiverId: member.userId,
+      receiverEmail: member.email,
+    });
 
     try {
-      const validMembers = updatedMembers.map((m) => ({
-        userId: m.userId.toString(), // Ensure userId is a string
-        role: m.role || "member", // Default role
-      }));
-
-      await axiosPublic.put(`/boards/${id}`, { members: validMembers }); // Ensure `id` is correct
-      console.log("Member added successfully");
-
-      // Refetch the board data to update the UI
-      const response = await axiosPublic.get(`/boards/${id}`);
-      setBoard(response.data);
-      setMembers(response.data.members || []);
-
-      // Show success message
-      Swal.fire({
-        icon: "success",
-        title: "Member Added",
-        text: `${member.name} has been successfully added to the board!`,
+      const response = await axiosPublic.post("/join-requests", {
+        boardId: id,
+        boardName: board?.name,
+        senderId: currentUser?._id,
+        senderName: currentUser?.displayName,
+        senderPhotoURL: currentUser?.photoURL,
+        receiverName: member.displayName || member.name, // Correctly using receiverName
+        receiverPhotoURL: member.photoURL, // Correctly using receiverPhotoURL
+        receiverId: member.userId,
+        receiverEmail: member.email,
       });
+
+      const savedRequest = response.data;
+
+      // Emit the join request event to the receiver
+      socket.current.emit("join-request-sent", {
+        receiverEmail: member.email,
+        joinRequest: savedRequest,
+      });
+
+      toast.success(`Join request sent to ${member.name}.`);
     } catch (error) {
-      console.error("Error adding member to the board:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Failed to add member. Please check the data and try again.",
-      });
+      console.error("Error sending join request:", error);
+      toast.error("Failed to send join request. Please try again.");
     }
   };
 
@@ -340,7 +355,7 @@ export default function NewTaskManagement() {
 
       await addMember({
         userId: user.id,
-        name: user.name,
+        name: user.name || user.displayName,
         email: user.email,
         photoURL: user.photoURL,
 
@@ -417,6 +432,9 @@ export default function NewTaskManagement() {
       // Capture original and new columns BEFORE updating
       const columnBeforeMove = activeTask.columnTittle || "Backlog";
       const columnAfterMove = overTask.columnTittle || "Backlog";
+      // Capture original and new columns BEFORE updating
+      const columnBeforeMove = activeTask.columnTittle || "Backlog";
+      const columnAfterMove = overTask.columnTittle || "Backlog";
 
       // Update the task's position and column
       const updatedTasks = tasks.map(task => {
@@ -435,6 +453,7 @@ export default function NewTaskManagement() {
       const overIndex = tasks.findIndex(t => t.id === overId);
       const newTaskArray = arrayMove(updatedTasks, activeIndex, overIndex);
 
+      setTasks(newTaskArray);
       setTasks(newTaskArray);
 
       axiosPublic.put("/tasks", newTaskArray)
@@ -457,6 +476,10 @@ export default function NewTaskManagement() {
     if (isActiveTask && isOverAColumn) {
       const columnBeforeMove = activeTask.columnTittle || "Backlog";
       const columnAfterMove = over.data.current?.tittle || "New Column";
+    // Scenario 2: Dropping a Task over a Column
+    if (isActiveTask && isOverAColumn) {
+      const columnBeforeMove = activeTask.columnTittle || "Backlog";
+      const columnAfterMove = over.data.current?.tittle || "New Column";
 
       const updatedTasks = tasks.map(task => {
         if (task.id === activeId) {
@@ -469,6 +492,7 @@ export default function NewTaskManagement() {
         return task;
       });
 
+      setTasks(updatedTasks);
       setTasks(updatedTasks);
 
       axiosPublic.put("/tasks", updatedTasks)
@@ -488,6 +512,13 @@ export default function NewTaskManagement() {
     }
   };
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 3,
+      },
+    })
+  );
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {

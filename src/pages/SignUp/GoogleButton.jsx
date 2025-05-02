@@ -20,29 +20,22 @@ const GoogleButton = () => {
                     role: "user",
                     photoURL: user.photoURL || null,
                 };
-
-                fetch("http://localhost:5000/users", {
+console.log("Google User:", newUser);
+                fetch(`${import.meta.env.VITE_API_URL}/users`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify(newUser),
                 })
-                    .then(response => {
-                        if (response.status === 400) {
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.message === "User already exists") {
                             console.log("User already exists in the database.");
                             Swal.fire("Successfully Logged in").then(() => {
                                 navigate("/dashboard");
                             });
-                            return;
-                        }
-                        if (!response.ok) {
-                            throw new Error("Failed to save user to the database");
-                        }
-                        return response.json();
-                    })
-                    .then(result => {
-                        if (result) {
+                        } else {
                             console.log("Google User Added to DB:", result);
                             Swal.fire("Successfully Logged in").then(() => {
                                 navigate("/dashboard");
