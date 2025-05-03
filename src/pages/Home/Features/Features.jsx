@@ -1,5 +1,10 @@
 import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import Lottie from "lottie-react";
+import realTimeAnimation from "../../../assets/realtime.json"; // Update with the correct path
+import fileShareAnimation from "../../../assets/fileshare.json"; // Update with the correct path
+import chatVideoAnimation from "../../../assets/chat&video.json"; // Update with the correct path
+import taskManagementAnimation from "../../../assets/taskmanagement.json"; // Update with the correct path
 import "./Features.css";
 const featuresData = [
   {
@@ -38,32 +43,59 @@ const fadeVariants = {
 };
 export default function Features() {
   return (
-    <section className="px-6 h-screen overflow-y-scroll scroll-smooth snap-y snap-mandatory scrollbar-hide">
-      {featuresData.map((feature) => (
+    <section className="px-6 py-8 space-y-6">
+      {featuresData.map((feature, index) => (
         <motion.div
           key={feature.id}
-          className="snap-start grid grid-cols-1 md:grid-cols-2 items-center h-screen px-4"
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+          className={`flex items-center justify-between p-6 rounded-lg shadow-lg h-screen flex-col sm:${
+            index % 2 === 0 ? "flex-row" : "flex-row-reverse"
+          }`}
+          initial={{ opacity: 0, scale: 0.8 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          viewport={{ once: false, amount: 0.5 }}
+          transition={{ duration: 0.8, type: "spring" }}
         >
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ duration: 0.6 }}
-            className="mx-auto h-[50%] w-[50%] flex items-center justify-center"
+            className="flex-1 w-full max-w-xs sm:max-w-sm lg:max-w-md items-center justify-center"
           >
-            <img
-              src={feature.image}
-              alt={feature.title}
-              className="w-full h-full object-cover rounded-2xl shadow-lg"
-            />
+            <div>
+              {feature.id === 1 ? (
+                <Lottie
+                  animationData={realTimeAnimation}
+                  className="w-full h-auto"
+                />
+              ) : feature.id === 2 ? (
+                <Lottie
+                  animationData={fileShareAnimation}
+                  className="w-full h-auto"
+                />
+              ) : feature.id === 3 ? (
+                <Lottie
+                  animationData={chatVideoAnimation}
+                  className="w-full h-auto"
+                />
+              ) : feature.id === 4 ? (
+                <Lottie
+                  animationData={taskManagementAnimation}
+                  className="w-full h-auto"
+                />
+              ) : (
+                <img
+                  src={feature.image}
+                  alt={feature.title}
+                  className="w-full h-auto object-cover rounded-lg shadow-md"
+                />
+              )}
+            </div>
           </motion.div>
-          <div className=" space-y-4 text-center md:text-left">
-            <h3 className="text-2xl md:text-3xl font-bold">{feature.title}</h3>
-            <p className=" text-base md:text-lg">{feature.description}</p>
-            <button className="mt-4 text-blue-800 hover:text-blue-300 transition">
+          <div className="flex-1 ml-6">
+            <h3 className="text-3xl sm:text-4xl font-bold">{feature.title}</h3>
+            <p className="text-lg sm:text-xl mt-4">{feature.description}</p>
+            <button className="mt-6 text-blue-800 hover:text-blue-300 transition text-lg sm:text-xl">
               Learn more →
             </button>
           </div>

@@ -6,9 +6,10 @@ const MessengerHeader = ({
   selectedBoard,
   showOptions,
   setShowOptions,
-  createPoll,
   messages,
   onScrollToMessage,
+  toggleBoardDropdown, // Add toggleBoardDropdown as a prop
+  showBoardDropdown, // Add showBoardDropdown as a prop
 }) => {
   const optionsRef = useRef(null);
   const [showSearch, setShowSearch] = useState(false);
@@ -39,19 +40,27 @@ const MessengerHeader = ({
 
   return (
     <motion.div
-      className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 pb-4 border-b border-gray-300"
+      className="flex sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 p-4 border-b border-gray-300"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <motion.h2
-        className="text-lg sm:text-xl font-bold text-primary mb-2 sm:mb-0"
+      <motion.div
+        className="flex items-center gap-2"
         initial={{ scale: 0.8 }}
         animate={{ scale: 1 }}
         transition={{ duration: 0.3 }}
       >
-        {selectedBoard.name}
-      </motion.h2>
+        <h2 className="text-lg sm:text-xl font-bold text-primary mb-2 sm:mb-0">
+          {selectedBoard.name}
+        </h2>
+        <button
+          className="text-primary hover:text-secondary p-2"
+          onClick={toggleBoardDropdown}
+        >
+          {showBoardDropdown ? "▲" : "▼"}
+        </button>
+      </motion.div>
       <motion.div
         className="flex items-center gap-2 sm:gap-4"
         initial={{ opacity: 0 }}
@@ -109,12 +118,6 @@ const MessengerHeader = ({
               transition={{ duration: 0.3 }}
             >
               <ul className="py-2">
-                <li
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer transition duration-200"
-                  onClick={createPoll}
-                >
-                  Create Poll
-                </li>
                 <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer transition duration-200">
                   Set Nickname
                 </li>
