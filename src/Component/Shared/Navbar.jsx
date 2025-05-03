@@ -233,6 +233,7 @@ const Navbar = () => {
               <li className="mb-1">
                 <Link
                   to="/"
+                  onClick={() => setIsOpen(false)}
                   className="block p-4 text-sm font-semibold text-primary hover:bg-blue-50 hover:text-secondary rounded"
                 >
                   Home
@@ -241,6 +242,7 @@ const Navbar = () => {
               <li className="mb-1">
                 <Link
                   to="/about"
+                  onClick={() => setIsOpen(false)}
                   className="block p-4 text-sm font-semibold text-primary hover:bg-blue-50 hover:text-secondary rounded"
                 >
                   About Us
@@ -249,6 +251,7 @@ const Navbar = () => {
               <li className="mb-1">
                 <Link
                   to="/services"
+                  onClick={() => setIsOpen(false)}
                   className="block p-4 text-sm font-semibold text-primary hover:bg-blue-50 hover:text-secondary rounded"
                 >
                   Services
@@ -257,21 +260,26 @@ const Navbar = () => {
               <li className="mb-1">
                 <Link
                   to="/pricing"
+                  onClick={() => setIsOpen(false)}
                   className="block p-4 text-sm font-semibold text-primary hover:bg-blue-50 hover:text-secondary rounded"
                 >
                   Pricing
                 </Link>
               </li>
-              {/* <li className="mb-1">
-                <Link to="/contact" className="block p-4 text-sm font-semibold text-primary hover:bg-blue-50 hover:text-secondary rounded">
-                  Contact
+              <li className="mb-1">
+                <Link
+                  to="/dashboard"
+                  onClick={() => setIsOpen(false)}
+                  className="block p-4 text-sm font-semibold text-primary hover:bg-blue-50 hover:text-secondary rounded"
+                >
+                  Dashboard
                 </Link>
-              </li> */}
+              </li>
             </ul>
             <div className="mt-auto">
               <div className="pt-6">
                 {currentUser ? (
-                  <Link to="/profile" className="flex items-center mb-4">
+                  <Link to="/dashboard/myProfile" className="flex items-center mb-4">
                     <img
                       className="w-10 h-10 rounded-full mr-3"
                       src={currentUser.photoURL || userimage}

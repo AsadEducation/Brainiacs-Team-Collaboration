@@ -45,7 +45,7 @@ const Banner = () => {
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 1 }}
-          className="backdrop-blur-[calc(xs/2)] bg-black/5 rounded-2xl p-4 md:p-8 w-sm md:w-3xl text-center text-white shadow-xl"
+          className="backdrop-blur-[calc(xs/2)] bg-black/5 rounded-2xl p-4 md:p-8 w-sm md:w-6xl text-center text-white shadow-lg"
         >
           <TypeAnimation
             sequence={[

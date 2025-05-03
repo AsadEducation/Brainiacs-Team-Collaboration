@@ -40,16 +40,15 @@ const Statistics = () => {
   const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
 
   return (
-    <section className="px-4 sm:px-6 py-12 sm:py-20 ">
+    <section className="px-4 sm:px-6 py-12 sm:py-20 w-full">
       <div className="max-w-7xl mx-auto text-center space-y-4 mb-20 sm:mb-16">
         <h2 className="text-3xl sm:text-4xl font-bold">
-          Why <span className="text-secondary">Teams Trust Brainiacs</span>
+          <span className="text-secondary"> Why Teams Trust Brainiacs</span>
         </h2>
         <p className="text-base sm:text-lg max-w-md sm:max-w-xl mx-auto">
           Empower your team with faster workflows, better communication, and
           global collaboration.
         </p>
-        
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
         {statsData.map((item, index) => (
@@ -64,11 +63,11 @@ const Statistics = () => {
               glareEnable={true}
               glareMaxOpacity={0.2}
               scale={1.05}
-              className="w-full"
+              className="w-full h-full"
             >
               <div
                 ref={ref}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 p-6 sm:p-8 rounded-2xl shadow-xl text-center space-y-4 hover:shadow-2xl transition duration-300"
+                className="bg-white/10 backdrop-blur-lg border border-white/20 p-6 sm:p-8 rounded-2xl shadow-xl text-center space-y-4 hover:shadow-2xl transition duration-300 flex flex-col justify-between h-full"
               >
                 <div className="flex items-center justify-center">
                   {item.icon}
